@@ -33,10 +33,7 @@ const Context = createContext<{
   chat: UseChatHelpers<ChatUIMessage>;
 } | null>(null);
 
-export function AISearchPanelHeader({
-  className,
-  ...props
-}: ComponentProps<"div">) {
+function AISearchPanelHeader({ className, ...props }: ComponentProps<"div">) {
   const { setOpen } = useAISearchContext();
 
   return (
@@ -55,6 +52,7 @@ export function AISearchPanelHeader({
       </div>
 
       <button
+        type="button"
         aria-label="Close"
         tabIndex={-1}
         className={cn(
@@ -72,7 +70,7 @@ export function AISearchPanelHeader({
   );
 }
 
-export function AISearchInputActions() {
+function AISearchInputActions() {
   const { messages, status, setMessages, regenerate } = useChatContext();
   const isLoading = status === "streaming";
 
@@ -296,7 +294,7 @@ function Message({
   }
 
   return (
-    <div onClick={(e) => e.stopPropagation()} {...props}>
+    <div {...props}>
       <p
         className={cn(
           "mb-1 text-sm font-medium text-fd-muted-foreground",
@@ -401,7 +399,9 @@ export function AISearchPanel() {
         }`}
       </style>
       <Presence present={open}>
-        <div
+        <button
+          type="button"
+          aria-label="Close AI chat"
           data-state={open ? "open" : "closed"}
           className="fixed inset-0 z-30 backdrop-blur-xs bg-fd-overlay data-[state=open]:animate-fd-fade-in data-[state=closed]:animate-fd-fade-out lg:hidden"
           onClick={() => setOpen(false)}
@@ -434,7 +434,7 @@ export function AISearchPanel() {
   );
 }
 
-export function AISearchPanelList({
+function AISearchPanelList({
   className,
   style,
   ...props
@@ -455,7 +455,7 @@ export function AISearchPanelList({
       {messages.length === 0 ? (
         <div className="text-sm text-fd-muted-foreground/80 size-full flex flex-col items-center justify-center text-center gap-2">
           <MessageCircleIcon fill="currentColor" stroke="none" />
-          <p onClick={(e) => e.stopPropagation()}>Start a new chat below.</p>
+          <p>Start a new chat below.</p>
         </div>
       ) : (
         <div className="flex flex-col px-3 gap-4">
@@ -468,7 +468,7 @@ export function AISearchPanelList({
   );
 }
 
-export function useHotKey() {
+function useHotKey() {
   const { open, setOpen } = useAISearchContext();
 
   const onKeyPress = useEffectEvent((e: KeyboardEvent) => {
@@ -489,10 +489,16 @@ export function useHotKey() {
   }, []);
 }
 
-export function useAISearchContext() {
-  return use(Context)!;
+function useAISearchContext() {
+  const context = use(Context);
+
+  if (!context) {
+    throw new Error("useAISearchContext must be used within AISearch");
+  }
+
+  return context;
 }
 
 function useChatContext() {
-  return use(Context)!.chat;
+  return useAISearchContext().chat;
 }
