@@ -1,10 +1,25 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
-import { appName, gitConfig } from "./shared";
+import Image from "next/image";
+import { gitConfig } from "./shared";
 
 export function baseOptions(): BaseLayoutProps {
   return {
     nav: {
-      title: appName,
+      title: (
+        <span className="group inline-flex items-center gap-2.5">
+          <Image
+            src="/eve-logo-only.svg"
+            alt=""
+            aria-hidden="true"
+            width={22}
+            height={22}
+            className="h-auto w-auto shrink-0 transition-transform duration-200 ease-out group-hover:scale-110"
+          />
+          <span className="text-sm font-semibold tracking-tight">
+            Everstrat.xyz | Docs
+          </span>
+        </span>
+      ),
     },
     githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
   };
