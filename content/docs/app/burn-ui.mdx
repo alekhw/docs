@@ -1,0 +1,25 @@
+---
+title: Burn UI
+description: Approval, burn submission, queued-request blocking, and cancellation in the live app.
+---
+
+## Burn UX Responsibilities
+
+- check EVE allowance
+- prepare `approve(...)` when needed
+- simulate `AMM.exit(...)`
+- block duplicate current-batch queued burns
+- expose cancellation when protocol rules allow it
+
+## Current Write Shapes
+
+```solidity
+EVE.approve(AMM, burnAmount)
+AMM.exit(requestedEth, burnAmount, burnPriceTolerance)
+AMM.cancelRedemption(batchId)
+```
+
+## Important Detail
+
+The pending-request block is based on direct contract reads into the current batch, not on
+subgraph-only state.

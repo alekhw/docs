@@ -1,0 +1,8 @@
+{
+  "title": "Risk",
+  "icon": "TriangleAlert",
+  "pages": [
+    "key-risks-and-assumptions",
+    "smart-contract-and-operational-trust-model"
+  ]
+}

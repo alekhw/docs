@@ -1,0 +1,32 @@
+---
+title: EVE
+description: The immutable ERC-20 token contract for Everything Strategy.
+---
+
+## Purpose
+
+`EVE` is the protocol token. It is an immutable ERC-20 with role-based mint and burn privileges.
+
+## Key Properties
+
+| Item | Value |
+| --- | --- |
+| Name | `Everything Strategy` |
+| Symbol | `EVE` |
+| Decimals | `18` |
+| Upgradeability | none |
+| Role of interest | `MINTER_ROLE` |
+
+## Key Functions
+
+```solidity
+function mint(address to, uint256 amount) external
+function burn(uint256 amount) external
+function burnFrom(address account, uint256 amount) external
+```
+
+## Integration Notes
+
+- AMM receives `MINTER_ROLE`.
+- Approval events from EVE are indexed because the frontend burn flow depends on `approve(...)`.
+- The subgraph filters approval activity to approvals where `spender == AMM`.

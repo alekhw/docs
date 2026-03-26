@@ -1,0 +1,33 @@
+---
+title: Overview
+description: Contract map for the immutable core and the upgradeable management layer.
+---
+
+## Current Contract Set
+
+| Contract | Type | Upgradeability | Primary role |
+| --- | --- | --- | --- |
+| `EVE` | token | immutable | ERC-20 supply surface for the protocol |
+| `AMM` | core | immutable | ETH entry and exit surface |
+| `Controller` | management | UUPS proxy | keeper coordinator and queue operator |
+| `ExitQueue` | management | UUPS proxy | queued redemption batches and request state |
+| `StrategyManager` | management | UUPS proxy | strategy registry, NAV, distribution, withdrawals |
+| `Oracle` | management | UUPS proxy | price feed registry and staleness controls |
+
+## Reading Strategy
+
+<Cards>
+  <Card title="EVE" href="/contracts/eve" />
+  <Card title="AMM" href="/contracts/amm" />
+  <Card title="Controller" href="/contracts/controller" />
+  <Card title="ExitQueue" href="/contracts/exit-queue" />
+  <Card title="StrategyManager" href="/contracts/strategy-manager" />
+  <Card title="Oracle" href="/contracts/oracle" />
+</Cards>
+
+## Design Split
+
+The repository uses a deliberate split:
+
+- immutable contracts for the direct user entry/exit surface
+- upgradeable contracts for operational control, queue state, oracle config, and strategy management

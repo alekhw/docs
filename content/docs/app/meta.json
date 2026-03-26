@@ -1,0 +1,13 @@
+{
+  "title": "App",
+  "icon": "AppWindow",
+  "pages": [
+    "overview",
+    "wallet-connection-and-supported-chain",
+    "mint-ui",
+    "burn-ui",
+    "slippage-model",
+    "account-details-and-activity-feed",
+    "transaction-modal-and-status-ux"
+  ]
+}

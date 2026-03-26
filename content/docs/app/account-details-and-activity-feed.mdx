@@ -1,0 +1,34 @@
+---
+title: Account details and activity feed
+description: The wallet-specific account dialog, GoldSky-backed profile data, and lifecycle mapping in the activity feed.
+---
+
+## What The Dialog Shows
+
+- formatted address and explorer link
+- chain and connector metadata
+- aggregate totals
+- recent protocol activity
+- queued burn cancellation where available
+
+## Data Sources
+
+| Source | Used for |
+| --- | --- |
+| wagmi / RainbowKit | wallet and chain metadata |
+| GoldSky subgraph | profile aggregates and activity history |
+| direct contract write path | cancel queued burn |
+
+## Activity States
+
+The mapper supports:
+
+- `APPROVE`
+- `BOOTSTRAP_MINT`
+- `MINT`
+- `BURN_IMMEDIATE`
+- `BURN_QUEUED`
+- `BURN_PROCESSED`
+- `CANCEL_REDEMPTION`
+
+Rendered outcomes include filled, queued, failed, and canceled burn states.

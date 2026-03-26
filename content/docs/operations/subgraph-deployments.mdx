@@ -1,0 +1,29 @@
+---
+title: Subgraph deployments
+description: Current GoldSky endpoint, deployment naming pattern, and the config snapshot used by the subgraph workspace.
+---
+
+## Public Endpoint
+
+`https://api.goldsky.com/api/public/project_cm7aaq2gvh5ak01wf890nferb/subgraphs/everything-strategy/v0.1.4/gn`
+
+## Versioning Pattern
+
+The repository examples use versioned deployment names such as:
+
+- `everything-strategy/v0.1.0`
+- `everything-strategy/v0.1.1`
+- `everything-strategy/v0.1.4`
+
+## Current Config Snapshot
+
+| Item | Value |
+| --- | --- |
+| Network | `arbitrum-sepolia` |
+| `startBlock` | `252617320` |
+| Config file | `subgraph/config/deployments/arbitrum-sepolia.json` |
+
+<Callout type="warn" title="Drift watch">
+  The subgraph README and `.env.example` history include older values. Operational truth should come
+  from the current deployment config and frontend config, not the oldest example in the repo.
+</Callout>

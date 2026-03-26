@@ -1,0 +1,49 @@
+---
+title: Overview
+description: The shortest path from first visit to understanding how the live app behaves on Arbitrum Sepolia.
+---
+
+## Before You Open The App
+
+The current web3 client is a single-chain app for **Arbitrum Sepolia**. It is not a generic
+multi-chain shell and it assumes the current contract snapshot from
+[`frontend-app/web3-app/src/config/index.ts`](https://github.com/Guide-DAO-Organization/hackerhouse/blob/feat/fumadocs-init/frontend-app/web3-app/src/config/index.ts).
+
+<Steps>
+  <Step>
+    Use a wallet supported by the RainbowKit and wagmi integration in the app.
+  </Step>
+  <Step>
+    Switch to Arbitrum Sepolia before attempting a mint or burn.
+  </Step>
+  <Step>
+    Treat the flow as a protocol redemption flow, not a DEX swap. Burns can settle immediately
+    or enter the queued exit lifecycle.
+  </Step>
+</Steps>
+
+## What Users Can Do Today
+
+<Cards>
+  <Card title="Connect wallet" href="/get-started/connect-wallet-and-supported-network" />
+  <Card title="Mint EVE" href="/get-started/first-mint" />
+  <Card title="Burn and redeem" href="/get-started/burn-and-redeem" />
+</Cards>
+
+## Mental Model
+
+<Tabs items={["Mint", "Burn"]}>
+  <Tab>
+    Users deposit native ETH through `AMM.enter(...)` and receive EVE. The frontend simulates
+    the write first and applies slippage to the minimum acceptable token output.
+  </Tab>
+  <Tab>
+    Users burn through `AMM.exit(...)`. If AMM liquidity is sufficient, redemption is immediate.
+    If not, the request is queued in `ExitQueue` and later depends on keeper pricing and processing.
+  </Tab>
+</Tabs>
+
+<Callout type="warn" title="Queued burn expectation">
+  A burn is not always final in one transaction. If your request enters the queue, the final
+  outcome depends on the batch price and your `priceTolerance`.
+</Callout>

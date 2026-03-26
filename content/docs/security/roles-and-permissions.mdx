@@ -1,0 +1,25 @@
+---
+title: Roles and permissions
+description: The active role model across EVE, AMM, Controller, ExitQueue, StrategyManager, and Oracle.
+---
+
+## Role Matrix
+
+| Role | Where it appears | Main power |
+| --- | --- | --- |
+| `DEFAULT_ADMIN_ROLE` | setup paths | bootstrap role assignment during initialization |
+| `ADMIN_ROLE` | AMM and upgradeable contracts | upgrades, pausing, strategy management, keeper grants |
+| `KEEPER_ROLE` | Controller | strategy operations and queue operations |
+| `CONTROLLER_ROLE` | AMM, ExitQueue, StrategyManager | processing or management privileges granted to Controller |
+| `AMM_ROLE` | ExitQueue | push, pull, and close queue requests |
+| `ORACLE_MANAGER_ROLE` | Oracle | manage price feeds |
+| `MINTER_ROLE` | EVE | mint and burn EVE |
+
+## Practical Assignments
+
+- AMM gets `MINTER_ROLE` on EVE.
+- Controller gets `CONTROLLER_ROLE` where queue and strategy operations require it.
+- Keeper accounts receive `KEEPER_ROLE` on Controller.
+- Oracle manager manages feed configuration on Oracle.
+
+Read also [Governance / roles, permissions, and admin powers](/governance/roles-permissions-and-admin-powers).

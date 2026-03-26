@@ -1,0 +1,30 @@
+---
+title: ExitQueue
+description: The upgradeable queue contract for redemption batches, slippage checks, and escape-hatch closure.
+---
+
+## Purpose
+
+`ExitQueue` tracks queued burn requests when immediate redemption is not possible.
+
+## Core Data
+
+- current batch id
+- request snapshot per user
+- priced batch metadata
+- processing eligibility
+
+## Core Rules
+
+<Steps>
+  <Step>AMM pushes requests into the current batch.</Step>
+  <Step>Controller prices the batch with a final EVE price.</Step>
+  <Step>AMM pulls requests and applies tolerance logic.</Step>
+  <Step>Users can close requests only when closure rules allow it.</Step>
+</Steps>
+
+## Timing Constant
+
+`MAX_BATCH_PROCESSING_TIME = 3 days`
+
+That constant matters because it gates the escape hatch after pricing.

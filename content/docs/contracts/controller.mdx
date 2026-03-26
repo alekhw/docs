@@ -1,0 +1,29 @@
+---
+title: Controller
+description: The upgradeable coordinator for keeper workflows, strategy management, and queue processing.
+---
+
+## Purpose
+
+`Controller` is the operational coordinator. It receives ETH from AMM, interacts with StrategyManager,
+and manages priced queue processing through keeper flows.
+
+## Main Powers
+
+- distribute ETH to strategies
+- withdraw or queue withdrawals from strategies
+- rebalance unhealthy strategies
+- price exit batches
+- process queued redemption requests
+
+## Role Model
+
+| Role | Meaning |
+| --- | --- |
+| `ADMIN_ROLE` | upgrade authorization and emergency functions |
+| `KEEPER_ROLE` | routine strategy and queue operations |
+
+## Important Integration Edge
+
+Controller does not directly replace AMM or ExitQueue. It receives operational privileges on those
+contracts through `CONTROLLER_ROLE`.

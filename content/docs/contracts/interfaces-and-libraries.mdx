@@ -1,0 +1,33 @@
+---
+title: Interfaces and libraries
+description: Interfaces and support libraries that define contract boundaries in the repository.
+---
+
+## Interfaces
+
+- `IAMM`
+- `IController`
+- `IEVE`
+- `IExitQueue`
+- `IOracle`
+- `IStrategy`
+- `IStrategyManager`
+
+## Why They Matter
+
+Interfaces formalize:
+
+- controller-to-manager coordination
+- AMM-to-queue coordination
+- strategy requirements for registration
+- oracle lookup expectations
+
+## Strategy Contract Boundary
+
+`IStrategy` is especially important because it defines:
+
+- metadata
+- safety level
+- withdrawal priority
+- ETH NAV reporting
+- deposit / withdraw / queue / rebalance hooks

@@ -1,0 +1,27 @@
+---
+title: Burn and redemption flow
+description: Immediate redemption versus queued redemption at the AMM boundary.
+---
+
+## Entry Point
+
+Burns originate from `AMM.exit(requestedEth, maxTokensToBurn, priceTolerance)`.
+
+<Tabs items={["Immediate redemption", "Queued redemption"]}>
+  <Tab>
+    If the AMM can satisfy the ETH request, the user receives ETH immediately and the lifecycle ends
+    in a single transaction.
+  </Tab>
+  <Tab>
+    If the AMM cannot satisfy the request, the AMM records a queue request in `ExitQueue` and emits
+    `RedemptionQueued`.
+  </Tab>
+</Tabs>
+
+## Why Slippage Matters More On Burn
+
+Burn slippage is not just a UI display guard. It becomes protocol `priceTolerance` for queued
+redemptions. If the keeper-priced batch falls outside that tolerance, the request can close instead
+of redeeming ETH.
+
+Read next: [Queued redemption lifecycle](/protocol/queued-redemption-lifecycle).

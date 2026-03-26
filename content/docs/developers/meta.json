@@ -1,0 +1,9 @@
+{
+  "title": "Developers",
+  "icon": "CodeXml",
+  "pages": [
+    "contract-addresses-and-deployments",
+    "events-entities-and-integrations",
+    "subgraph-and-data-access"
+  ]
+}

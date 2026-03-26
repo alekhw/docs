@@ -1,0 +1,22 @@
+---
+title: Entities
+description: The current GraphQL entity model used by the frontend and query examples.
+---
+
+## Current Entity Set
+
+| Entity | Purpose |
+| --- | --- |
+| `User` | aggregate wallet-level statistics |
+| `UserActivity` | append-only activity feed |
+| `ExitBatch` | batch-level queue state |
+| `RedemptionRequest` | per-user queued burn lifecycle snapshot |
+
+## Why It Works For The App
+
+The app needs both:
+
+- append-only chronological events
+- latest request snapshot state
+
+That is why `UserActivity` and `RedemptionRequest` coexist instead of collapsing into one record type.

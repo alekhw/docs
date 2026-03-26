@@ -1,0 +1,19 @@
+---
+title: Roles, permissions, and admin powers
+description: Governance-oriented view of who can upgrade, pause, configure, or process core flows.
+---
+
+## Admin Powers
+
+- authorize UUPS upgrades on management contracts
+- pause and unpause where supported
+- manage strategies on `StrategyManager`
+- grant `KEEPER_ROLE`
+- manage Oracle feed configuration through `ORACLE_MANAGER_ROLE`
+
+## Security Posture
+
+`DEFAULT_ADMIN_ROLE` is intended as a temporary setup role. The safer steady state is to rely on
+`ADMIN_ROLE` and narrower operational roles instead of leaving setup authority in place.
+
+For function-level detail, see [Roles and permissions](/security/roles-and-permissions).

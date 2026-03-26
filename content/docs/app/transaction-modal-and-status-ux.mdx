@@ -1,0 +1,21 @@
+---
+title: Transaction modal and status UX
+description: Shared status handling for network switching, confirmation, pending state, success, and errors.
+---
+
+## Shared Flow
+
+All protocol writes go through a shared transaction UX provider.
+
+## States
+
+<Steps>
+  <Step>switch network if required</Step>
+  <Step>request wallet confirmation</Step>
+  <Step>wait for on-chain confirmation</Step>
+  <Step>show success or error state</Step>
+</Steps>
+
+## Why It Matters
+
+This is where the app keeps mint, approval, burn, and cancel interactions behaviorally consistent.

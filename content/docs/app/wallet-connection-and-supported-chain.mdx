@@ -1,0 +1,16 @@
+---
+title: Wallet connection and supported chain
+description: Connection model, wrong-network handling, and how the app surfaces account state.
+---
+
+## Current Behavior
+
+- RainbowKit and wagmi provide the low-level connection state
+- the app is configured for Arbitrum Sepolia only
+- unsupported chains trigger a dedicated switch flow
+- connected users see a custom account dialog
+
+## Why The Single-Chain Assumption Matters
+
+The app is not built as a generic chain router. Several UX paths, contract addresses, and explorer
+links assume a single deployment snapshot.

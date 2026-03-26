@@ -1,0 +1,28 @@
+---
+title: Mint flow
+description: Protocol-level view of how ETH deposits become EVE through the AMM.
+---
+
+## Contract Path
+
+The live frontend submits `AMM.enter(minTokensToMint)` with native ETH.
+
+## Sequence
+
+<Steps>
+  <Step>User provides ETH and signs the transaction.</Step>
+  <Step>AMM validates paused state and pricing constraints.</Step>
+  <Step>If the protocol is not yet bootstrapped, the bootstrap path runs.</Step>
+  <Step>EVE is minted to the user and ETH moves into protocol custody.</Step>
+</Steps>
+
+## Pricing Notes
+
+- premium price is user-facing for mint UX
+- minimum output is protected by frontend slippage handling
+- oracle is not part of the normal enter execution path
+
+## Data Notes
+
+Mints appear in the subgraph as either `BOOTSTRAP_MINT` or `MINT`, and both update user aggregate
+deposit and minted-token totals.

@@ -1,0 +1,21 @@
+---
+title: Subgraph overview
+description: GoldSky-backed Graph workspace used for account history, queue snapshots, and user aggregates.
+---
+
+## What The Subgraph Exists To Do
+
+- index successful user actions initiated from the web3 app
+- track keeper-driven queue state transitions that happen after the user transaction
+- serve account profile data and activity history to the frontend
+
+## Mandatory Indexed Contracts
+
+- `AMM`
+- `ExitQueue`
+- `EVE`
+
+## Current Deployment Target
+
+The repository targets **Arbitrum Sepolia** and the current public endpoint is the GoldSky
+deployment under `everything-strategy/v0.1.4/gn`.

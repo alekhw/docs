@@ -1,0 +1,21 @@
+---
+title: Oracle
+description: The upgradeable price feed registry used for ETH-to-USD conversion and staleness checks.
+---
+
+## Purpose
+
+`Oracle` manages token price feed configuration and staleness validation.
+
+## Important Role
+
+`ORACLE_MANAGER_ROLE` can:
+
+- add token price feeds
+- update feed configuration
+- remove token configuration
+
+## Protocol Scope
+
+Oracle is important, but it is not on the hottest user flow path. The system deliberately keeps
+normal mint and burn execution ETH-native.

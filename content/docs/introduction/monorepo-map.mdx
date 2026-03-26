@@ -1,0 +1,30 @@
+---
+title: Monorepo map
+description: A contributor-oriented map of the workspaces that feed the docs site.
+---
+
+## Top-Level Map
+
+| Path | Responsibility |
+| --- | --- |
+| `frontend-app/landing` | Brand surface and product messaging |
+| `frontend-app/web3-app` | Wallet UX, mint/burn UX, activity feed, transaction flow |
+| `frontend-app/web3-app/subgraph` | GoldSky / Graph indexing workspace |
+| `frontend-app/everstrat-docs` | Public docs site |
+| `smart-contracts` | Protocol contracts, interfaces, tests, scripts |
+| `mermaid` | Architecture, role, and deployment diagrams |
+
+## Practical Reading Order
+
+<Steps>
+  <Step>Use landing files for tone and terminology.</Step>
+  <Step>Use smart contracts and tests for protocol truth.</Step>
+  <Step>Use the web3 app for current shipped behavior.</Step>
+  <Step>Use subgraph docs for entities, lifecycle indexing, and query examples.</Step>
+</Steps>
+
+## Drift Rules
+
+- When addresses change, docs must follow `web3-app/src/config/index.ts`.
+- When queue semantics change, docs must follow `smart-contracts` first and subgraph mapping second.
+- When the app ships new UX behavior, docs should describe the shipped path, not the old one.

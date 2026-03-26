@@ -1,0 +1,40 @@
+---
+title: What is Everstrat?
+description: Product framing for Everstrat and how it relates to Everything Strategy across the monorepo.
+---
+
+## Product Positioning
+
+The landing page positions the product as **Everything Strategy** with the promise:
+“one click to everything DeFi.”
+
+In the monorepo, that promise resolves into several concrete surfaces:
+
+- **smart contracts** that accept ETH, mint EVE, and manage redemptions
+- **a web3 app** that exposes mint, burn, and account history on Arbitrum Sepolia
+- **a subgraph** that turns raw protocol events into account and queue history
+- **docs** that explain how those surfaces relate
+
+## Naming
+
+This repository uses both **Everstrat** and **Everything Strategy**:
+
+- **Everything Strategy** is the product and token-facing name in the contracts and landing copy.
+- **Everstrat Docs** is the documentation surface for the same system.
+
+## What Users Actually Interact With
+
+Users do not interact with the full protocol stack directly. They mostly see:
+
+1. the wallet connection flow
+2. the mint or burn form
+3. transaction status UX
+4. account details and activity history
+
+The rest of the system exists to price, custody, distribute, redeem, and index those actions.
+
+<Callout type="idea" title="Use the docs in layers">
+  Start with [Get Started](/get-started/overview) if you need the product path. Jump to
+  [Protocol](/protocol/high-level-architecture) or [Contracts](/contracts/overview) if you need
+  implementation detail.
+</Callout>

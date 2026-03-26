@@ -1,0 +1,38 @@
+---
+title: High-level architecture
+description: The current contract and application architecture behind deposits, strategy management, redemptions, and indexing.
+---
+
+## Main Components
+
+| Layer | Components | Role |
+| --- | --- | --- |
+| Immutable core | `EVE`, `AMM` | Token mint/burn and user entry/exit surface |
+| Upgradeable management | `Controller`, `ExitQueue`, `StrategyManager`, `Oracle` | Strategy operations, queue state, NAV support, oracle support |
+| User interface | `web3-app` | Wallet, mint/burn flow, transaction UX, account details |
+| Data layer | GoldSky subgraph | Activity feed, request history, user aggregates |
+
+## Key Relationship
+
+<Tabs items={["User action", "Keeper action"]}>
+  <Tab>
+    Users interact primarily through `AMM.enter(...)`, `AMM.exit(...)`, and `AMM.cancelRedemption(...)`.
+  </Tab>
+  <Tab>
+    Keepers use Controller to price batches, process queued requests, and move funds across strategies.
+  </Tab>
+</Tabs>
+
+## Core Rule
+
+The hot path is **ETH-first**:
+
+- AMM price calculations are based on ETH NAV.
+- Oracle is not used for normal enter/exit execution.
+- Oracle is used for bootstrap USD validation and USD-denominated view functions.
+
+Read next:
+
+- [Mint flow](/protocol/mint-flow)
+- [Burn and redemption flow](/protocol/burn-and-redemption-flow)
+- [Strategy and NAV model](/protocol/strategy-and-nav-model)

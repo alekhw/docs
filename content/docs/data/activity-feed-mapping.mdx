@@ -1,0 +1,23 @@
+---
+title: Activity feed mapping
+description: How raw events become the account dialog's user-facing activity cards.
+---
+
+## Mapping Strategy
+
+The feed is event-first, not snapshot-first.
+
+## Why
+
+- queued burn rows need to be resolved against later terminal events
+- request snapshots alone are not enough to tell the full history
+- delayed indexing should not erase protocol chronology
+
+## Final UI States
+
+- `Approve / Confirmed`
+- `Mint / Filled`
+- `Burn / Queued`
+- `Burn / Filled`
+- `Burn / Failed`
+- `Burn / Canceled`

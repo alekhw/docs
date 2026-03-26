@@ -1,0 +1,20 @@
+{
+  "title": "Everstrat Docs",
+  "root": true,
+  "pages": [
+    "index",
+    "get-started",
+    "introduction",
+    "protocol",
+    "contracts",
+    "app",
+    "data",
+    "security",
+    "risk",
+    "governance",
+    "developers",
+    "operations",
+    "engineering",
+    "reference"
+  ]
+}

@@ -1,0 +1,31 @@
+---
+title: User lifecycle
+description: End-to-end lifecycle from connection to mint, burn, queued settlement, and indexed history.
+---
+
+## Lifecycle Stages
+
+<Steps>
+  <Step>Connect a wallet on Arbitrum Sepolia.</Step>
+  <Step>Mint EVE by depositing ETH into the AMM.</Step>
+  <Step>Hold or later burn EVE through the AMM redemption path.</Step>
+  <Step>If liquidity is insufficient, wait for queue pricing and processing or cancel when permitted.</Step>
+  <Step>Review outcome in the account dialog and activity feed.</Step>
+</Steps>
+
+## Indexed Outcomes
+
+The subgraph maps user-visible lifecycle events into:
+
+- `APPROVE`
+- `BOOTSTRAP_MINT`
+- `MINT`
+- `BURN_IMMEDIATE`
+- `BURN_QUEUED`
+- `BURN_PROCESSED`
+- `CANCEL_REDEMPTION`
+
+## Important Constraint
+
+The frontend only checks pending queue state in the **current batch** through direct RPC reads. The
+full historical picture comes from the subgraph, not from those live contract reads alone.

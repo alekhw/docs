@@ -1,0 +1,12 @@
+{
+  "title": "Protocol",
+  "icon": "Workflow",
+  "pages": [
+    "high-level-architecture",
+    "user-lifecycle",
+    "mint-flow",
+    "burn-and-redemption-flow",
+    "queued-redemption-lifecycle",
+    "strategy-and-nav-model"
+  ]
+}

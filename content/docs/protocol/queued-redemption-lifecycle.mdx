@@ -1,0 +1,46 @@
+---
+title: Queued redemption lifecycle
+description: The exact lifecycle for burns that cannot settle immediately in the AMM.
+---
+
+## Lifecycle Overview
+
+<Steps>
+  <Step>AMM pushes the request into `ExitQueue`.</Step>
+  <Step>The current batch later gets priced by Controller using the AMM base EVE price.</Step>
+  <Step>Queued requests are processed one by one or in ranges.</Step>
+  <Step>Each request either redeems within tolerance or closes due to slippage.</Step>
+  <Step>If the processing window expires, the user may cancel via the escape hatch.</Step>
+</Steps>
+
+## User Action vs Keeper Action
+
+<Tabs items={["User", "Keeper"]}>
+  <Tab>
+    User can create the queued request through `exit(...)` and later call `cancelRedemption(batchId)`
+    when closure rules allow it.
+  </Tab>
+  <Tab>
+    Keeper prices the batch through Controller and processes requests through AMM / ExitQueue
+    coordination.
+  </Tab>
+</Tabs>
+
+## Processing Window
+
+`ExitQueue.MAX_BATCH_PROCESSING_TIME` is **3 days**.
+
+Within that window after pricing:
+
+- requests must be processed
+- normal closure is blocked
+
+After that window:
+
+- users can close via escape hatch
+- the cancellation outcome is distinguishable in events and subgraph fields
+
+<Callout type="warn" title="Snapshot rule">
+  `ExitQueue.closeRequest()` emits `RequestClosed` after deleting storage. That is why the subgraph
+  must snapshot request fields when the request is first pushed, not at close time.
+</Callout>

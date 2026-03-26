@@ -1,0 +1,11 @@
+{
+  "title": "Data",
+  "icon": "Database",
+  "pages": [
+    "subgraph-overview",
+    "indexed-contracts-and-events",
+    "entities",
+    "activity-feed-mapping",
+    "query-examples"
+  ]
+}

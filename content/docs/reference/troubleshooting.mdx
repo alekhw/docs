@@ -1,0 +1,21 @@
+---
+title: Troubleshooting
+description: Common operational and product issues implied by the current architecture.
+---
+
+## Common Issues
+
+<Accordions type="single">
+  <Accordion title="My wallet connects but transactions do not start">
+    Check that you are on Arbitrum Sepolia and that the wallet flow completed the required network switch.
+  </Accordion>
+  <Accordion title="My burn is still pending">
+    If the request was queued, it depends on batch pricing and processing. Check whether cancellation is available.
+  </Accordion>
+  <Accordion title="The activity feed is incomplete">
+    Verify the GoldSky endpoint and allow for indexing delay. The frontend uses direct RPC only for a subset of current state.
+  </Accordion>
+  <Accordion title="Docs AI gives weak answers">
+    The assistant only works from local docs search results. If the topic is not yet documented, the correct fix is to improve content, not to force a generic answer.
+  </Accordion>
+</Accordions>

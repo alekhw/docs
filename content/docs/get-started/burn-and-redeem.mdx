@@ -1,0 +1,40 @@
+---
+title: Burn and redeem
+description: The live burn flow, including approval, immediate redemption, queued redemption, and cancellation.
+---
+
+## Burn Is A Redemption Flow
+
+The app does not model burn as a spot swap. It prepares protocol writes around `AMM.exit(...)`
+and `AMM.cancelRedemption(...)`.
+
+<Tabs items={["Immediate", "Queued"]}>
+  <Tab>
+    If AMM liquidity is sufficient, the burn settles immediately and the indexed outcome is
+    `BURN_IMMEDIATE`.
+  </Tab>
+  <Tab>
+    If liquidity is insufficient, the request is added to `ExitQueue`, later priced by a keeper,
+    and then processed or closed depending on tolerance and timing.
+  </Tab>
+</Tabs>
+
+## Current Frontend Behavior
+
+<Steps>
+  <Step>Check EVE balance, AMM allowance, base price, and current pending request state.</Step>
+  <Step>If allowance is insufficient, submit `EVE.approve(AMM, amount)` first.</Step>
+  <Step>Simulate `AMM.exit(requestedEth, maxTokensToBurn, priceTolerance)`.</Step>
+  <Step>If a pending queued request already exists in the current batch, block creating another one.</Step>
+</Steps>
+
+## Canceling A Pending Burn
+
+The app exposes `Cancel Pending Burn` only when the request can be closed under the protocol rules.
+That includes unpriced requests and escape-hatch closures after `MAX_BATCH_PROCESSING_TIME`.
+
+Read more in:
+
+- [Burn UI](/app/burn-ui)
+- [Queued redemption lifecycle](/protocol/queued-redemption-lifecycle)
+- [Failure and recovery scenarios](/security/failure-and-recovery-scenarios)

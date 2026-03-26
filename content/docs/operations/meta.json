@@ -1,0 +1,14 @@
+{
+  "title": "Operations",
+  "icon": "ServerCog",
+  "pages": [
+    "deployment-architecture",
+    "contract-deployment-sequence",
+    "current-deployments",
+    "smart-contract-addresses",
+    "subgraph-deployments",
+    "environment-variables",
+    "docs-app-runtime-configuration",
+    "subgraph-deployment"
+  ]
+}

@@ -1,0 +1,25 @@
+---
+title: Core concepts glossary
+description: Shared vocabulary used across the product, protocol, app, and data model.
+---
+
+## Terms
+
+| Term | Meaning |
+| --- | --- |
+| `EVE` | The protocol ERC-20 token, named “Everything Strategy” on-chain. |
+| `AMM` | The immutable contract that accepts ETH deposits and handles redemption attempts. |
+| `NAV` | Net asset value of the protocol, calculated in ETH first and converted to USD only when needed. |
+| `Connector weight` | AMM parameter used in premium-price calculations. |
+| `Immediate redemption` | Burn settles directly in the AMM because sufficient ETH is available. |
+| `Queued redemption` | Burn request is pushed into `ExitQueue` for later pricing and processing. |
+| `Batch pricing` | Keeper action that records the final EVE price for the current exit batch. |
+| `priceTolerance` | User slippage bound used to decide whether a queued request can settle. |
+| `Escape hatch` | Request closure path after `MAX_BATCH_PROCESSING_TIME` has passed. |
+| `KEEPER_ROLE` | Operational role on Controller used for strategy and queue workflows. |
+
+## Related References
+
+- [Reference glossary](/reference/glossary)
+- [Queued redemption lifecycle](/protocol/queued-redemption-lifecycle)
+- [Entities](/data/entities)

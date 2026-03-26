@@ -1,0 +1,17 @@
+---
+title: Indexed contracts and events
+description: Which contracts are indexed today and why those particular events exist in the data model.
+---
+
+## Indexed Event Surfaces
+
+| Contract | Why it is indexed |
+| --- | --- |
+| `EVE` | approvals before burn |
+| `AMM` | mint, immediate redemption, queued redemption, processed/canceled lifecycle events |
+| `ExitQueue` | batch and request state snapshots |
+
+## Event Logic
+
+`RequestPushed` and `RequestPulled` capture queue state, while AMM emits the user-facing business
+events the frontend wants to show.

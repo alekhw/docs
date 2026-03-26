@@ -1,0 +1,20 @@
+---
+title: Mint UI
+description: The current frontend behavior for deposit input, simulation, and transaction submission.
+---
+
+## Mint UI Features
+
+- dual-input ETH / EVE editing
+- percentage slider presets
+- live price-driven output calculation
+- simulated write before submission
+- slippage-protected minimum output
+
+## Transaction Shape
+
+```solidity
+AMM.enter(effectiveMinTokensToMint)
+```
+
+with transaction `value = depositEth`.

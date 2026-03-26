@@ -1,0 +1,19 @@
+---
+title: FAQ
+description: Concise answers to the most likely product and protocol questions that arise from the current repository state.
+---
+
+<Accordions type="single">
+  <Accordion title="Is this live on mainnet?">
+    The current shipped frontend configuration in this repository is for Arbitrum Sepolia, not mainnet.
+  </Accordion>
+  <Accordion title="Does every burn settle immediately?">
+    No. Burns use the protocol redemption path and can enter `ExitQueue` if AMM liquidity is insufficient.
+  </Accordion>
+  <Accordion title="Why can the activity feed lag behind my transaction?">
+    Historical UI uses the GoldSky subgraph, which is eventually consistent relative to the chain.
+  </Accordion>
+  <Accordion title="Is there an audit linked in this repository?">
+    No dedicated audit artifact is currently documented in the repository snapshot used by these docs.
+  </Accordion>
+</Accordions>

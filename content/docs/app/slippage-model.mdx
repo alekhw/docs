@@ -1,0 +1,22 @@
+---
+title: Slippage model
+description: How slippage is represented in mint and burn mode in the current frontend.
+---
+
+## Two Different Meanings
+
+<Tabs items={["Mint", "Burn"]}>
+  <Tab>
+    Slippage protects the minimum EVE output passed into `enter(...)`.
+  </Tab>
+  <Tab>
+    Slippage becomes protocol `priceTolerance` passed into `exit(...)`, which matters later if the
+    burn enters the queue.
+  </Tab>
+</Tabs>
+
+## UX Details
+
+- auto and manual modes
+- localStorage persistence
+- reused across mint and burn with different protocol semantics

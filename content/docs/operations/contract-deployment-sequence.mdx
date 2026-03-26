@@ -1,0 +1,19 @@
+---
+title: Contract deployment sequence
+description: Deployment order implied by the scripts and Mermaid deployment architecture.
+---
+
+## Sequence
+
+1. Deploy `EVE`.
+2. Deploy `ExitQueue` implementation and proxy.
+3. Deploy `Controller` implementation and proxy.
+4. Deploy `Oracle` implementation and proxy, then configure feeds.
+5. Deploy `StrategyManager` implementation and proxy.
+6. Deploy `AMM`.
+7. Grant operational roles and revoke temporary setup powers where intended.
+
+## Why Order Matters
+
+Later contracts depend on earlier addresses, especially Controller, StrategyManager, Oracle, AMM,
+and ExitQueue role wiring.

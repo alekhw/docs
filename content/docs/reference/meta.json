@@ -1,0 +1,11 @@
+{
+  "title": "Reference",
+  "icon": "Library",
+  "pages": [
+    "faq",
+    "glossary",
+    "network-and-links",
+    "troubleshooting",
+    "changelog-or-release-notes-strategy"
+  ]
+}

@@ -1,0 +1,34 @@
+---
+title: First mint
+description: How the current mint UI turns ETH input into an `AMM.enter(...)` transaction.
+---
+
+## What The Mint UI Reads
+
+Before a mint write becomes actionable, the frontend reads:
+
+- AMM paused state
+- premium price
+- user ETH balance
+- configured contract addresses
+
+## Mint Flow
+
+<Steps>
+  <Step>Enter ETH or target EVE amount using the dual-input form.</Step>
+  <Step>Adjust balance with `0 / 25 / 50 / 75 / 100` presets if needed.</Step>
+  <Step>The frontend simulates `AMM.enter(minTokensToMint)` before submission.</Step>
+  <Step>When confirmed, the transaction is sent with `value = depositEth`.</Step>
+</Steps>
+
+## Slippage Behavior
+
+For mint, slippage protects the minimum EVE output, not the ETH deposit amount. The app computes
+the minimum-out floor and submits that value into `enter(...)`.
+
+Read more in [Slippage model](/app/slippage-model).
+
+<Callout type="success" title="Bootstrap note">
+  The first mint can trigger the AMM bootstrap path. At the protocol layer that is still the same
+  user-facing action, but the indexed activity type becomes `BOOTSTRAP_MINT` instead of `MINT`.
+</Callout>

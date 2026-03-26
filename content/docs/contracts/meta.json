@@ -1,0 +1,14 @@
+{
+  "title": "Contracts",
+  "icon": "FileCode",
+  "pages": [
+    "overview",
+    "eve",
+    "amm",
+    "controller",
+    "exit-queue",
+    "strategy-manager",
+    "oracle",
+    "interfaces-and-libraries"
+  ]
+}

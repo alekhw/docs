@@ -1,0 +1,28 @@
+---
+title: Strategy and NAV model
+description: How StrategyManager, Controller, and Oracle support ETH-first NAV and strategy operations.
+---
+
+## NAV Model
+
+The protocol calculates NAV in **ETH first**:
+
+- total strategy NAV in ETH
+- plus Controller ETH balance that has not yet been distributed
+
+USD views are derived later through Oracle conversion.
+
+## StrategyManager Responsibilities
+
+- track registered strategies
+- distribute ETH based on safety levels
+- withdraw or queue withdrawals based on withdrawal priorities
+- rebalance unhealthy strategies
+
+## Why This Matters To Pricing
+
+AMM price functions depend on protocol NAV. Because that NAV comes from StrategyManager in ETH
+terms, the enter/exit hot path stays oracle-free.
+
+Read more in [StrategyManager](/contracts/strategy-manager) and
+[Trust assumptions](/security/trust-assumptions).

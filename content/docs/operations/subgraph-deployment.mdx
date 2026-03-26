@@ -1,0 +1,25 @@
+---
+title: Subgraph deployment
+description: Build and deploy workflow for the bundled GoldSky/The Graph workspace.
+---
+
+## Build Workflow
+
+```bash
+cd frontend-app/web3-app/subgraph
+npm install
+npm run codegen
+npm run build
+```
+
+## Deploy Workflow
+
+```bash
+goldsky login
+goldsky subgraph deploy everything-strategy/v0.1.4 --path .
+```
+
+## Change Rule
+
+When redeploying contracts, update `config/deployments/arbitrum-sepolia.json` first and regenerate
+from there.

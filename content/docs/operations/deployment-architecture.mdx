@@ -1,0 +1,16 @@
+---
+title: Deployment architecture
+description: The current phased deployment model for immutable contracts, proxies, and setup steps.
+---
+
+## Phases
+
+<Steps>
+  <Step>Deploy prerequisites: `EVE` and `ExitQueue`.</Step>
+  <Step>Deploy core management contracts and AMM.</Step>
+  <Step>Grant roles, wire dependencies, revoke setup privileges, and add strategies.</Step>
+</Steps>
+
+## Core Principle
+
+Immutable contracts are deployed directly. Upgradeable contracts are deployed behind UUPS proxies.

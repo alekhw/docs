@@ -1,0 +1,38 @@
+---
+title: Query examples
+description: Copy-paste GraphQL examples for the current GoldSky deployment.
+---
+
+## Latest activities
+
+```graphql
+query LatestActivities {
+  userActivities(first: 20, orderBy: timestamp, orderDirection: desc) {
+    id
+    type
+    status
+    txHash
+    ethAmount
+    eveAmount
+  }
+}
+```
+
+## Latest redemption requests
+
+```graphql
+query LatestRequests {
+  redemptionRequests(first: 20, orderBy: createdAt, orderDirection: desc) {
+    id
+    status
+    tokensToBurn
+    requestedEthEffective
+    finalEvePrice
+    isWithinTolerance
+    viaEscapeHatch
+  }
+}
+```
+
+For the full query set and field commentary, see the source document in
+`frontend-app/web3-app/subgraph/docs/query-examples.md`.

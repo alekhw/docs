@@ -1,0 +1,23 @@
+---
+title: StrategyManager
+description: The upgradeable contract that manages strategy registration, NAV, distribution, withdrawals, and rebalancing.
+---
+
+## Responsibilities
+
+- register and remove strategies
+- compute total NAV in ETH
+- distribute ETH based on safety levels
+- withdraw or queue withdrawals based on withdrawal priority
+- rebalance unhealthy strategies
+
+## Important Constraints
+
+- safety levels must be within `1..100`
+- withdrawal priorities must be within `1..100`
+- range-based operations use `[startIndex, endIndex)`
+
+## Why It Matters
+
+StrategyManager is the bridge between pooled protocol capital and the external strategy set. Its
+ETH-first NAV is the pricing input the AMM cares about.

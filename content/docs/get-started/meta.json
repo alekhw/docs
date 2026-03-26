@@ -1,0 +1,10 @@
+{
+  "title": "Get Started",
+  "icon": "Rocket",
+  "pages": [
+    "overview",
+    "connect-wallet-and-supported-network",
+    "first-mint",
+    "burn-and-redeem"
+  ]
+}

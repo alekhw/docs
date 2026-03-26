@@ -1,0 +1,17 @@
+---
+title: Cross-workspace sync rules
+description: Practical rules for keeping docs aligned with contracts, app config, subgraph config, and diagrams.
+---
+
+## Sync Rules
+
+- if contract roles or queue rules change, update `security` and `protocol`
+- if frontend addresses change, update `operations` and `developers`
+- if subgraph entities or endpoint versions change, update `data` and `operations`
+- if landing terminology changes, check homepage and introduction pages
+
+## Common Drift Sources
+
+- old README examples
+- stale `.env.example` endpoints
+- address changes made only in frontend config

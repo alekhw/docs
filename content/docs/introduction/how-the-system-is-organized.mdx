@@ -1,0 +1,45 @@
+---
+title: How the system is organized
+description: The relationship between the landing site, docs app, web3 app, contracts, subgraph, and supporting diagrams.
+---
+
+## Workspace View
+
+<Cards>
+  <Card title="landing" href="/engineering/monorepo-structure">
+    Brand voice, high-level product positioning, and visual reference.
+  </Card>
+  <Card title="web3-app" href="/app/overview">
+    User-facing protocol client for Arbitrum Sepolia.
+  </Card>
+  <Card title="smart-contracts" href="/contracts/overview">
+    Protocol implementation, tests, and deployment scripts.
+  </Card>
+  <Card title="subgraph" href="/data/subgraph-overview">
+    GoldSky indexing layer used by the app.
+  </Card>
+</Cards>
+
+## Runtime Relationship
+
+<Tabs items={["User path", "Operator path"]}>
+  <Tab>
+    User opens the app, connects a wallet, mints or burns, and then inspects activity through the
+    account dialog.
+  </Tab>
+  <Tab>
+    Operators and keepers interact with Controller, StrategyManager, ExitQueue pricing, and deployment
+    or upgrade workflows outside the web app.
+  </Tab>
+</Tabs>
+
+## Documentation Boundary
+
+This docs app does not own protocol logic or frontend logic, but it must remain aligned with them.
+That means the docs source of truth is spread across:
+
+- `smart-contracts/README.md`
+- `frontend-app/web3-app/README.md`
+- `frontend-app/web3-app/src/config/index.ts`
+- `frontend-app/web3-app/subgraph/*`
+- `mermaid/*.md`

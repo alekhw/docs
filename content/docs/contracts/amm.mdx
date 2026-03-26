@@ -1,0 +1,40 @@
+---
+title: AMM
+description: The immutable bonding-curve contract that accepts ETH and handles entry and exit requests.
+---
+
+## Responsibilities
+
+- accept ETH deposits and mint EVE
+- process immediate redemption when liquidity is sufficient
+- queue redemptions when liquidity is insufficient
+- expose ETH-first price views
+
+## Key Roles
+
+| Role | Meaning |
+| --- | --- |
+| `ADMIN_ROLE` | configure connector weight, pause, unpause |
+| `CONTROLLER_ROLE` | allow Controller-mediated redemption processing |
+
+## Key Functions
+
+```solidity
+function enter(uint256 _deposit, uint256 _minTokensToMint) external payable
+function exit(uint256 _requestedETH, uint256 _maxTokensToBurn, uint256 _priceTolerance) external returns (uint256)
+function processRedemption(uint256 _batchId, address _user) external payable
+function cancelRedemption(uint256 _batchId) external
+```
+
+## Critical Behavior
+
+<Tabs items={["Oracle usage", "Queue usage"]}>
+  <Tab>
+    Oracle is not used in the normal enter/exit hot path. It is used for bootstrap minimum deposit
+    checks and USD-facing view functions.
+  </Tab>
+  <Tab>
+    When ETH liquidity is insufficient, AMM hands off request state to `ExitQueue` and emits the
+    user-facing queue event.
+  </Tab>
+</Tabs>

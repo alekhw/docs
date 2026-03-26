@@ -1,0 +1,16 @@
+---
+title: Docs app runtime configuration
+description: Runtime assumptions inside the Fumadocs application itself.
+---
+
+## Current Runtime Features
+
+- root-routed documentation pages
+- search endpoint from Fumadocs source
+- AI chat endpoint grounded by local content search
+- `llms.txt` and `llms-full.txt` export routes
+
+## Current AI Decision
+
+The AI assistant remains available on all docs pages. It is configured as a grounded docs assistant,
+not a generic chatbot, and it should say when search context is insufficient.

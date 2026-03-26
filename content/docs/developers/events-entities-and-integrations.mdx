@@ -1,0 +1,22 @@
+---
+title: Events, entities, and integrations
+description: The minimum event and entity set required to integrate with frontend or analytics consumers.
+---
+
+## Event Families That Matter
+
+- approval events on EVE
+- mint and redemption events on AMM
+- queue state events on ExitQueue
+
+## Entity Families That Matter
+
+- `User`
+- `UserActivity`
+- `ExitBatch`
+- `RedemptionRequest`
+
+## Integration Advice
+
+If you need current balances or real-time pricing, use direct RPC reads. If you need queue history or
+user history, use the subgraph.

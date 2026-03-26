@@ -16,7 +16,7 @@ export function getSiteUrl(): URL {
 
 // fill this with your actual GitHub info, for example:
 export const gitConfig = {
-  user: "fuma-nama",
-  repo: "fumadocs",
-  branch: "main",
+  user: "Guide-DAO-Organization",
+  repo: "hackerhouse",
+  branch: "feat/fumadocs-init",
 };
