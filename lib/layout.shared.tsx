@@ -1,19 +1,9 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
-import { BotIcon } from "lucide-react";
 import Image from "next/image";
 import { gitConfig } from "./shared";
 
 export function baseOptions(): BaseLayoutProps {
   return {
-    links: [
-      {
-        icon: <BotIcon className="size-4" />,
-        text: "LLMs Full",
-        url: "/llms-full.txt",
-        active: "none",
-        secondary: false,
-      },
-    ],
     nav: {
       title: (
         <span className="group inline-flex items-center gap-2.5 rounded-md transition-opacity hover:opacity-80">

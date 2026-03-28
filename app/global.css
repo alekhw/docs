@@ -1,3 +1,8 @@
 @import "tailwindcss";
 @import "fumadocs-ui/css/neutral.css";
 @import "fumadocs-ui/css/preset.css";
+
+#nd-sidebar a[href="/"][data-active],
+#nd-sidebar-mobile a[href="/"][data-active] {
+  margin-bottom: 0.875rem;
+}
