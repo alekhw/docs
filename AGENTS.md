@@ -13,7 +13,7 @@ Agents working here should optimize for:
 - accurate documentation of shipped behavior
 - clean Fumadocs and Next.js integration
 - consistent visual alignment with the landing page brand
-- safe updates to content, search, AI chat, and metadata
+- safe updates to content, search, metadata, and LLM export routes
 
 This is not a generic starter Fumadocs app anymore. Treat it as a product-facing docs surface.
 
@@ -25,7 +25,6 @@ This app owns:
 - MDX content rendering from `content/docs`
 - root-routed docs pages
 - search API
-- AI-assisted docs chat
 - docs metadata, icons, manifest, and LLM export routes
 
 This app does not own:
@@ -42,12 +41,10 @@ But it must stay aligned with all of them.
 - `app/(docs)/layout.tsx`: shared docs shell
 - `app/docs/[[...slug]]/page.tsx`: legacy `/docs/*` redirect
 - `app/api/search/route.ts`: Fumadocs search endpoint
-- `app/api/chat/route.ts`: AI chat endpoint
 - `content/docs`: primary documentation source
 - `lib/source.ts`: Fumadocs loader and page access
 - `lib/layout.shared.tsx`: shared layout options
 - `app/global.css`: docs theme
-- `components/ai/search.tsx`: AI search/chat UI
 
 ## Routing Rules
 
@@ -101,30 +98,11 @@ If routing or layout changes are needed, preserve:
 - valid search indexing
 - valid `llms.txt` and `llms-full.txt` routes
 
-## AI Search Rules
-
-`app/api/chat/route.ts` is a grounded docs assistant, not a generic chatbot.
-
-Agents should preserve these principles:
-
-- answers should be grounded in docs search results
-- the model should not invent unsupported claims
-- if search results are insufficient, the assistant should say so
-- AI behavior should remain documentation-oriented
-
-If modifying the AI system:
-
-- keep the `search` tool available unless explicitly replacing it
-- preserve content grounding
-- avoid changes that silently degrade answer reliability
-
 ## Environment Variables
 
 Common variables used by this workspace:
 
 - `NEXT_PUBLIC_SITE_URL`: absolute URL base for metadata
-- `OPENROUTER_API_KEY`: required for AI chat
-- `OPENROUTER_MODEL`: optional model override
 
 Do not hardcode production URLs or secrets into source files.
 
@@ -134,6 +112,7 @@ Run validation from this workspace:
 
 ```bash
 cd frontend-app/everstrat-docs
+bun run docs:gen
 bun run lint
 bun run types:check
 bun run build
@@ -142,7 +121,8 @@ bun run build
 Important:
 
 - `bun run lint` runs Biome in write mode and may modify files
-- `bun run types:check` regenerates types before TypeScript checking
+- `bun run docs:gen` refreshes generated `.source` files when docs collections change
+- `bun run types:check` regenerates Next route types before TypeScript checking
 
 At minimum, agents touching this workspace should run `bun run lint` unless blocked.
 
@@ -181,4 +161,4 @@ Final handoff for this workspace should include:
 - what changed
 - whether docs content, docs UI, or docs infrastructure changed
 - which validation commands were run
-- any unverified runtime assumptions, especially around AI chat or environment variables
+- any unverified runtime assumptions, especially around search, LLM exports, or environment variables

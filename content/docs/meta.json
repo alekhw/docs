@@ -1,5 +1,6 @@
 {
   "title": "Everstrat Docs",
+  "icon": "House",
   "root": true,
   "pages": [
     "index",

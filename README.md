@@ -11,7 +11,6 @@ The docs application is responsible for:
 - serving the documentation site from the root route `/`
 - rendering MDX content from `content/docs`
 - exposing full-text search through `app/api/search/route.ts`
-- exposing an AI-assisted docs chat through `app/api/chat/route.ts`
 - generating `llms.txt` and `llms-full.txt`
 - generating documentation-specific metadata, social assets, and manifest data
 
@@ -25,8 +24,6 @@ The docs application is responsible for:
 - Tailwind CSS 4
 - Biome
 - TypeScript 6
-- FlexSearch
-- AI SDK + OpenRouter
 
 ## Project Structure
 
@@ -35,7 +32,6 @@ frontend-app/everstrat-docs/
 ├── app/
 │   ├── (docs)/[[...slug]]/page.tsx   # Root-routed documentation pages
 │   ├── (docs)/layout.tsx             # Docs layout and shared UI shell
-│   ├── api/chat/route.ts             # AI-assisted docs chat
 │   ├── api/search/route.ts           # Search endpoint
 │   ├── docs/[[...slug]]/page.tsx     # Legacy redirect from /docs/* to /*
 │   ├── llms.txt/route.ts             # LLM-friendly text index
@@ -44,7 +40,6 @@ frontend-app/everstrat-docs/
 │   ├── global.css                    # Docs theme styling
 │   └── manifest.ts                   # App metadata manifest
 ├── components/
-│   ├── ai/                           # AI chat UI and search panel
 │   ├── markdown.tsx                  # MDX rendering helpers
 │   └── ui/                           # Shared UI helpers
 ├── content/docs/                     # MDX source content
@@ -81,32 +76,11 @@ The Fumadocs loader in `lib/source.ts` builds:
 
 When writing or restructuring docs, the `content/docs` tree is the primary source of truth.
 
-## AI Search And Search API
+## Search API
 
 ### Full-text Search
 
 `app/api/search/route.ts` creates a Fumadocs search endpoint from the current content source.
-
-### AI-assisted Chat
-
-`app/api/chat/route.ts` provides a streamed AI chat endpoint that:
-
-- indexes docs content with FlexSearch
-- exposes a `search` tool to the model
-- grounds responses in indexed documentation pages
-- uses OpenRouter through the AI SDK
-
-Required environment variable:
-
-```bash
-OPENROUTER_API_KEY=your_key_here
-```
-
-Optional environment variable:
-
-```bash
-OPENROUTER_MODEL=anthropic/claude-3.5-sonnet
-```
 
 ## Metadata And Public URL
 
@@ -143,6 +117,13 @@ bun install
 bun run dev
 ```
 
+If you changed `content/docs` structure or `source.config.ts` and need to refresh generated
+Fumadocs source files manually:
+
+```bash
+bun run docs:gen
+```
+
 Default local URL:
 
 - [http://localhost:3000](http://localhost:3000)
@@ -150,6 +131,7 @@ Default local URL:
 ## Quality Checks
 
 ```bash
+bun run docs:gen
 bun run lint
 bun run types:check
 bun run build
@@ -159,7 +141,8 @@ Notes:
 
 - `bun run lint` runs `biome check --write`, `biome format --write`, and `tsc --noEmit`
 - `bun run lint` may modify files
-- `bun run types:check` regenerates Fumadocs/Next types before running TypeScript
+- `bun run docs:gen` refreshes generated Fumadocs source files under `.source`
+- `bun run types:check` regenerates Next route types before running TypeScript
 
 ## Writing Documentation
 
