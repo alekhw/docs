@@ -25,7 +25,7 @@ This app owns:
 - MDX content rendering from `content/docs`
 - root-routed docs pages
 - search API
-- docs metadata, icons, OG/Twitter assets, sitemap, robots, manifest, and LLM export routes
+- docs metadata, structured data, icons, OG/Twitter assets, sitemap, robots, manifest, and LLM export routes
 
 This app does not own:
 
@@ -47,8 +47,10 @@ But it must stay aligned with all of them.
 - `app/twitter-image.tsx`: Twitter/X social preview image
 - `content/docs`: primary documentation source
 - `lib/config.ts`: typed site, route, repo, and SEO config
+- `lib/content.ts`: content file helpers such as last-modified lookups
 - `lib/source.ts`: Fumadocs loader and page access
 - `lib/metadata.ts`: shared Next metadata helpers
+- `lib/structured-data.tsx`: JSON-LD helpers for home and docs pages
 - `lib/layout.shared.tsx`: shared layout options
 - `app/global.css`: docs theme
 
@@ -96,6 +98,7 @@ Agents should work with the existing Fumadocs setup rather than fighting it.
 - keep cross-app constants in `lib/config.ts` when they are reused by multiple routes or layers
 - keep `lib/source.ts` as the content access layer
 - keep `lib/metadata.ts` as the metadata composition layer
+- keep `lib/structured-data.tsx` as the JSON-LD composition layer
 - use `source.config.ts` for MDX collection behavior
 - do not hand-edit generated output under `.source`
 
@@ -104,7 +107,7 @@ If routing or layout changes are needed, preserve:
 - root-routed docs behavior
 - working page tree generation
 - valid search indexing
-- valid canonical metadata, sitemap output, and robots output
+- valid canonical metadata, sitemap output, robots output, and JSON-LD output
 - valid `llms.txt` and `llms-full.txt` routes
 
 ## Environment Variables

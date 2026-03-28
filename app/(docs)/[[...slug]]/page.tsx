@@ -10,9 +10,20 @@ import { createRelativeLink } from "fumadocs-ui/mdx";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getMDXComponents } from "@/components/mdx";
-import { getGitHubContentUrl } from "@/lib/config";
+import { getGitHubContentUrl, siteConfig } from "@/lib/config";
+import { getContentFileLastModified } from "@/lib/content";
 import { createDocsPageMetadata } from "@/lib/metadata";
-import { getPageImage, getPageMarkdownUrl, source } from "@/lib/source";
+import {
+  getPageContentPath,
+  getPageImage,
+  getPageMarkdownUrl,
+  source,
+} from "@/lib/source";
+import {
+  getDocsPageJsonLd,
+  getHomePageJsonLd,
+  JsonLd,
+} from "@/lib/structured-data";
 
 type DocsPageProps = {
   params: Promise<{
@@ -27,29 +38,51 @@ export default async function Page(props: DocsPageProps) {
 
   const MDX = page.data.body;
   const markdownUrl = getPageMarkdownUrl(page).url;
+  const pageImage = getPageImage(page);
+  const contentPath = getPageContentPath(page);
+  const description = page.data.description ?? siteConfig.description;
+  const lastModified =
+    page.url === "/"
+      ? undefined
+      : await getContentFileLastModified(contentPath);
 
   return (
-    <DocsPage toc={page.data.toc} full={page.data.full}>
-      <DocsTitle>{page.data.title}</DocsTitle>
-      <DocsDescription className="mb-0">
-        {page.data.description}
-      </DocsDescription>
-      <div className="flex flex-row gap-2 items-center border-b pb-6">
-        <MarkdownCopyButton markdownUrl={markdownUrl} />
-        <ViewOptionsPopover
-          markdownUrl={markdownUrl}
-          githubUrl={getGitHubContentUrl(`content/docs/${page.path}`)}
-        />
-      </div>
-      <DocsBody>
-        <MDX
-          components={getMDXComponents({
-            // This allows relative MDX links to resolve against the root docs route.
-            a: createRelativeLink(source, page),
+    <>
+      {page.url !== "/" ? (
+        <JsonLd
+          data={getDocsPageJsonLd({
+            title: page.data.title,
+            description,
+            pageUrl: page.url,
+            imageUrl: pageImage.url,
+            lastModified,
           })}
         />
-      </DocsBody>
-    </DocsPage>
+      ) : (
+        <JsonLd data={getHomePageJsonLd(description)} />
+      )}
+      <DocsPage toc={page.data.toc} full={page.data.full}>
+        <DocsTitle>{page.data.title}</DocsTitle>
+        <DocsDescription className="mb-0">
+          {page.data.description}
+        </DocsDescription>
+        <div className="flex flex-row gap-2 items-center border-b pb-6">
+          <MarkdownCopyButton markdownUrl={markdownUrl} />
+          <ViewOptionsPopover
+            markdownUrl={markdownUrl}
+            githubUrl={getGitHubContentUrl(`content/docs/${contentPath}`)}
+          />
+        </div>
+        <DocsBody>
+          <MDX
+            components={getMDXComponents({
+              // This allows relative MDX links to resolve against the root docs route.
+              a: createRelativeLink(source, page),
+            })}
+          />
+        </DocsBody>
+      </DocsPage>
+    </>
   );
 }
 
@@ -64,5 +97,10 @@ export async function generateMetadata(
   const page = source.getPage(slug);
   if (!page) notFound();
 
-  return createDocsPageMetadata(page, getPageImage(page).url);
+  const lastModified =
+    page.url === "/"
+      ? undefined
+      : await getContentFileLastModified(getPageContentPath(page));
+
+  return createDocsPageMetadata(page, getPageImage(page).url, lastModified);
 }

@@ -27,3 +27,9 @@ export default function proxy(request: NextRequest) {
 
   return NextResponse.next();
 }
+
+export const config = {
+  matcher: [
+    "/((?!api/search|llms\\.mdx|llms\\.txt|llms-full\\.txt|og/docs|opengraph-image|twitter-image|robots\\.txt|sitemap\\.xml|manifest\\.webmanifest|favicon\\.ico|apple-touch-icon(?:-precomposed)?\\.png|favicon-(?:16x16|32x32)\\.png|icon-(?:192|512)\\.png|_next).*)",
+  ],
+};

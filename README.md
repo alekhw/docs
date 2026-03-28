@@ -12,7 +12,7 @@ The docs application is responsible for:
 - rendering MDX content from `content/docs`
 - exposing full-text search through `app/api/search/route.ts`
 - generating `llms.txt` and `llms-full.txt`
-- generating documentation-specific metadata, OG/Twitter assets, sitemap, robots, and manifest data
+- generating documentation-specific metadata, JSON-LD, OG/Twitter assets, sitemap, robots, and manifest data
 
 ## Tech Stack
 
@@ -49,8 +49,10 @@ frontend-app/everstrat-docs/
 ├── content/docs/                     # MDX source content
 ├── lib/
 │   ├── config.ts                     # Typed site, route, repo, and SEO config
+│   ├── content.ts                    # Content file helpers such as last-modified lookups
 │   ├── layout.shared.tsx             # Shared layout options
 │   ├── metadata.ts                   # Metadata and sitemap helpers
+│   ├── structured-data.tsx           # JSON-LD helpers
 │   ├── social-image.tsx              # Shared OG/Twitter image component
 │   └── source.ts                     # Fumadocs content loader
 ├── public/                           # Favicons and app icons
@@ -87,6 +89,15 @@ When writing or restructuring docs, the `content/docs` tree is the primary sourc
 ### Full-text Search
 
 `app/api/search/route.ts` creates a Fumadocs search endpoint from the current content source.
+
+## Structured Data
+
+The app emits JSON-LD for:
+
+- `WebSite` and `Organization` at the app shell level
+- `TechArticle` and `BreadcrumbList` for documentation pages
+
+These are generated from shared helpers rather than hardcoded in individual pages.
 
 ## Metadata And Public URL
 

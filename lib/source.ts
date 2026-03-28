@@ -19,6 +19,11 @@ export function getPageImage(page: InferPageType<typeof source>) {
   };
 }
 
+export function getPageContentPath(page: InferPageType<typeof source>) {
+  if (page.path) return page.path;
+  return page.slugs.length > 0 ? `${page.slugs.join("/")}.mdx` : "index.mdx";
+}
+
 export function getPageMarkdownUrl(page: InferPageType<typeof source>) {
   const segments = [...page.slugs, "content.md"];
 

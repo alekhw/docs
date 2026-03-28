@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { siteConfig } from "@/lib/config";
 import { rootMetadata } from "@/lib/metadata";
+import { getSiteJsonLd, JsonLd } from "@/lib/structured-data";
 import "./global.css";
 
 const inter = Inter({
@@ -21,6 +22,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <body className="flex flex-col min-h-screen">
+        <JsonLd data={getSiteJsonLd()} />
         <RootProvider>{children}</RootProvider>
       </body>
     </html>

@@ -6,16 +6,34 @@ import {
   getSiteUrl,
   siteConfig,
 } from "@/lib/config";
-import { source } from "@/lib/source";
+import { getContentFileLastModified } from "@/lib/content";
+import { getPageContentPath, source } from "@/lib/source";
 
 type DocsPage = InferPageType<typeof source>;
 
-const defaultSocialImage = {
-  url: "/opengraph-image",
-  width: 1200,
-  height: 630,
-  alt: siteConfig.seo.defaultSocialImageAlt,
-} as const;
+const rootOpenGraph: NonNullable<Metadata["openGraph"]> = {
+  type: "website",
+  locale: siteConfig.openGraphLocale,
+  url: siteConfig.routes.docs,
+  siteName: siteConfig.seo.siteTitle,
+  title: siteConfig.name,
+  description: siteConfig.description,
+  images: [
+    {
+      url: "/opengraph-image",
+      width: 1200,
+      height: 630,
+      alt: siteConfig.seo.defaultSocialImageAlt,
+    },
+  ],
+};
+
+const rootTwitter: NonNullable<Metadata["twitter"]> = {
+  card: "summary_large_image",
+  title: siteConfig.name,
+  description: siteConfig.description,
+  images: ["/opengraph-image"],
+};
 
 function getVerificationMetadata(): Metadata["verification"] | undefined {
   const google = process.env.GOOGLE_SITE_VERIFICATION;
@@ -86,21 +104,8 @@ export const rootMetadata: Metadata = {
       },
     ],
   },
-  openGraph: {
-    type: "website",
-    locale: siteConfig.openGraphLocale,
-    url: siteConfig.routes.docs,
-    siteName: siteConfig.seo.siteTitle,
-    title: siteConfig.name,
-    description: siteConfig.description,
-    images: [defaultSocialImage],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: siteConfig.name,
-    description: siteConfig.description,
-    images: [defaultSocialImage.url],
-  },
+  openGraph: rootOpenGraph,
+  twitter: rootTwitter,
   robots: {
     index: true,
     follow: true,
@@ -123,21 +128,54 @@ export const rootMetadata: Metadata = {
 export function createDocsPageMetadata(
   page: DocsPage,
   pageImageUrl: string,
+  lastModified?: Date,
 ): Metadata {
+  const description = page.data.description ?? siteConfig.description;
   const imageAlt = `${page.data.title} | ${siteConfig.name}`;
+
+  if (page.url === siteConfig.routes.docs) {
+    return {
+      title: {
+        absolute: siteConfig.name,
+      },
+      description,
+      alternates: {
+        canonical: siteConfig.routes.docs,
+      },
+      openGraph: {
+        ...rootOpenGraph,
+        title: siteConfig.name,
+        description,
+        images: [
+          {
+            url: "/opengraph-image",
+            width: 1200,
+            height: 630,
+            alt: siteConfig.seo.defaultSocialImageAlt,
+          },
+        ],
+      },
+      twitter: {
+        ...rootTwitter,
+        title: siteConfig.name,
+        description,
+        images: ["/opengraph-image"],
+      },
+    };
+  }
 
   return {
     title: page.data.title,
-    description: page.data.description,
+    description,
     alternates: {
       canonical: page.url,
     },
     openGraph: {
+      ...rootOpenGraph,
+      type: "article",
       url: page.url,
-      siteName: siteConfig.seo.siteTitle,
       title: page.data.title,
-      description: page.data.description,
-      locale: siteConfig.openGraphLocale,
+      description,
       images: [
         {
           url: pageImageUrl,
@@ -146,29 +184,29 @@ export function createDocsPageMetadata(
           alt: imageAlt,
         },
       ],
+      modifiedTime: lastModified?.toISOString(),
     },
     twitter: {
-      card: "summary_large_image",
+      ...rootTwitter,
       title: page.data.title,
-      description: page.data.description,
+      description,
       images: [pageImageUrl],
     },
   };
 }
 
 export function getDisallowedRobotsPaths(): string[] {
-  return [
-    siteConfig.routes.search,
-    `${siteConfig.routes.docsContent}/`,
-    siteConfig.routes.llmsIndex,
-    siteConfig.routes.llmsFull,
-  ];
+  return [siteConfig.routes.search, `${siteConfig.routes.docsContent}/`];
 }
 
-export function getSitemapEntries(): MetadataRoute.Sitemap {
-  return source.getPages().map((page) => ({
-    url: getAbsoluteUrl(page.url),
-    changeFrequency: page.url === siteConfig.routes.docs ? "weekly" : "monthly",
-    priority: page.url === siteConfig.routes.docs ? 1 : 0.7,
-  }));
+export async function getSitemapEntries(): Promise<MetadataRoute.Sitemap> {
+  return Promise.all(
+    source.getPages().map(async (page) => ({
+      url: getAbsoluteUrl(page.url),
+      lastModified: await getContentFileLastModified(getPageContentPath(page)),
+      changeFrequency:
+        page.url === siteConfig.routes.docs ? "weekly" : "monthly",
+      priority: page.url === siteConfig.routes.docs ? 1 : 0.7,
+    })),
+  );
 }
