@@ -1,6 +1,6 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 import Image from "next/image";
-import { gitConfig } from "./shared";
+import { getGitHubRepoUrl, siteConfig } from "./config";
 
 export function baseOptions(): BaseLayoutProps {
   return {
@@ -8,7 +8,7 @@ export function baseOptions(): BaseLayoutProps {
       title: (
         <span className="group inline-flex items-center gap-2.5 rounded-md transition-opacity hover:opacity-80">
           <Image
-            src="/eve-logo-only.svg"
+            src={siteConfig.assets.logo}
             alt=""
             aria-hidden="true"
             width={22}
@@ -18,11 +18,11 @@ export function baseOptions(): BaseLayoutProps {
             className="h-auto w-auto shrink-0 transition-transform duration-200 ease-out group-hover:scale-110"
           />
           <span className="text-sm font-semibold tracking-tight">
-            Everstrat.xyz | Docs
+            {siteConfig.seo.siteTitle}
           </span>
         </span>
       ),
     },
-    githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
+    githubUrl: getGitHubRepoUrl(),
   };
 }

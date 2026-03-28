@@ -1,22 +1,22 @@
 import type { MetadataRoute } from "next";
-import { appName } from "@/lib/shared";
+import { siteConfig } from "@/lib/config";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: appName,
-    short_name: "Everstrat.xyz Docs",
-    start_url: "/",
+    name: siteConfig.name,
+    short_name: siteConfig.shortName,
+    start_url: siteConfig.routes.docs,
     display: "standalone",
-    background_color: "#ffffff",
-    theme_color: "#111111",
+    background_color: siteConfig.seo.backgroundColor,
+    theme_color: siteConfig.seo.themeColor,
     icons: [
       {
-        src: "/icon-192.png",
+        src: siteConfig.assets.icon192,
         sizes: "192x192",
         type: "image/png",
       },
       {
-        src: "/icon-512.png",
+        src: siteConfig.assets.icon512,
         sizes: "512x512",
         type: "image/png",
       },

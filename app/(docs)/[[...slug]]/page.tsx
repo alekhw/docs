@@ -10,7 +10,8 @@ import { createRelativeLink } from "fumadocs-ui/mdx";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getMDXComponents } from "@/components/mdx";
-import { gitConfig } from "@/lib/shared";
+import { getGitHubContentUrl } from "@/lib/config";
+import { createDocsPageMetadata } from "@/lib/metadata";
 import { getPageImage, getPageMarkdownUrl, source } from "@/lib/source";
 
 type DocsPageProps = {
@@ -37,7 +38,7 @@ export default async function Page(props: DocsPageProps) {
         <MarkdownCopyButton markdownUrl={markdownUrl} />
         <ViewOptionsPopover
           markdownUrl={markdownUrl}
-          githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${page.path}`}
+          githubUrl={getGitHubContentUrl(`content/docs/${page.path}`)}
         />
       </div>
       <DocsBody>
@@ -63,11 +64,5 @@ export async function generateMetadata(
   const page = source.getPage(slug);
   if (!page) notFound();
 
-  return {
-    title: page.data.title,
-    description: page.data.description,
-    openGraph: {
-      images: getPageImage(page).url,
-    },
-  };
+  return createDocsPageMetadata(page, getPageImage(page).url);
 }

@@ -25,7 +25,7 @@ This app owns:
 - MDX content rendering from `content/docs`
 - root-routed docs pages
 - search API
-- docs metadata, icons, manifest, and LLM export routes
+- docs metadata, icons, OG/Twitter assets, sitemap, robots, manifest, and LLM export routes
 
 This app does not own:
 
@@ -41,8 +41,14 @@ But it must stay aligned with all of them.
 - `app/(docs)/layout.tsx`: shared docs shell
 - `app/docs/[[...slug]]/page.tsx`: legacy `/docs/*` redirect
 - `app/api/search/route.ts`: Fumadocs search endpoint
+- `app/robots.ts`: crawl directives
+- `app/sitemap.ts`: sitemap generation
+- `app/opengraph-image.tsx`: default social preview image
+- `app/twitter-image.tsx`: Twitter/X social preview image
 - `content/docs`: primary documentation source
+- `lib/config.ts`: typed site, route, repo, and SEO config
 - `lib/source.ts`: Fumadocs loader and page access
+- `lib/metadata.ts`: shared Next metadata helpers
 - `lib/layout.shared.tsx`: shared layout options
 - `app/global.css`: docs theme
 
@@ -87,7 +93,9 @@ Use Fumadocs primitives, but theme them to match the product brand.
 Agents should work with the existing Fumadocs setup rather than fighting it.
 
 - prefer updating `content/docs` over hardcoding page content in React
+- keep cross-app constants in `lib/config.ts` when they are reused by multiple routes or layers
 - keep `lib/source.ts` as the content access layer
+- keep `lib/metadata.ts` as the metadata composition layer
 - use `source.config.ts` for MDX collection behavior
 - do not hand-edit generated output under `.source`
 
@@ -96,6 +104,7 @@ If routing or layout changes are needed, preserve:
 - root-routed docs behavior
 - working page tree generation
 - valid search indexing
+- valid canonical metadata, sitemap output, and robots output
 - valid `llms.txt` and `llms-full.txt` routes
 
 ## Environment Variables
@@ -103,6 +112,10 @@ If routing or layout changes are needed, preserve:
 Common variables used by this workspace:
 
 - `NEXT_PUBLIC_SITE_URL`: absolute URL base for metadata
+- `GOOGLE_SITE_VERIFICATION`: optional Google Search Console verification
+- `BING_SITE_VERIFICATION`: optional Bing Webmaster verification
+- `YANDEX_VERIFICATION`: optional Yandex verification
+- `YAHOO_SITE_VERIFICATION`: optional Yahoo verification
 
 Do not hardcode production URLs or secrets into source files.
 
@@ -133,6 +146,7 @@ At minimum, agents touching this workspace should run `bun run lint` unless bloc
 - do not edit generated `.source/` files manually
 - do not replace MDX content with hardcoded JSX unless the page truly requires a custom implementation
 - do not break root routing or legacy `/docs/*` redirects
+- do not scatter site-level strings or SEO defaults across routes when they belong in `lib/config.ts`
 
 ## Cross-Workspace Awareness
 
@@ -161,4 +175,4 @@ Final handoff for this workspace should include:
 - what changed
 - whether docs content, docs UI, or docs infrastructure changed
 - which validation commands were run
-- any unverified runtime assumptions, especially around search, LLM exports, or environment variables
+- any unverified runtime assumptions, especially around search, metadata, LLM exports, or environment variables

@@ -1,6 +1,7 @@
 import { ImageResponse } from "@takumi-rs/image-response";
 import { generate as DefaultImage } from "fumadocs-ui/og/takumi";
 import { notFound } from "next/navigation";
+import { siteConfig } from "@/lib/config";
 import { getPageImage, source } from "@/lib/source";
 
 export const revalidate = false;
@@ -17,7 +18,7 @@ export async function GET(
     <DefaultImage
       title={page.data.title}
       description={page.data.description}
-      site="My App"
+      site={siteConfig.seo.siteTitle}
     />,
     {
       width: 1200,
@@ -28,8 +29,7 @@ export async function GET(
 }
 
 export function generateStaticParams() {
-  return source.getPages().map((page) => ({
-    lang: page.locale,
-    slug: getPageImage(page).segments,
-  }));
+  return source
+    .getPages()
+    .map((page) => ({ slug: getPageImage(page).segments }));
 }

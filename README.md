@@ -12,7 +12,7 @@ The docs application is responsible for:
 - rendering MDX content from `content/docs`
 - exposing full-text search through `app/api/search/route.ts`
 - generating `llms.txt` and `llms-full.txt`
-- generating documentation-specific metadata, social assets, and manifest data
+- generating documentation-specific metadata, OG/Twitter assets, sitemap, robots, and manifest data
 
 ## Tech Stack
 
@@ -38,14 +38,20 @@ frontend-app/everstrat-docs/
 │   ├── llms-full.txt/route.ts        # Full LLM export
 │   ├── layout.tsx                    # Root HTML shell and metadata
 │   ├── global.css                    # Docs theme styling
-│   └── manifest.ts                   # App metadata manifest
+│   ├── manifest.ts                   # App metadata manifest
+│   ├── opengraph-image.tsx           # Default social preview image
+│   ├── twitter-image.tsx             # Twitter/X social preview image
+│   ├── robots.ts                     # Crawl directives
+│   └── sitemap.ts                    # XML sitemap
 ├── components/
 │   ├── markdown.tsx                  # MDX rendering helpers
 │   └── ui/                           # Shared UI helpers
 ├── content/docs/                     # MDX source content
 ├── lib/
+│   ├── config.ts                     # Typed site, route, repo, and SEO config
 │   ├── layout.shared.tsx             # Shared layout options
-│   ├── shared.ts                     # Site-level constants and URL helpers
+│   ├── metadata.ts                   # Metadata and sitemap helpers
+│   ├── social-image.tsx              # Shared OG/Twitter image component
 │   └── source.ts                     # Fumadocs content loader
 ├── public/                           # Favicons and app icons
 ├── source.config.ts                  # Fumadocs MDX collection config
@@ -85,6 +91,12 @@ When writing or restructuring docs, the `content/docs` tree is the primary sourc
 ## Metadata And Public URL
 
 The app uses `NEXT_PUBLIC_SITE_URL` to compute absolute metadata URLs.
+Optional verification tags can be supplied with:
+
+- `GOOGLE_SITE_VERIFICATION`
+- `BING_SITE_VERIFICATION`
+- `YANDEX_VERIFICATION`
+- `YAHOO_SITE_VERIFICATION`
 
 Recommended local and production setup:
 
