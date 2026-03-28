@@ -4,6 +4,7 @@ import {
   DocsPage,
   DocsTitle,
   MarkdownCopyButton,
+  PageLastUpdate,
   ViewOptionsPopover,
 } from "fumadocs-ui/layouts/docs/page";
 import { createRelativeLink } from "fumadocs-ui/mdx";
@@ -11,11 +12,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getMDXComponents } from "@/components/mdx";
 import { getGitHubContentUrl, siteConfig } from "@/lib/config";
-import { getContentFileLastModified } from "@/lib/content";
 import { createDocsPageMetadata } from "@/lib/metadata";
 import {
   getPageContentPath,
   getPageImage,
+  getPageLastModified,
   getPageMarkdownUrl,
   source,
 } from "@/lib/source";
@@ -41,10 +42,7 @@ export default async function Page(props: DocsPageProps) {
   const pageImage = getPageImage(page);
   const contentPath = getPageContentPath(page);
   const description = page.data.description ?? siteConfig.description;
-  const lastModified =
-    page.url === "/"
-      ? undefined
-      : await getContentFileLastModified(contentPath);
+  const lastModified = getPageLastModified(page);
 
   return (
     <>
@@ -81,6 +79,9 @@ export default async function Page(props: DocsPageProps) {
             })}
           />
         </DocsBody>
+        {lastModified && (
+          <PageLastUpdate className="mt-6" date={lastModified} />
+        )}
       </DocsPage>
     </>
   );
@@ -97,10 +98,9 @@ export async function generateMetadata(
   const page = source.getPage(slug);
   if (!page) notFound();
 
-  const lastModified =
-    page.url === "/"
-      ? undefined
-      : await getContentFileLastModified(getPageContentPath(page));
-
-  return createDocsPageMetadata(page, getPageImage(page).url, lastModified);
+  return createDocsPageMetadata(
+    page,
+    getPageImage(page).url,
+    getPageLastModified(page),
+  );
 }

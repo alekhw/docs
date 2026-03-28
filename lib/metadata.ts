@@ -6,8 +6,7 @@ import {
   getSiteUrl,
   siteConfig,
 } from "@/lib/config";
-import { getContentFileLastModified } from "@/lib/content";
-import { getPageContentPath, source } from "@/lib/source";
+import { getPageLastModified, source } from "@/lib/source";
 
 type DocsPage = InferPageType<typeof source>;
 
@@ -203,7 +202,7 @@ export async function getSitemapEntries(): Promise<MetadataRoute.Sitemap> {
   return Promise.all(
     source.getPages().map(async (page) => ({
       url: getAbsoluteUrl(page.url),
-      lastModified: await getContentFileLastModified(getPageContentPath(page)),
+      lastModified: getPageLastModified(page),
       changeFrequency:
         page.url === siteConfig.routes.docs ? "weekly" : "monthly",
       priority: page.url === siteConfig.routes.docs ? 1 : 0.7,

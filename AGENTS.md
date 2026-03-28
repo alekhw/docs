@@ -47,7 +47,6 @@ But it must stay aligned with all of them.
 - `app/twitter-image.tsx`: Twitter/X social preview image
 - `content/docs`: primary documentation source
 - `lib/config.ts`: typed site, route, repo, and SEO config
-- `lib/content.ts`: content file helpers such as last-modified lookups
 - `lib/source.ts`: Fumadocs loader and page access
 - `lib/metadata.ts`: shared Next metadata helpers
 - `lib/structured-data.tsx`: JSON-LD helpers for home and docs pages
@@ -99,7 +98,7 @@ Agents should work with the existing Fumadocs setup rather than fighting it.
 - keep `lib/source.ts` as the content access layer
 - keep `lib/metadata.ts` as the metadata composition layer
 - keep `lib/structured-data.tsx` as the JSON-LD composition layer
-- use `source.config.ts` for MDX collection behavior
+- use `source.config.ts` for MDX collection behavior, including the Fumadocs `lastModified` plugin
 - do not hand-edit generated output under `.source`
 
 If routing or layout changes are needed, preserve:
@@ -119,6 +118,7 @@ Common variables used by this workspace:
 - `BING_SITE_VERIFICATION`: optional Bing Webmaster verification
 - `YANDEX_VERIFICATION`: optional Yandex verification
 - `YAHOO_SITE_VERIFICATION`: optional Yahoo verification
+- `VERCEL_DEEP_CLONE`: set to `true` on Vercel when Git-based last-modified timestamps must reflect full history
 
 Do not hardcode production URLs or secrets into source files.
 

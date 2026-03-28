@@ -24,6 +24,13 @@ export function getPageContentPath(page: InferPageType<typeof source>) {
   return page.slugs.length > 0 ? `${page.slugs.join("/")}.mdx` : "index.mdx";
 }
 
+export function getPageLastModified(page: InferPageType<typeof source>) {
+  const value = page.data.lastModified;
+  if (!value) return undefined;
+
+  return value instanceof Date ? value : new Date(value);
+}
+
 export function getPageMarkdownUrl(page: InferPageType<typeof source>) {
   const segments = [...page.slugs, "content.md"];
 

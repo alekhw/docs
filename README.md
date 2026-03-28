@@ -49,12 +49,11 @@ frontend-app/everstrat-docs/
 ├── content/docs/                     # MDX source content
 ├── lib/
 │   ├── config.ts                     # Typed site, route, repo, and SEO config
-│   ├── content.ts                    # Content file helpers such as last-modified lookups
 │   ├── layout.shared.tsx             # Shared layout options
 │   ├── metadata.ts                   # Metadata and sitemap helpers
 │   ├── structured-data.tsx           # JSON-LD helpers
 │   ├── social-image.tsx              # Shared OG/Twitter image component
-│   └── source.ts                     # Fumadocs content loader
+│   └── source.ts                     # Fumadocs content loader and page access helpers
 ├── public/                           # Favicons and app icons
 ├── source.config.ts                  # Fumadocs MDX collection config
 ├── package.json
@@ -84,6 +83,9 @@ The Fumadocs loader in `lib/source.ts` builds:
 
 When writing or restructuring docs, the `content/docs` tree is the primary source of truth.
 
+`source.config.ts` enables the Fumadocs `lastModified` plugin, so page-level "last updated"
+timestamps come from Git history instead of filesystem mtimes.
+
 ## Search API
 
 ### Full-text Search
@@ -108,6 +110,10 @@ Optional verification tags can be supplied with:
 - `BING_SITE_VERIFICATION`
 - `YANDEX_VERIFICATION`
 - `YAHOO_SITE_VERIFICATION`
+
+If you deploy on Vercel and want accurate Git-based last-modified timestamps during build, set:
+
+- `VERCEL_DEEP_CLONE=true`
 
 Recommended local and production setup:
 
