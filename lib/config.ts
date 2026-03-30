@@ -44,7 +44,7 @@ export const siteConfig = {
   repository: {
     owner: "Guide-DAO-Organization",
     name: "hackerhouse",
-    branch: "feat/fumadocs-init",
+    branch: "main",
   },
   seo: {
     siteTitle: "Everstrat.xyz | Docs",
