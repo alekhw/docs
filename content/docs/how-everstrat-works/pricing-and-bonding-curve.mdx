@@ -17,10 +17,10 @@ The AMM uses two distinct prices, both derived from the protocol's NAV:
 | **Base price** | `NAV / EVE supply` | Exits (redeeming EVE for ETH) |
 | **Premium price** | `NAV / (EVE supply × connector weight)` | Entries (depositing ETH to mint EVE) |
 
-The **connector weight** (default **0.5**, range `(0, 1]`) is the parameter that creates the bonding
-curve. At the default of 0.5, the premium price is double the base price, meaning new depositors pay
-more per EVE than existing holders would receive on exit. The gap accrues to existing holders, not to
-a fee recipient — it increases the NAV per EVE for everyone already in.
+The **connector weight** (default **0.9**, range `(0, 1]`) is the parameter that creates the bonding
+curve. At the default of 0.9, the premium price is roughly **11% above** the base price (1/0.9 ≈ 1.111),
+meaning new depositors pay somewhat more per EVE than existing holders would receive on exit. The gap
+accrues to existing holders, not to a fee recipient — it increases the NAV per EVE for everyone already in.
 
 As more ETH flows in, the supply grows and the premium price increases further along the bonding
 curve. The connector weight can be adjusted by `ADMIN_ROLE` within the allowed range.
@@ -71,23 +71,23 @@ adjusted_supply = EVE_supply × connector_weight
 premium_price   = NAV_total / adjusted_supply
 ```
 
-At the default connector weight of 0.5:
+At the default connector weight of 0.9:
 
 ```text
-premium_price = NAV_total / (EVE_supply × 0.5)
-              = 2 × (NAV_total / EVE_supply)
-              = 2 × base_price
+premium_price = NAV_total / (EVE_supply × 0.9)
+              ≈ 1.111 × (NAV_total / EVE_supply)
+              ≈ 1.111 × base_price
 ```
 
 **Example.** Suppose the protocol holds 10 ETH in NAV and 1,000 EVE are in circulation (ignoring the
 1 EVE permanently burned at bootstrap, which stays in the dead address):
 
 - Base price (exit) = 10 ETH / 1,000 EVE = **0.01 ETH per EVE**
-- Premium price (entry, cw=0.5) = 10 ETH / (1,000 × 0.5) = **0.02 ETH per EVE**
+- Premium price (entry, cw=0.9) = 10 ETH / (1,000 × 0.9) = 10 / 900 ≈ **0.01111 ETH per EVE**
 
-If you deposit 1 ETH, you receive 1 ETH / 0.02 ETH/EVE = **50 EVE**. The new NAV is 11 ETH, the new
-supply is 1,050 EVE. The new base price is 11/1,050 ≈ **0.01048 ETH per EVE** — slightly higher than
-before your deposit, so original holders benefited.
+If you deposit 1 ETH, you receive roughly 1 ETH / 0.01111 ETH/EVE ≈ **90 EVE**. The new NAV is 11 ETH,
+the new supply is 1,090 EVE. The new base price is 11/1,090 ≈ **0.01009 ETH per EVE** — slightly higher
+than before your deposit, so original holders benefited.
 
 For a step-by-step walkthrough from the user's perspective, see
 [Depositing & minting](/using-everstrat/depositing-and-minting).
