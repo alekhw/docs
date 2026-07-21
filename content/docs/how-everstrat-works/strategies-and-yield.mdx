@@ -65,8 +65,9 @@ tick, because the TWAP has not moved.
 - **Swap safety.** Internal swaps are capped at 2% slippage (`MAX_SWAP_SLIPPAGE_BPS = 200`) and
   checked against a Chainlink quote with a 2% maximum deviation (`MAX_QUOTE_DEVIATION_BPS = 200`).
 - **Pause and emergency exit.** Pausing the strategy withdraws its pool liquidity and revokes its
-  Converter allowances. `emergencyExit()` (admin-only) requires the strategy to be paused first, then
-  drains all funds back to the StrategyManager.
+  Converter allowances. `emergencyExit()` requires the strategy to be paused first, then drains all
+  funds back to the StrategyManager. It is callable by either `ADMIN_ROLE` or `SECURITY_ROLE`
+  (`onlyEitherAuthRole`), consistent with the other emergency capital-recovery paths.
 
 ## Performance fee
 
