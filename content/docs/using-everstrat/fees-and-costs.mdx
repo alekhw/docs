@@ -4,7 +4,7 @@ description: A complete breakdown of what interacting with Everstrat costs you �
 ---
 
 <Callout type="warn" title="Testnet only">
-  Everstrat is currently on **Arbitrum Sepolia testnet (chain id 421614)**. Tokens have no monetary
+  Everstrat is currently on **Sepolia testnet (chain id 11155111)**. Tokens have no monetary
   value. Do not send real funds.
 </Callout>
 
@@ -18,7 +18,7 @@ Here is everything that affects how much ETH you actually receive relative to wh
 | Protocol fee on exit | — | None |
 | Entry premium (bonding curve) | Existing EVE holders | Difference between premium price and base price |
 | Performance fee (UniCLStrat strategy) | DAO treasury | Up to 20% of NAV growth above high-water mark |
-| Gas | Arbitrum Sepolia validators | Standard network gas |
+| Gas | Sepolia validators | Standard network gas |
 | Slippage | — | Price movement between quote and execution |
 
 ## No protocol fee on deposit or exit
@@ -61,7 +61,7 @@ charge on your account — it is reflected in a lower NAV than you would see wit
 
 ## Gas
 
-Every on-chain interaction — deposit, exit submission, and claim — costs gas. Arbitrum Sepolia gas
+Every on-chain interaction — deposit, exit submission, and claim — costs gas. Sepolia gas
 fees are low, but they are non-zero. On a queued exit, you pay gas twice: once to submit and once to
 claim. (The keeper pays gas to price and process the batch.)
 

@@ -4,13 +4,13 @@ description: Answers to the most common questions about Everstrat — what it is
 ---
 
 <Callout type="warn" title="Testnet only">
-  Everstrat is on **Arbitrum Sepolia testnet (chain id 421614)**. Tokens have no monetary value. Do not
+  Everstrat is on **Sepolia testnet (chain id 11155111)**. Tokens have no monetary value. Do not
   send real funds.
 </Callout>
 
 <Accordions type="single">
   <Accordion title="Is Everstrat live on mainnet?">
-    No. Everstrat is deployed on **Arbitrum Sepolia testnet** (chain id 421614). There is no mainnet
+    No. Everstrat is deployed on **Sepolia testnet** (chain id 11155111). There is no mainnet
     deployment. EVE tokens and any ETH you interact with on this testnet have no monetary value.
   </Accordion>
   <Accordion title="What is EVE and what backs it?">
@@ -21,7 +21,7 @@ description: Answers to the most common questions about Everstrat — what it is
     [EVE and NAV](/how-everstrat-works/eve-and-nav) for the full formula.
   </Accordion>
   <Accordion title="How do I deposit ETH and receive EVE?">
-    Connect your wallet on Arbitrum Sepolia, enter an ETH amount, and confirm the transaction. The AMM
+    Connect your wallet on Sepolia, enter an ETH amount, and confirm the transaction. The AMM
     calculates how much EVE to mint using the premium price (which is higher than the redemption base
     price). You can set a `minTokensToMint` floor to protect against slippage. See
     [Depositing & minting](/using-everstrat/depositing-and-minting) for a step-by-step walkthrough.
@@ -60,7 +60,7 @@ description: Answers to the most common questions about Everstrat — what it is
       to existing EVE holders, not the protocol. See [Fees & costs](/using-everstrat/fees-and-costs).
     - **Performance fee** — up to **20%** of NAV growth above the strategy's high-water mark, paid to
       the DAO treasury. This reduces NAV growth flowing to you rather than appearing as a direct charge.
-    - **Gas** — standard Arbitrum Sepolia network gas on every on-chain action, including deposit, exit
+    - **Gas** — standard Sepolia network gas on every on-chain action, including deposit, exit
       submission, and claim.
     - **Slippage** — price can move between submission and settlement.
   </Accordion>
@@ -71,15 +71,15 @@ description: Answers to the most common questions about Everstrat — what it is
     the mechanism is real. See [Key risks](/risk-and-trust/key-risks) for a full breakdown.
   </Accordion>
   <Accordion title="Has Everstrat been audited?">
-    No audit is documented in this repository. The protocol is on Arbitrum Sepolia testnet and should
+    No audit is documented in this repository. The protocol is on Sepolia testnet and should
     be treated as unaudited. Do not treat testnet deployment as a signal of production readiness.
   </Accordion>
   <Accordion title="What network are the contracts on?">
-    All contracts are on **Arbitrum Sepolia** (chain id 421614). See
+    All contracts are on **Sepolia** (chain id 11155111). See
     [Contract addresses](/reference/contract-addresses) for the full list of deployed addresses.
   </Accordion>
   <Accordion title="My wallet is connected but transactions are not starting">
-    Check that your wallet is switched to **Arbitrum Sepolia** (chain id 421614). Everstrat does not
+    Check that your wallet is switched to **Sepolia** (chain id 11155111). Everstrat does not
     support any other network. If you see a network mismatch prompt, approve the switch. If transactions
     still do not initiate, refresh the page and reconnect your wallet.
   </Accordion>
@@ -98,6 +98,6 @@ description: Answers to the most common questions about Everstrat — what it is
   <Accordion title="The activity feed is lagging behind my transaction">
     The activity history uses the GoldSky subgraph, which indexes on-chain events with a short delay.
     Your transaction may have settled on-chain before the subgraph reflects it. Wait a minute and
-    refresh — if it still does not appear, check the transaction hash directly on Arbiscan.
+    refresh — if it still does not appear, check the transaction hash directly on Etherscan.
   </Accordion>
 </Accordions>

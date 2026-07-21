@@ -7,25 +7,29 @@ description: Current live deployment snapshot from frontend and subgraph configu
 
 | Item | Value |
 | --- | --- |
-| Network | Arbitrum Sepolia |
-| Chain ID | `421614` |
+| Network | Sepolia |
+| Chain ID | `11155111` |
 
-## Contract Snapshot
+## Contract snapshot
 
 | Contract | Address |
 | --- | --- |
-| `EVE_TOKEN` | `0x5557d2579AB5cA2Ee689ad74f5C14688dFBcF24c` |
-| `EXIT_QUEUE` | `0xf441aA569970Ee134f79772CC85b419CAc1AD5F2` |
-| `CONTROLLER` | `0x5Fc0491f0ac2b3eA1f3FCD93CE23F41399DE44dA` |
-| `ORACLE` | `0x9725d4a2790c8610e82899C060Ef98de98cFa6fA` |
-| `STRATEGY_MANAGER` | `0x9021Ee2b5e9FB92648720438A7E085Ff2a39E720` |
-| `AMM` | `0x9551D8b1639a0981a9D88A6A834b43D8B913Aa28` |
-| `MOCK_STRATEGY` | `0xd5be61ac673DB992F1872Eb604FaEb1B34A6880f` |
+| `REGISTRY` | `0x88a9692069fF43A439Ff876E28A8df5769175254` |
+| `EVE_TOKEN` | `0xFcf9F72C41E1BfA481d145933486DeF934a6C006` |
+| `EXIT_QUEUE` | `0x56d60283b42B8125389eAEc9a3c9AFE04Aa9e8f6` |
+| `CONTROLLER` | `0xB4a9F1df239A408998358dE3Ba8e11F0f267da7A` |
+| `ORACLE` | `0xce2b65C769479f2CbbFcFf7213EC0917A5b26Dd3` |
+| `STRATEGY_MANAGER` | `0xd4Bb0bEF88b6be67CD3285f8A56fa74839f36728` |
+| `AMM` | `0xad8afa3c697D7D3B87E73e30BD9ADd42098593f6` |
+| `CONVERTER` | `0xacB3567e20418D3B668233cF2eDB31D0801C163F` |
+| `TIMELOCK` | `0x5E19AcCDDedAf0A185C5627f41b1AB98179CC064` |
 
-## Current Subgraph
+## Current subgraph
 
-`https://api.goldsky.com/api/public/project_cm7aaq2gvh5ak01wf890nferb/subgraphs/everything-strategy/v0.1.4/gn`
+`https://api.goldsky.com/api/public/project_cm7aaq2gvh5ak01wf890nferb/subgraphs/everything-strategy-sepolia/v0.1.0/gn`
 
-## Source Of Truth Rule
+## Source of truth
 
-Prefer frontend config and subgraph deployment config over stale examples or old README snippets.
+These values are copied from [`frontend-app/web3-app/src/config/index.ts`](https://github.com/Guide-DAO-Organization/hackerhouse/blob/main/frontend-app/web3-app/src/config/index.ts), which is kept in sync with [`frontend-app/web3-app/subgraph/src/config.ts`](https://github.com/Guide-DAO-Organization/hackerhouse/blob/main/frontend-app/web3-app/subgraph/src/config.ts) via `scripts/sync-config.mjs`. If this page ever disagrees with those files, the config files are correct and this page is stale.
+
+For the user-facing view, see [Contract addresses](/reference/contract-addresses).

@@ -1,10 +1,10 @@
 ---
 title: Contract addresses
-description: Deployed contract addresses for Everstrat on Arbitrum Sepolia testnet.
+description: Deployed contract addresses for Everstrat on Sepolia testnet.
 ---
 
 <Callout type="warn" title="Testnet contracts">
-  These are **Arbitrum Sepolia testnet** contracts (chain id 421614). There is no mainnet deployment.
+  These are **Sepolia testnet** contracts (chain id 11155111). There is no mainnet deployment.
   These addresses have no monetary value and should not be used with real funds.
 </Callout>
 
@@ -12,18 +12,25 @@ description: Deployed contract addresses for Everstrat on Arbitrum Sepolia testn
 
 | Contract | Address |
 | --- | --- |
-| EVE token | `0x5557d2579AB5cA2Ee689ad74f5C14688dFBcF24c` |
-| AMM | `0x9551D8b1639a0981a9D88A6A834b43D8B913Aa28` |
-| Controller | `0x5Fc0491f0ac2b3eA1f3FCD93CE23F41399DE44dA` |
-| ExitQueue | `0xf441aA569970Ee134f79772CC85b419CAc1AD5F2` |
-| StrategyManager | `0x9021Ee2b5e9FB92648720438A7E085Ff2a39E720` |
-| Oracle | `0x9725d4a2790c8610e82899C060Ef98de98cFa6fA` |
+| EVE token | `0xFcf9F72C41E1BfA481d145933486DeF934a6C006` |
+| AMM | `0xad8afa3c697D7D3B87E73e30BD9ADd42098593f6` |
+| Controller | `0xB4a9F1df239A408998358dE3Ba8e11F0f267da7A` |
+| ExitQueue | `0x56d60283b42B8125389eAEc9a3c9AFE04Aa9e8f6` |
+| StrategyManager | `0xd4Bb0bEF88b6be67CD3285f8A56fa74839f36728` |
+| Oracle | `0xce2b65C769479f2CbbFcFf7213EC0917A5b26Dd3` |
+| Registry | `0x88a9692069fF43A439Ff876E28A8df5769175254` |
+| Converter | `0xacB3567e20418D3B668233cF2eDB31D0801C163F` |
+| Timelock | `0x5E19AcCDDedAf0A185C5627f41b1AB98179CC064` |
 
-The Registry proxy address is not published in the app or subgraph configuration and is therefore not
-listed here.
+## Source of truth
+
+These addresses are copied directly from:
+
+- [`frontend-app/web3-app/src/config/index.ts`](https://github.com/Guide-DAO-Organization/hackerhouse/blob/main/frontend-app/web3-app/src/config/index.ts) — `CONFIG.CONTRACTS`
+- [`frontend-app/web3-app/subgraph/src/config.ts`](https://github.com/Guide-DAO-Organization/hackerhouse/blob/main/frontend-app/web3-app/subgraph/src/config.ts) — the auto-generated subgraph config
+
+The two files are kept in sync by `scripts/sync-config.mjs` and agree exactly. If they ever disagree, the source of truth is `frontend-app/web3-app/src/config/index.ts`.
 
 ## Verifying addresses
 
-You can look up any of these addresses on [Arbiscan (Sepolia)](https://sepolia.arbiscan.io/). The
-addresses above are sourced from the frontend and subgraph configuration files in this repository —
-they are the best available source until on-chain broadcast files are published.
+You can look up any of these addresses on [Etherscan (Sepolia)](https://sepolia.etherscan.io/). If an address on this page ever disagrees with the config files above, treat the config files as correct and open an issue or PR to update this page.
