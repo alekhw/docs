@@ -1,0 +1,107 @@
+---
+title: The redemption queue, in depth
+description: Full mechanics of the ExitQueue — how your exit request is batched, priced, processed, and claimed, and what to do if things go wrong.
+---
+
+<Callout type="warn" title="Testnet only">
+  Everstrat is deployed on **Sepolia testnet (chain id 11155111)** only. No mainnet deployment
+  exists.
+</Callout>
+
+This page explains the full lifecycle of a queued redemption. For the user-facing summary, see
+[Exiting & redeeming](/using-everstrat/exiting-and-redeeming).
+
+## When does an exit go to the queue?
+
+When you call `exit()`, the AMM first checks its **free balance** — the ETH it holds minus any ETH
+already reserved for pending claims (`freeBalance = address(AMM).balance − lockedForClaims`). If the
+free balance is enough to pay your redemption at the current base price, the exit settles immediately.
+If not, your request enters the **ExitQueue** and your EVE is escrowed.
+
+There is a minimum size for queued exits: your redemption must be worth at least **0.001 ETH** (the
+default `minBatchExitETH`). The admin can raise this up to **0.05 ETH** if needed to keep batch sizes
+economical. Immediate exits have no minimum.
+
+## Step-by-step: queued exit lifecycle
+
+<Steps>
+  <Step>
+    **Your request joins the current batch.** Your EVE tokens are escrowed in the ExitQueue (not yet
+    burned). Your request records the base price at the time you submitted, which is used for the
+    slippage check later.
+  </Step>
+  <Step>
+    **A keeper prices the batch.** The keeper calls the Controller, which prices the batch on the
+    ExitQueue at the current base price. That price is validated against the AMM's last settled base
+    price (the same price-deviation guard that protects normal enters and exits) to prevent a keeper
+    from pricing a batch at a manipulated price. Once priced, the batch is locked — requests inside it
+    cannot be cancelled until the batch processing window expires.
+  </Step>
+  <Step>
+    **The keeper processes each request.** For each request in the batch, the ExitQueue checks whether
+    the settled price has fallen too far from the price at submission time. If `finalEvePrice` has
+    dropped more than your `priceTolerance` below `evePriceAtRequestTime`, the request is **closed for
+    slippage** — your EVE is returned to you and you receive no ETH. Otherwise, your ETH entitlement is
+    computed and credited.
+  </Step>
+  <Step>
+    **Your ETH is credited to your claimable balance.** The ETH is not pushed to your wallet
+    automatically. Instead, it is added to `claimableBalances[you]` and tracked in the AMM's
+    `lockedForClaims` counter (which is why it is excluded from the free balance and from NAV). This
+    **pull-over-push** pattern ensures one user's reverting wallet cannot block the entire batch from
+    settling.
+  </Step>
+  <Step>
+    **You call `claim()` to withdraw.** Once your ETH is in your claimable balance, you call `claim()`
+    on the AMM at any time to transfer it to your wallet.
+  </Step>
+</Steps>
+
+## Slippage tolerance
+
+When you queue an exit, you specify a `priceTolerance` — the maximum percentage drop in base price you
+are willing to accept between your submission and the batch settlement. If the price falls more than
+this, your EVE is returned and you can try again.
+
+The tolerance must be in the range `[0, 100%]`. Setting it to 0 means any price drop will trigger a
+slippage return; setting it high means you accept significant price movement in exchange for a higher
+chance of your exit settling.
+
+## The escape hatch
+
+If your batch is priced but the keeper never processes your request (for example, because the protocol
+encounters a problem), you are not locked in forever. After **3 days from when the batch was priced**,
+you can call `cancelRedemption(batchId)` on the AMM to recover your EVE. This is the escape hatch
+(`MAX_BATCH_PROCESSING_TIME = 3 days`).
+
+You can also cancel **at any time before the batch is priced** — there is no waiting period for
+unpriced batches.
+
+| When | Can you cancel? |
+| --- | --- |
+| Before the batch is priced | Yes, any time — no waiting period |
+| After batch is priced, within 3 days | No — the protocol expects the keeper to process within this window |
+| After batch is priced, more than 3 days ago | Yes — escape hatch available via `cancelRedemption` |
+
+<Callout type="info">
+  The 3-day window after pricing exists to give the keeper time to process all requests in the batch
+  without users gaming the system by watching the final price and cancelling if they don't like it.
+  The escape hatch only kicks in if the keeper fails to act.
+</Callout>
+
+## Summary of key parameters
+
+| Parameter | Default | Maximum |
+| --- | --- | --- |
+| Minimum queued exit size | **0.001 ETH** | **0.05 ETH** (admin-configurable) |
+| Escape hatch after pricing | **3 days** | Fixed in contract |
+| Price-deviation guard | **5%** default | **20%** maximum |
+
+## See also
+
+- [Exiting & redeeming](/using-everstrat/exiting-and-redeeming) — the user-facing summary
+- [Pricing & the bonding curve](/how-everstrat-works/pricing-and-bonding-curve) — how base price is
+  computed
+- [Architecture at a glance](/how-everstrat-works/architecture) — how the ExitQueue fits into the full
+  contract map
+- [Key risks](/risk-and-trust/key-risks) — liquidity and queue timing risks

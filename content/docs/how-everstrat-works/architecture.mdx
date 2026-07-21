@@ -1,0 +1,90 @@
+---
+title: Architecture at a glance
+description: How Everstrat's contracts fit together — the Registry-centric design, which contracts are immutable, and what each component does.
+---
+
+<Callout type="warn" title="Testnet only">
+  Everstrat is deployed on **Sepolia testnet (chain id 11155111)** only. No mainnet deployment
+  exists.
+</Callout>
+
+## Registry-centric design
+
+Every Everstrat contract resolves its peers and enforces role permissions through a single
+**Registry** contract. Instead of hardcoding addresses, each contract asks the Registry: "give me the
+current address of the Controller" or "does this caller hold KEEPER_ROLE?" The Registry's address is
+the one fixed reference every other contract points to. The Registry itself is immutable — it is
+deployed directly, with no proxy, so the anchor every peer resolves through can never change its
+logic. What it *stores* — peer addresses and role grants — is configuration that `ADMIN_ROLE` manages
+behind the 48-hour timelock.
+
+This design means:
+
+- **Upgradeable contracts** can be replaced at their proxy without touching any other contract's
+  configuration. Other contracts just query the Registry at call time.
+- **Roles** (ADMIN, KEEPER, SECURITY, MINTER, …) are all managed in one place, making permission
+  audits straightforward.
+- **A paused Registry** freezes all mutations across the protocol in a single action.
+
+## Contract roles
+
+| Contract | Upgradeable? | What it does |
+| --- | --- | --- |
+| **Registry** | No (immutable) | Protocol address book and role authority. Every contract resolves peers and checks roles through it; its logic is fixed, while the addresses and roles it stores are admin-configurable. |
+| **AMM** | No (immutable) | User entry and exit point. Runs the bonding curve, mints/burns EVE, manages immediate vs. queued exits. |
+| **EVE** | No (immutable) | The ERC-20 token that represents your proportional share of the protocol's NAV. |
+| **Controller** | Yes (UUPS proxy) | Receives deposited ETH from the AMM. A keeper bot drives distribution to strategies, withdrawal from strategies, and redemption-queue operations. |
+| **StrategyManager** | Yes (UUPS proxy) | Registers strategies, routes funds in and out, and computes total NAV by aggregating each strategy's `navInETH()`. |
+| **ExitQueue** | Yes (UUPS proxy) | Manages batches of queued redemption requests when the AMM lacks free ETH to pay immediately. |
+| **Oracle** | Yes (UUPS proxy) | Wraps Chainlink ETH/USD and strategy-asset price feeds. Used for bootstrap validation, USD-denominated view prices, and strategy asset valuation — **not** in the enter/exit hot path. |
+| **Converter** | Yes (UUPS proxy) | Shared DEX swap and WETH wrap/unwrap module used by strategies. Centralises routing so strategies don't each integrate a DEX directly. |
+| **UniCLStrat** | No (immutable) | The first strategy. Deploys pooled ETH into a Uniswap V3 concentrated-liquidity position and reports NAV back to the StrategyManager. |
+
+## Immutable vs. upgradeable
+
+The distinction is intentional:
+
+- **Immutable contracts** (AMM, EVE, UniCLStrat, Registry) are "code is law." Their logic cannot
+  change after deployment. Because AMM and EVE are the trust anchors users interact with directly —
+  and the Registry is the anchor every contract resolves through — making them immutable limits the
+  attack surface for governance actions.
+- **Upgradeable contracts** (Controller, StrategyManager, ExitQueue, Oracle, Converter) can be
+  improved to fix bugs or add features. Upgrades require `ADMIN_ROLE`, which in production is intended
+  to be held by a 48-hour TimelockController — meaning the community has time to react before a change
+  takes effect.
+
+For the full role breakdown and governance model, see
+[Trust & governance](/risk-and-trust/trust-and-governance).
+
+## The money flow in brief
+
+<Steps>
+  <Step>
+    **Deposit.** You call the AMM with ETH. The AMM mints EVE at the current premium price and
+    forwards your ETH to the Controller.
+  </Step>
+  <Step>
+    **Deployment.** A keeper calls the Controller, which routes ETH through the StrategyManager into
+    registered strategies. Strategies deploy capital into yield sources (currently Uniswap V3
+    concentrated liquidity via UniCLStrat).
+  </Step>
+  <Step>
+    **Accounting.** Each strategy continuously tracks its NAV in ETH. The StrategyManager aggregates
+    these into a total NAV that the AMM uses to price entries and exits.
+  </Step>
+  <Step>
+    **Exit.** You call the AMM with EVE. If free ETH is available, you receive ETH immediately at the
+    base price. If not, your request joins the ExitQueue — a keeper prices and processes the batch,
+    then you claim your ETH.
+  </Step>
+</Steps>
+
+## Where to go next
+
+- Deep per-contract reference: [Contracts](/contracts/overview)
+- Immutable vs. upgradeable governance split:
+  [Trust & governance](/risk-and-trust/trust-and-governance)
+- How the bonding curve prices entry and exit:
+  [Pricing & the bonding curve](/how-everstrat-works/pricing-and-bonding-curve)
+- How queued exits work in detail:
+  [The redemption queue, in depth](/how-everstrat-works/redemption-queue)

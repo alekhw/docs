@@ -1,0 +1,104 @@
+---
+title: Pricing & the bonding curve
+description: How the AMM prices entries and exits using NAV and a bonding curve connector weight — and how the price-deviation guard protects against manipulation.
+---
+
+<Callout type="warn" title="Testnet only">
+  Everstrat is deployed on **Sepolia testnet (chain id 11155111)** only. No mainnet deployment
+  exists.
+</Callout>
+
+## Two prices: base and premium
+
+The AMM uses two distinct prices, both derived from the protocol's NAV:
+
+| Price | Formula | Used for |
+| --- | --- | --- |
+| **Base price** | `NAV / EVE supply` | Exits (redeeming EVE for ETH) |
+| **Premium price** | `NAV / (EVE supply × connector weight)` | Entries (depositing ETH to mint EVE) |
+
+The **connector weight** (default **0.5**, range `(0, 1]`) is the parameter that creates the bonding
+curve. At the default of 0.5, the premium price is double the base price, meaning new depositors pay
+more per EVE than existing holders would receive on exit. The gap accrues to existing holders, not to
+a fee recipient — it increases the NAV per EVE for everyone already in.
+
+As more ETH flows in, the supply grows and the premium price increases further along the bonding
+curve. The connector weight can be adjusted by `ADMIN_ROLE` within the allowed range.
+
+## ETH-first, oracle-free hot path
+
+Entries and exits are priced entirely in ETH. The Chainlink Oracle is **not** consulted during a
+normal deposit or redemption. Oracle data is used only for:
+
+- The bootstrap minimum deposit check (validated in USD: minimum $1,000)
+- USD-denominated view functions (so the UI can display a dollar price)
+- Strategy asset valuation inside `navInETH()` (for non-WETH tokens held by strategies)
+
+This matters because oracle-dependent hot paths can be attacked or halted by stale data. Everstrat's
+enter/exit pricing only freezes if NAV itself cannot be computed — not because a price feed is
+unavailable.
+
+## Price-deviation guard
+
+Each entry and exit checks whether the resulting base price has moved too far from a rolling reference
+checkpoint. If the price moves more than the allowed deviation, the transaction reverts with
+`AMMExcessiveDeviation`.
+
+| Parameter | Default | Maximum |
+| --- | --- | --- |
+| Allowed deviation | **5%** | **20%** |
+| Checkpoint update frequency | At most once per block | — |
+
+The once-per-block checkpoint rule prevents an attacker from chaining multiple transactions in the
+same block to step the price through the deviation limit in small increments.
+
+After a legitimate large NAV move (for example, a strategy harvests a significant amount of fees at
+once), `ADMIN_ROLE` or `SECURITY_ROLE` can call `resetBasePriceCheckpoint()` to unblock trading.
+
+<Accordions type="single">
+  <Accordion title="Formula detail & worked example">
+
+**Base price** (exits):
+
+```text
+base_price = NAV_total / EVE_supply
+```
+
+**Premium price** (entries):
+
+```text
+adjusted_supply = EVE_supply × connector_weight
+premium_price   = NAV_total / adjusted_supply
+```
+
+At the default connector weight of 0.5:
+
+```text
+premium_price = NAV_total / (EVE_supply × 0.5)
+              = 2 × (NAV_total / EVE_supply)
+              = 2 × base_price
+```
+
+**Example.** Suppose the protocol holds 10 ETH in NAV and 1,000 EVE are in circulation (ignoring the
+1 EVE permanently burned at bootstrap, which stays in the dead address):
+
+- Base price (exit) = 10 ETH / 1,000 EVE = **0.01 ETH per EVE**
+- Premium price (entry, cw=0.5) = 10 ETH / (1,000 × 0.5) = **0.02 ETH per EVE**
+
+If you deposit 1 ETH, you receive 1 ETH / 0.02 ETH/EVE = **50 EVE**. The new NAV is 11 ETH, the new
+supply is 1,050 EVE. The new base price is 11/1,050 ≈ **0.01048 ETH per EVE** — slightly higher than
+before your deposit, so original holders benefited.
+
+For a step-by-step walkthrough from the user's perspective, see
+[Depositing & minting](/using-everstrat/depositing-and-minting).
+  </Accordion>
+</Accordions>
+
+## See also
+
+- [EVE & NAV](/how-everstrat-works/eve-and-nav) — where NAV comes from
+- [Depositing & minting](/using-everstrat/depositing-and-minting) — the user experience side of
+  entering
+- [Exiting & redeeming](/using-everstrat/exiting-and-redeeming) — the user experience side of exiting
+- [Trust & governance](/risk-and-trust/trust-and-governance) — who can change the connector weight and
+  deviation limit

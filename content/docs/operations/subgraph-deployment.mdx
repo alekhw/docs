@@ -3,7 +3,7 @@ title: Subgraph deployment
 description: Build and deploy workflow for the bundled GoldSky/The Graph workspace.
 ---
 
-## Build Workflow
+## Build workflow
 
 ```bash
 cd frontend-app/web3-app/subgraph
@@ -12,14 +12,23 @@ npm run codegen
 npm run build
 ```
 
-## Deploy Workflow
+Both `codegen` and `build` run `npm run config:sync` first, which regenerates `src/config.ts` from
+`config/deployments/sepolia.json`.
+
+## Deploy workflow
 
 ```bash
 goldsky login
-goldsky subgraph deploy everything-strategy/v0.1.4 --path .
+goldsky subgraph deploy everything-strategy-sepolia/v0.1.0 --path .
 ```
 
-## Change Rule
+## Change rule
 
-When redeploying contracts, update `config/deployments/arbitrum-sepolia.json` first and regenerate
-from there.
+When redeploying contracts:
+
+1. Update `frontend-app/web3-app/subgraph/config/deployments/sepolia.json` with the new addresses
+   and `startBlock`.
+2. Run `npm run config:sync` (or any of `codegen`/`build` which invoke it) to regenerate
+   `src/config.ts`.
+3. Update `frontend-app/web3-app/src/config/index.ts` `CONFIG.CONTRACTS` to match — the two files
+   are expected to agree exactly.

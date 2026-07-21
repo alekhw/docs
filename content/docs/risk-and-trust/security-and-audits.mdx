@@ -1,0 +1,96 @@
+---
+title: Security & audits
+description: The honest state of third-party review and the security model built into the protocol design.
+---
+
+<Callout type="warn" title="Testnet only">
+  Everstrat is on **Sepolia testnet**. Tokens have no monetary value. Do not send real funds.
+</Callout>
+
+## Audit status
+
+<Callout type="warn" title="No audit">
+  No third-party audit report is documented in this repository. The smart-contracts README references an
+  internal design designation ("PL-003") for the timelock governance model, but no formal audit artifact
+  — no report, no auditor, no engagement — is present in the codebase. Everstrat is currently on the
+  Sepolia testnet. Treat the contracts as unaudited.
+</Callout>
+
+If an audit is completed in future, it will be linked here with the report artifact and the auditor's
+name. Until then, the responsible position is: no external review has been documented.
+
+## Security model
+
+The protocol's security design relies on a layered set of mechanisms rather than a single point of
+protection. Each is described below.
+
+### Immutable core
+
+EVE, AMM, UniCLStrat, and the Registry are static (non-upgradeable) contracts. Their code is fixed at
+deployment. This means:
+
+- The bonding curve formulas for enter (premium price) and exit (base price) cannot be changed.
+- The AMM's fee structure (currently no protocol fee on enter or exit) cannot be changed.
+- The UniCLStrat's position management and per-strategy settlement logic (its side of the
+  performance fee — measuring accrued Uniswap V3 trading fees and reporting an ETH-equivalent
+  amount to the StrategyManager) cannot be changed. The fee **rate**, cap, and the EVE-mint
+  settlement that actually dilutes holders live on the upgradeable StrategyManager.
+- The Registry's address-resolution and role-check logic cannot be changed (the addresses and roles it
+  stores remain admin-configurable, behind the timelock).
+
+There is no admin key that can alter these contracts' code.
+
+### Upgradeable management contracts behind a 48-hour timelock
+
+Controller, StrategyManager, ExitQueue, Oracle, and Converter are UUPS-upgradeable. All upgrades
+require ADMIN_ROLE authorization. ADMIN_ROLE is intended to be held by a 48-hour `TimelockController` —
+every upgrade or configuration change must wait 48 hours from announcement before it can execute.
+
+The timelock delay is your reaction window. See [Trust & governance](/risk-and-trust/trust-and-governance)
+for the full role breakdown.
+
+### Emergency pause (SECURITY_ROLE)
+
+A security multisig holds SECURITY_ROLE. It can pause AMM, Controller, ExitQueue, StrategyManager,
+UniCLStrat, and Registry immediately — no timelock, because emergency response must be fast. A paused
+protocol freezes deposits, withdrawals, and strategy operations.
+
+The security multisig cannot unpause, reconfigure, or upgrade anything. Unpausing requires ADMIN_ROLE,
+which goes through the 48-hour timelock.
+
+The security multisig also holds the CANCELLER role on the timelock, giving it the ability to veto a
+queued admin action before it executes.
+
+### Fail-closed NAV
+
+If any registered strategy's `navInETH()` call reverts, the protocol's total NAV calculation reverts.
+Deposits, withdrawals, and price updates all freeze until the strategy is fixed or removed by
+governance. This is a safety-first design: the protocol refuses to operate at an unverifiable price, at
+the cost of temporary unavailability.
+
+### Price-deviation guard
+
+Every enter and exit checks the current EVE price against a recent checkpoint. If the price has moved
+more than the configured maximum (default 5%) since the last block-level checkpoint, the transaction
+reverts. This prevents manipulation via rapid price swings. The checkpoint moves at most once per block
+to prevent chaining multiple deviation steps.
+
+Recovery from a deviation revert requires `ADMIN_ROLE` or `SECURITY_ROLE` to reset the checkpoint.
+
+### Pull-over-push claims
+
+When a queued exit batch is processed, ETH is credited to each user's claimable balance rather than
+pushed directly to their address. Users call `claim()` to withdraw. This avoids the reentrancy and
+griefing risks that come with pushing ETH to arbitrary addresses.
+
+### priceTolerance guard on queued exits
+
+When you submit a queued exit, you specify a `priceTolerance`. If the EVE price at settlement has
+fallen more than that tolerance below the price when you submitted, the request is closed and your EVE
+is returned. This protects you from being settled at a significantly worse price than you expected, but
+it also means your exit request may fail and need to be resubmitted.
+
+---
+
+For what these mechanisms mean in practice as a user, see [Key risks](/risk-and-trust/key-risks) and
+[Trust & governance](/risk-and-trust/trust-and-governance).

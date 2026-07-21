@@ -1,0 +1,80 @@
+---
+title: Fees & costs
+description: A complete breakdown of what interacting with Everstrat costs you — protocol fees, the bonding curve premium, performance fees, gas, and slippage.
+---
+
+<Callout type="warn" title="Testnet only">
+  Everstrat is currently on **Sepolia testnet (chain id 11155111)**. Tokens have no monetary
+  value. Do not send real funds.
+</Callout>
+
+Here is everything that affects how much ETH you actually receive relative to what you put in.
+
+## Cost breakdown
+
+| Cost | Paid to | Amount |
+| --- | --- | --- |
+| Protocol fee on deposit | — | None |
+| Protocol fee on exit | — | None |
+| Entry premium (bonding curve) | Existing EVE holders | Difference between premium price and base price |
+| Performance fee | DAO treasury | A configurable bps rate (max 20%) on accrued Uniswap V3 LP trading fees, settled by minting EVE (diluting existing holders) |
+| Gas | Sepolia validators | Standard network gas |
+| Slippage | — | Price movement between quote and execution |
+
+## No protocol fee on deposit or exit
+
+The Everstrat AMM does not charge a protocol fee when you deposit ETH or when you burn EVE. Your full
+deposit is forwarded to the protocol, and the full ETH value of your EVE is redeemed on exit. This is
+confirmed in the contract code — there is no fee deduction in the `enter()` or `exit()` paths.
+
+## The entry premium — a real cost, not a protocol fee
+
+When you deposit, you pay the **premium price**, which is higher than the **base price** (NAV /
+supply). See [Depositing & minting](/using-everstrat/depositing-and-minting) for the formula and a
+worked example.
+
+<Callout type="info">
+  The gap between the premium price you pay and the base price is **not money paid to the protocol**.
+  It is distributed to all existing EVE holders by slightly increasing the NAV backing each EVE already
+  in circulation. This is how the bonding curve incentivizes early participation and discourages rapid
+  in-and-out cycling. It is still a real cost to you as a new depositor — you are paying above the
+  current redemption value of EVE.
+</Callout>
+
+## Performance fee
+
+The strategy earns yield from Uniswap V3 trading fees on its LP position. The protocol charges a
+**performance fee** on those accrued trading fees — a configurable bps rate set on the
+StrategyManager (capped at **20%**, `MAX_PERFORMANCE_FEE_BPS = 2000`).
+
+Key details:
+
+- The fee applies to **accrued Uniswap V3 LP trading fees** in the strategy — not to NAV growth,
+  not on a high-water mark. If the strategy has not earned trading fees, no fee accrues.
+- The live rate is set at deployment and may be anywhere from 0 to 20%; 0 disables harvesting.
+- Settlement does **not** move ETH out of the protocol and does **not** involve the Converter.
+  Instead, the StrategyManager **mints EVE** to the DAO treasury using bonding-curve dilution:
+  `evesToMint = (feeETH × supply) / (totalNAV − feeETH)`.
+- The result is that existing EVE holders are **diluted proportionally** — the treasury takes a
+  larger slice of NAV, and every other holder's slice shrinks by the same fraction.
+
+This fee does not appear as a separate charge on your account. You experience it as gradual
+dilution over time as the keeper harvests. For the full mechanics, see
+[Strategies & yield](/how-everstrat-works/strategies-and-yield).
+
+## Gas
+
+Every on-chain interaction — deposit, exit submission, and claim — costs gas. Sepolia gas
+fees are low, but they are non-zero. On a queued exit, you pay gas twice: once to submit and once to
+claim. (The keeper pays gas to price and process the batch.)
+
+## Slippage
+
+Price can move between the time you request an action and the time it settles:
+
+- **On deposit:** controlled by `minTokensToMint`. If you would receive fewer EVE than your floor, the
+  transaction reverts.
+- **On exit:** controlled by `priceTolerance`. If the settled price on a queued exit has dropped more
+  than your tolerance, your request is closed for slippage and your EVE is returned.
+
+Neither of these is a fee — they are protections against adverse price movement, not charges.

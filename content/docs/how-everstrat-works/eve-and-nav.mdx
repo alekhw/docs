@@ -1,0 +1,75 @@
+---
+title: EVE & NAV
+description: What EVE represents, how net asset value is calculated, and what happens when a strategy misbehaves.
+---
+
+<Callout type="warn" title="Testnet only">
+  Everstrat is deployed on **Sepolia testnet (chain id 11155111)** only. No mainnet deployment
+  exists. EVE tokens have no monetary value.
+</Callout>
+
+## EVE is a proportional claim
+
+When you deposit ETH into Everstrat, you receive **EVE** — an ERC-20 token that represents your
+fractional share of the protocol's total **net asset value (NAV)**, measured in ETH.
+
+Your share of the protocol is simple:
+
+```text
+your share = your EVE balance / total EVE supply
+```
+
+As the protocol's strategies earn (or lose) value, NAV rises or falls, and each EVE token is worth
+correspondingly more or less ETH. There is no promised return. EVE is not pegged to anything.
+
+## What counts as NAV
+
+Total NAV is the sum of every pool of ETH the protocol controls. Specifically, the StrategyManager's
+`totalNAVInETH()` adds up:
+
+| Component | What it includes |
+| --- | --- |
+| Strategy `navInETH()` calls | Each registered strategy's reported ETH value — for UniCLStrat this includes idle ETH and WETH, the LP position value, uncollected trading fees, and paired-token inventory (the paired token is valued via the Oracle). |
+| StrategyManager balance | Any ETH sitting on the StrategyManager contract itself, waiting to be deployed. |
+| Controller balance | Any ETH held by the Controller — received from the AMM but not yet forwarded to strategies. |
+| AMM free balance | ETH in the AMM contract that is not reserved for pending claims: `address(AMM).balance − lockedForClaims`. |
+| Supported-ERC20 balances on the StrategyManager | The ETH value of each admin-whitelisted ERC-20 held by the StrategyManager, priced via `Oracle.convert`. This term is zero day-to-day and only becomes non-zero in emergencies — for example, after `UniCLStrat.emergencyExit()` leaves a paired-token balance stranded on the StrategyManager. |
+
+`lockedForClaims` tracks ETH already owed to users who have had their queued exit processed but have
+not yet called `claim()`. That ETH is excluded from NAV because it is no longer the protocol's to
+deploy.
+
+## Fail-closed NAV
+
+The NAV calculation is **fail-closed**: if any strategy's `navInETH()` call reverts — for example
+because the strategy is paused, broken, or in an inconsistent state — then `totalNAVInETH()` reverts
+too. When NAV cannot be computed, the AMM cannot price anything, so `enter()`, `exit()`, and batch
+pricing all freeze until the problem is resolved.
+
+<Callout type="info">
+  This is a deliberate safety property. Allowing enters and exits to proceed against a stale or missing
+  NAV figure would let users trade at a price that does not reflect reality, which could drain value
+  from the remaining holders. The protocol prefers a temporary freeze over mispricing.
+</Callout>
+
+A frozen strategy can be fixed by the admin (by repairing the strategy's state) or removed entirely
+via `StrategyManager.removeStrategy()`, which uses a try/catch so a reverting `navInETH()` does not
+block removal.
+
+## Why this matters to you
+
+- **NAV going up** means the strategies earned more in fees or asset appreciation than they lost. Each
+  EVE you hold is worth more ETH.
+- **NAV going down** means the strategies lost value (for example, due to impermanent loss or adverse
+  market movements). Each EVE is worth less ETH.
+- **A frozen protocol** means something is wrong with a strategy and the admin needs to intervene. You
+  cannot enter or exit until the issue is resolved or the bad strategy is removed.
+
+For a full treatment of what can go wrong, see [Key risks](/risk-and-trust/key-risks).
+
+## See also
+
+- [Pricing & the bonding curve](/how-everstrat-works/pricing-and-bonding-curve) — how NAV feeds the
+  enter and exit prices
+- [Strategies & yield](/how-everstrat-works/strategies-and-yield) — how strategies contribute to NAV
+- [Architecture at a glance](/how-everstrat-works/architecture) — the full contract layout

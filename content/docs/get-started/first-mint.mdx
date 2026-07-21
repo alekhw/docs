@@ -1,34 +1,47 @@
 ---
-title: First mint
-description: How the current mint UI turns ETH input into an `AMM.enter(...)` transaction.
+title: Your first deposit
+description: How to deposit ETH and mint EVE on Sepolia, step by step.
 ---
 
-## What The Mint UI Reads
-
-Before a mint write becomes actionable, the frontend reads:
-
-- AMM paused state
-- premium price
-- user ETH balance
-- configured contract addresses
-
-## Mint Flow
-
 <Steps>
-  <Step>Enter ETH or target EVE amount using the dual-input form.</Step>
-  <Step>Adjust balance with `0 / 25 / 50 / 75 / 100` presets if needed.</Step>
-  <Step>The frontend simulates `AMM.enter(minTokensToMint)` before submission.</Step>
-  <Step>When confirmed, the transaction is sent with `value = depositEth`.</Step>
+  <Step>
+    **Make sure the toggle is set to Mint.** The app has a Mint/Burn toggle at the top of the form.
+    Select **Mint** (shown in green). This puts you in deposit mode.
+  </Step>
+  <Step>
+    **Enter an ETH amount.** Type a value into the amount field, or use the percentage slider
+    (**0 / 25 / 50 / 75 / 100%**) to fill based on your wallet balance. The balance pill shows your
+    current ETH balance for reference.
+  </Step>
+  <Step>
+    **Review the estimated EVE you'll receive.** The app shows how much EVE you'll get based on the
+    current portfolio NAV and the entry (premium) price. You won't see the exact final amount until
+    the transaction is mined, which is why slippage matters.
+  </Step>
+  <Step>
+    **Set your slippage.** This controls `minTokensToMint` — the fewest EVE you'll accept. If the
+    price moves against you before the transaction confirms, it reverts instead of giving you less EVE
+    than expected. You can leave it on **Auto** or enter a manual basis-point value.
+  </Step>
+  <Step>
+    **Click Mint and approve in your wallet.** Confirm the transaction in your wallet when prompted.
+    The app will display a transaction status dialog showing progress.
+  </Step>
+  <Step>
+    **Wait for confirmation.** Once the transaction is confirmed, your EVE balance updates and the
+    deposit is complete.
+  </Step>
 </Steps>
 
-## Slippage Behavior
+<Callout type="info" title="More about depositing">
+  There's more to know about depositing: the first-ever deposit into the protocol (bootstrap) has a
+  minimum size requirement, and entry always uses a premium price above NAV. See
+  [Depositing and minting](/using-everstrat/depositing-and-minting) for a worked example and full
+  explanation.
+</Callout>
 
-For mint, slippage protects the minimum EVE output, not the ETH deposit amount. The app computes
-the minimum-out floor and submits that value into `enter(...)`.
-
-Read more in [Slippage model](/app/slippage-model).
-
-<Callout type="success" title="Bootstrap note">
-  The first mint can trigger the AMM bootstrap path. At the protocol layer that is still the same
-  user-facing action, but the indexed activity type becomes `BOOTSTRAP_MINT` instead of `MINT`.
+<Callout type="warn" title="AMM paused">
+  If you see **"AMM is currently paused"**, minting and burning are temporarily unavailable — check
+  back later. Claiming ETH you are already owed and the escape-hatch cancel keep working while paused,
+  so a pause never locks up funds that have been credited to you.
 </Callout>

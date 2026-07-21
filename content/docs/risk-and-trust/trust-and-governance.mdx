@@ -1,0 +1,82 @@
+---
+title: Trust & governance
+description: What you are trusting when you use Everstrat, who holds each role, and what controls exist.
+---
+
+<Callout type="warn" title="Testnet only">
+  Everstrat is on **Sepolia testnet**. Tokens have no monetary value. Do not send real funds.
+</Callout>
+
+When you deposit ETH into Everstrat, you are trusting a set of on-chain roles and the humans or
+contracts that hold them. This page describes exactly what each role can do and what controls limit
+it.
+
+## What you are trusting
+
+You trust that:
+
+- The contracts behave as their code specifies (and the code has not been changed without notice).
+- The 48-hour timelock gives you enough time to see announced changes and exit if you disagree.
+- The security multisig responds appropriately to emergencies without overstepping its limited powers.
+- The keeper bot stays live to process queued exits. (The 3-day escape hatch is your protection if it
+  doesn't — see [Key risks](/risk-and-trust/key-risks).)
+
+## Role table
+
+| Role | What it can do | What it cannot do | Intended holder |
+| --- | --- | --- | --- |
+| **ADMIN_ROLE** | Configure contracts (connector weight, min batch exit ETH, price deviation limit), manage oracle feeds and token configuration, add/remove strategies, register contracts in the registry, grant/revoke roles, **unpause** modules, and authorize **UUPS upgrades** | Nothing outside that list | 48-hour `TimelockController` — admin actions are announced 48 hours before they take effect |
+| **SECURITY_ROLE** | **Pause** AMM, Controller, ExitQueue, StrategyManager, UniCLStrat, and Registry; trigger emergency capital-recovery paths; reset the bonding curve price checkpoint | Unpause, reconfigure any parameter, or authorize upgrades | Security multisig (no timelock — fast reaction is the point) |
+| **KEEPER_ROLE** | Run strategy distributions and process exit-queue batches | Modify configuration, pause, or upgrade anything | Keeper bot or multisig |
+| **MINTER_ROLE** | Mint and burn EVE tokens | Any other action | AMM contract (not a human or multisig) |
+| **CONVERTER_CALLER_ROLE** | Call Converter for token wrap/unwrap/swap operations | Any other action | Granted by StrategyManager to each registered strategy |
+| **CONVERTER_CALLER_MANAGER_ROLE** | Grant and revoke `CONVERTER_CALLER_ROLE` — i.e. control which strategies may call the Converter | Any other action | The Converter contract itself (not a human or multisig) |
+
+### The 48-hour timelock
+
+ADMIN_ROLE is intended to be held by a `TimelockController` with a 48-hour delay
+(`DEFAULT_ADMIN_TIMELOCK_DELAY = 48 hours`, confirmed in `script/ProtocolDeployBase.sol`). This means
+any governance action — a configuration change, a strategy addition, a contract upgrade — is announced
+on-chain 48 hours before it can be executed. That window is your time to review the change and exit if
+you do not agree with it.
+
+The security multisig holds the CANCELLER role on the timelock, meaning it can veto a queued admin
+action before it executes.
+
+### SECURITY_ROLE limits
+
+The security multisig is designed for fast emergency response, not governance. It can pause the
+protocol (freezing deposits and withdrawals) but it cannot unpause, change any configuration, or
+authorize contract upgrades. Unpausing requires ADMIN_ROLE — which means going through the 48-hour
+timelock.
+
+## Immutable vs upgradeable contracts
+
+Not all contracts behave the same way under governance.
+
+| Contract | Status | What this means |
+| --- | --- | --- |
+| **EVE** | Immutable (static) | The EVE token contract cannot be changed. Its behavior is fixed at deployment. |
+| **AMM** | Immutable (static) | The bonding curve logic, enter/exit mechanics, and fee structure cannot be changed. |
+| **UniCLStrat** | Immutable (static) | The Uniswap V3 concentrated-liquidity strategy logic cannot be changed. |
+| **Registry** | Immutable (static) | The logic cannot be upgraded. The addresses and roles it stores are managed by ADMIN_ROLE (via 48h timelock). |
+| **Controller** | Upgradeable (UUPS) | Can be upgraded by ADMIN_ROLE (via 48h timelock). |
+| **StrategyManager** | Upgradeable (UUPS) | Can be upgraded by ADMIN_ROLE (via 48h timelock). |
+| **ExitQueue** | Upgradeable (UUPS) | Can be upgraded by ADMIN_ROLE (via 48h timelock). |
+| **Oracle** | Upgradeable (UUPS) | Can be upgraded by ADMIN_ROLE (via 48h timelock). |
+| **Converter** | Upgradeable (UUPS) | Can be upgraded by ADMIN_ROLE (via 48h timelock). |
+
+### The trade-off
+
+Upgradeable contracts can fix bugs and add features. They can also change behavior. The 48-hour
+timelock is the mitigation: you have a window to see what is being changed before it happens. Immutable
+contracts (EVE, AMM, UniCLStrat, Registry) offer the opposite assurance — their behavior is fixed
+forever, which means no bug fixes but also no surprise changes.
+
+You are trusting the timelock delay to give you enough time to act. If you disagree with an announced
+upgrade, you need to be able to exit within 48 hours of it being announced. Check the
+[Key risks](/risk-and-trust/key-risks) page for exit delay considerations.
+
+---
+
+For the audit status and security model detail, see [Security & audits](/risk-and-trust/security-and-audits).

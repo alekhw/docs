@@ -1,40 +1,62 @@
 ---
-title: Burn and redeem
-description: The live burn flow, including approval, immediate redemption, queued redemption, and cancellation.
+title: Your first exit
+description: How to burn EVE and redeem ETH on Sepolia, including immediate and queued exits.
 ---
 
-## Burn Is A Redemption Flow
+<Steps>
+  <Step>
+    **Switch the toggle to Burn.** The Mint/Burn toggle is at the top of the form. Select **Burn**
+    (shown in orange) to enter exit mode.
+  </Step>
+  <Step>
+    **Enter the amount of EVE to burn.** Type an amount or use the percentage slider to choose a
+    portion of your EVE balance. The balance pill shows your current EVE balance.
+  </Step>
+  <Step>
+    **Review the estimated ETH you'll receive.** The app shows the estimated ETH based on the current
+    exit (base) price, which equals the portfolio NAV divided by EVE supply.
+  </Step>
+  <Step>
+    **Set your slippage (`priceTolerance`).** This only matters if your exit gets queued: it sets how
+    much the EVE price can fall between when you submit the request and when the batch settles. If the
+    price drops beyond your tolerance, the request is cancelled and your EVE is returned. Immediate
+    exits don't use it — there, the EVE amount you entered acts as a hard cap on how much is burned
+    (`maxTokensToBurn`), and the transaction reverts if the price moves beyond it. Leave it on
+    **Auto** or enter a manual value.
+  </Step>
+  <Step>
+    **Click Burn and approve in your wallet.** Confirm the transaction. The app displays a transaction
+    status dialog while the transaction is processed.
+  </Step>
+</Steps>
 
-The app does not model burn as a spot swap. It prepares protocol writes around `AMM.exit(...)`
-and `AMM.cancelRedemption(...)`.
+## What happens next
 
-<Tabs items={["Immediate", "Queued"]}>
+Depending on how much free ETH the AMM holds at the moment you burn, your exit will be either
+immediate or queued.
+
+<Tabs items={["Immediate exit", "Queued exit"]}>
   <Tab>
-    If AMM liquidity is sufficient, the burn settles immediately and the indexed outcome is
-    `BURN_IMMEDIATE`.
+    If the AMM holds enough free ETH to cover your redemption, you receive ETH in the same
+    transaction. The exit is complete as soon as the transaction confirms — no further action needed.
   </Tab>
   <Tab>
-    If liquidity is insufficient, the request is added to `ExitQueue`, later priced by a keeper,
-    and then processed or closed depending on tolerance and timing.
+    If the AMM doesn't hold enough free ETH, your request joins a batch in the exit queue. Here's
+    what happens next:
+
+    1. A keeper prices and processes the batch.
+    2. Once processed, ETH is credited to your account — but not sent automatically (pull-over-push).
+    3. Come back to the app and click **Claim** to withdraw your ETH.
+
+    A **"Pending: [amount] EVE"** card will appear in the app while your request is waiting.
+
+    **Escape hatch:** If your batch hasn't been paid out within **3 days of being priced** (the clock
+    starts when the keeper prices the batch, not when you submit), you can cancel it and get your EVE
+    back. The **Cancel Pending Burn** action in the app will become available at that point.
   </Tab>
 </Tabs>
 
-## Current Frontend Behavior
-
-<Steps>
-  <Step>Check EVE balance, AMM allowance, base price, and current pending request state.</Step>
-  <Step>If allowance is insufficient, submit `EVE.approve(AMM, amount)` first.</Step>
-  <Step>Simulate `AMM.exit(requestedEth, maxTokensToBurn, priceTolerance)`.</Step>
-  <Step>If a pending queued request already exists in the current batch, block creating another one.</Step>
-</Steps>
-
-## Canceling A Pending Burn
-
-The app exposes `Cancel Pending Burn` only when the request can be closed under the protocol rules.
-That includes unpriced requests and escape-hatch closures after `MAX_BATCH_PROCESSING_TIME`.
-
-Read more in:
-
-- [Burn UI](/app/burn-ui)
-- [Queued redemption lifecycle](/protocol/queued-redemption-lifecycle)
-- [Failure and recovery scenarios](/security/failure-and-recovery-scenarios)
+<Callout type="info" title="Full mechanics">
+  For the full mechanics of queued exits, price tolerance, batch timing, and cancellation rules, see
+  [Exiting and redeeming](/using-everstrat/exiting-and-redeeming).
+</Callout>

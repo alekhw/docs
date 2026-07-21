@@ -1,0 +1,131 @@
+---
+title: Strategies & yield
+description: How the keeper deploys pooled ETH into strategies, how UniCLStrat earns trading fees on Uniswap V3, and how the performance fee works.
+---
+
+<Callout type="warn" title="Testnet only">
+  Everstrat is deployed on **Sepolia testnet (chain id 11155111)** only. No mainnet deployment
+  exists. Strategy returns are not guaranteed and can be negative.
+</Callout>
+
+## How funds reach strategies
+
+You do not choose which strategies receive your ETH. When you deposit, the AMM forwards your ETH to
+the **Controller**. A **keeper** bot then calls the Controller to route ETH through the
+**StrategyManager**, which distributes it to registered strategies proportionally according to each
+strategy's configured safety level.
+
+This means:
+
+- All depositors share the same strategy exposure.
+- Adding or removing strategies is a governance action (`ADMIN_ROLE`), not a user action.
+- A keeper, not a user, decides when to deploy idle ETH.
+
+## UniCLStrat — concentrated-liquidity on Uniswap V3
+
+UniCLStrat is the first (and currently only) registered strategy. It earns yield by providing
+**concentrated liquidity** on a Uniswap V3 WETH/paired-token pool.
+
+<Cards>
+  <Card title="Wrap ETH to WETH">
+    Received ETH is wrapped into WETH via the Converter module before entering the Uniswap pool.
+  </Card>
+  <Card title="Provide liquidity in a price range">
+    The strategy mints a concentrated LP position around the current pool price, earning a share of
+    the pool's trading fees from swaps that fall within the range.
+  </Card>
+  <Card title="Rebalance when price drifts">
+    When the pool price moves outside the strategy's range, a keeper triggers a rebalance — routed
+    through the Controller and StrategyManager, since only the StrategyManager can call the strategy
+    directly. Liquidity is removed, ticks are recalculated, and liquidity is re-added around the new
+    price. The rebalance executes only while the pool is calm; during sharp volatility it reverts until
+    the pool settles.
+  </Card>
+  <Card title="Report NAV in ETH">
+    The strategy's `navInETH()` continuously sums idle ETH and WETH, the LP position value, uncollected
+    trading fees, and any paired-token inventory. ETH and WETH count 1:1; the paired token is valued in
+    ETH via the Oracle. This feeds the AMM's pricing.
+  </Card>
+</Cards>
+
+## The calm-period check
+
+UniCLStrat only deposits or rebalances when the pool is **calm**. Calmness is determined by comparing
+both the pool's current spot tick and a short TWAP (at least 60 seconds) against a longer TWAP. If
+either deviates beyond a configured tolerance, the strategy refuses to act.
+
+This protects against flash-loan attacks and short-term price manipulation: an attacker who pushes the
+pool price in a single block cannot trick the strategy into depositing or rebalancing at a manipulated
+tick, because the TWAP has not moved.
+
+## Other guardrails
+
+- **Deposit cap.** The strategy enforces a configurable `maxTotalNAV`; deposits that would push its
+  NAV past the cap revert.
+- **Swap safety.** Internal swaps are capped at 2% slippage (`MAX_SWAP_SLIPPAGE_BPS = 200`) and
+  checked against a Chainlink quote with a 2% maximum deviation (`MAX_QUOTE_DEVIATION_BPS = 200`).
+- **Pause and emergency exit.** Pausing the strategy withdraws its pool liquidity and revokes its
+  Converter allowances. `emergencyExit()` requires the strategy to be paused first, then drains all
+  funds back to the StrategyManager. It is callable by either `ADMIN_ROLE` or `SECURITY_ROLE`
+  (`onlyEitherAuthRole`), consistent with the other emergency capital-recovery paths.
+
+## Performance fee
+
+The protocol charges a performance fee on the **accrued Uniswap V3 trading fees** earned by the
+strategy's LP position. The fee is **not** taken from NAV growth, **not** pegged to a high-water
+mark, and **not** paid out in ETH. It is settled by **minting EVE** to the DAO treasury, which
+dilutes existing EVE holders proportionally.
+
+| Parameter | Value |
+| --- | --- |
+| Fee rate | Configurable bps rate set on the StrategyManager (`performanceFeeBps`) |
+| Maximum rate | **20%** (`MAX_PERFORMANCE_FEE_BPS = 2000` basis points, enforced on the StrategyManager) |
+| Fee basis | A fraction of accrued LP trading fees from the strategy's Uniswap V3 position (the bps rate is applied to the ETH-equivalent value of uncharged `tokensOwed` growth) |
+| Recipient | DAO treasury |
+| Settlement | EVE is minted to the treasury via bonding-curve dilution — no ETH moves |
+
+### How settlement works
+
+When the keeper harvests, the StrategyManager calls `settlePerformanceFee(bps)` on the strategy,
+which:
+
+1. Measures the **accrued Uniswap V3 LP trading fees** since the last settlement — the
+   `tokensOwed` delta on the underlying V3 position, valued in ETH via the strategy's oracle.
+2. Returns `feeETH = feeBaseETH × bps / 10_000`.
+
+The StrategyManager then mints EVE to the DAO treasury using bonding-curve dilution:
+
+```text
+evesToMint = (feeETH × EVE_supply) / (totalNAV − feeETH)
+```
+
+This is the same dilution formula the AMM uses for premium-priced deposits. The treasury ends up
+owning a larger slice of the protocol; existing EVE holders' share of NAV shrinks proportionally.
+No ETH is transferred out of the protocol and no Converter/WETH unwrap is involved.
+
+**Example.** Suppose `totalNAV = 100 ETH`, `EVE_supply = 1,000 EVE`, and the strategy has accrued
+`10 ETH` of LP trading fees. With a 10% fee rate, `feeETH = 1 ETH`. EVE minted to the treasury =
+`(1 × 1,000) / (100 − 1) ≈ 10.1 EVE`. The treasury now holds ~10.1 EVE; every existing holder's
+share of NAV is diluted by roughly 1%.
+
+## Trade-offs and risks
+
+UniCLStrat carries risks that any concentrated-liquidity strategy carries:
+
+<Callout type="warn">
+  **Impermanent loss.** If the pool price moves significantly, the strategy may end up holding more of
+  the underperforming token. The LP position value can fall below the equivalent value of simply
+  holding WETH.
+
+  **Single-strategy concentration.** Currently all protocol ETH flows into one strategy. A bug in
+  UniCLStrat or the Uniswap V3 pool could affect the entire protocol NAV.
+
+  For a full treatment of these and other risks, see [Key risks](/risk-and-trust/key-risks).
+</Callout>
+
+## See also
+
+- [EVE & NAV](/how-everstrat-works/eve-and-nav) — how strategy NAV feeds the token price
+- [Architecture at a glance](/how-everstrat-works/architecture) — how the Controller,
+  StrategyManager, and strategy fit together
+- [Key risks](/risk-and-trust/key-risks) — impermanent loss, concentration risk, and more
