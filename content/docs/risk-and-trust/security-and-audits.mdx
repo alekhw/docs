@@ -31,8 +31,10 @@ deployment. This means:
 
 - The bonding curve formulas for enter (premium price) and exit (base price) cannot be changed.
 - The AMM's fee structure (currently no protocol fee on enter or exit) cannot be changed.
-- The UniCLStrat's position management and performance fee logic (max 20%, high-water-mark based)
-  cannot be changed.
+- The UniCLStrat's position management and per-strategy settlement logic (its side of the
+  performance fee — measuring accrued Uniswap V3 trading fees and reporting an ETH-equivalent
+  amount to the StrategyManager) cannot be changed. The fee **rate**, cap, and the EVE-mint
+  settlement that actually dilutes holders live on the upgradeable StrategyManager.
 - The Registry's address-resolution and role-check logic cannot be changed (the addresses and roles it
   stores remain admin-configurable, behind the timelock).
 

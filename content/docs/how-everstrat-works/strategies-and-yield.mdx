@@ -70,22 +70,42 @@ tick, because the TWAP has not moved.
 
 ## Performance fee
 
-UniCLStrat charges a performance fee only on **gains above the high-water mark**.
+The protocol charges a performance fee on the **accrued Uniswap V3 trading fees** earned by the
+strategy's LP position. The fee is **not** taken from NAV growth, **not** pegged to a high-water
+mark, and **not** paid out in ETH. It is settled by **minting EVE** to the DAO treasury, which
+dilutes existing EVE holders proportionally.
 
 | Parameter | Value |
 | --- | --- |
-| Maximum fee | **Up to 20%** (`MAX_PERFORMANCE_FEE_BPS = 2000`) |
-| Fee basis | NAV growth above the high-water mark only |
+| Fee rate | Configurable bps rate set on the StrategyManager (`performanceFeeBps`) |
+| Maximum rate | **20%** (`MAX_PERFORMANCE_FEE_BPS = 2000` basis points, enforced on the StrategyManager) |
+| Fee basis | A fraction of accrued LP trading fees from the strategy's Uniswap V3 position (the bps rate is applied to the ETH-equivalent value of uncharged `tokensOwed` growth) |
 | Recipient | DAO treasury |
-| Payment currency | ETH (paired-token inventory is converted via the Converter) |
-| High-water mark reset | After each fee payment, the high-water mark is reset to current NAV |
+| Settlement | EVE is minted to the treasury via bonding-curve dilution — no ETH moves |
 
-The high-water mark ensures the DAO only earns a fee on **new** gains. If the strategy loses value and
-then recovers, no fee is charged until NAV surpasses its previous peak.
+### How settlement works
 
-**Example.** If the high-water mark is 10 ETH and NAV grows to 11 ETH, the profit is 1 ETH. At a 10%
-fee rate, the DAO receives 0.1 ETH and the high-water mark resets to 10.9 ETH (current NAV after the
-fee is paid).
+When the keeper harvests, the StrategyManager calls `settlePerformanceFee(bps)` on the strategy,
+which:
+
+1. Measures the **accrued Uniswap V3 LP trading fees** since the last settlement — the
+   `tokensOwed` delta on the underlying V3 position, valued in ETH via the strategy's oracle.
+2. Returns `feeETH = feeBaseETH × bps / 10_000`.
+
+The StrategyManager then mints EVE to the DAO treasury using bonding-curve dilution:
+
+```text
+evesToMint = (feeETH × EVE_supply) / (totalNAV − feeETH)
+```
+
+This is the same dilution formula the AMM uses for premium-priced deposits. The treasury ends up
+owning a larger slice of the protocol; existing EVE holders' share of NAV shrinks proportionally.
+No ETH is transferred out of the protocol and no Converter/WETH unwrap is involved.
+
+**Example.** Suppose `totalNAV = 100 ETH`, `EVE_supply = 1,000 EVE`, and the strategy has accrued
+`10 ETH` of LP trading fees. With a 10% fee rate, `feeETH = 1 ETH`. EVE minted to the treasury =
+`(1 × 1,000) / (100 − 1) ≈ 10.1 EVE`. The treasury now holds ~10.1 EVE; every existing holder's
+share of NAV is diluted by roughly 1%.
 
 ## Trade-offs and risks
 

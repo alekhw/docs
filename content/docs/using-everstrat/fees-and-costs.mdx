@@ -17,7 +17,7 @@ Here is everything that affects how much ETH you actually receive relative to wh
 | Protocol fee on deposit | — | None |
 | Protocol fee on exit | — | None |
 | Entry premium (bonding curve) | Existing EVE holders | Difference between premium price and base price |
-| Performance fee (UniCLStrat strategy) | DAO treasury | Up to 20% of NAV growth above high-water mark |
+| Performance fee | DAO treasury | A configurable bps rate (max 20%) on accrued Uniswap V3 LP trading fees, settled by minting EVE (diluting existing holders) |
 | Gas | Sepolia validators | Standard network gas |
 | Slippage | — | Price movement between quote and execution |
 
@@ -43,21 +43,24 @@ worked example.
 
 ## Performance fee
 
-The UniCLStrat strategy (the on-chain yield strategy the keeper deploys into) charges a **performance
-fee of up to 20%** on NAV growth above its high-water mark.
+The strategy earns yield from Uniswap V3 trading fees on its LP position. The protocol charges a
+**performance fee** on those accrued trading fees — a configurable bps rate set on the
+StrategyManager (capped at **20%**, `MAX_PERFORMANCE_FEE_BPS = 2000`).
 
 Key details:
 
-- The maximum rate is capped at **20%** (`MAX_PERFORMANCE_FEE_BPS = 2000` basis points). The live rate
-  is set at deployment and may be lower.
-- The fee only accrues on growth **above the high-water mark** — the highest NAV the strategy has
-  previously reached. If NAV falls and then recovers, the fee applies only to the net new gain above
-  the previous peak.
-- After the fee is taken, the high-water mark is reset to the current NAV.
-- Fees are paid to the **DAO treasury** in native ETH (unwrapped from WETH via the Converter).
+- The fee applies to **accrued Uniswap V3 LP trading fees** in the strategy — not to NAV growth,
+  not on a high-water mark. If the strategy has not earned trading fees, no fee accrues.
+- The live rate is set at deployment and may be anywhere from 0 to 20%; 0 disables harvesting.
+- Settlement does **not** move ETH out of the protocol and does **not** involve the Converter.
+  Instead, the StrategyManager **mints EVE** to the DAO treasury using bonding-curve dilution:
+  `evesToMint = (feeETH × supply) / (totalNAV − feeETH)`.
+- The result is that existing EVE holders are **diluted proportionally** — the treasury takes a
+  larger slice of NAV, and every other holder's slice shrinks by the same fraction.
 
-This fee reduces the NAV growth that flows through to EVE holders. It does not appear as a separate
-charge on your account — it is reflected in a lower NAV than you would see without it.
+This fee does not appear as a separate charge on your account. You experience it as gradual
+dilution over time as the keeper harvests. For the full mechanics, see
+[Strategies & yield](/how-everstrat-works/strategies-and-yield).
 
 ## Gas
 

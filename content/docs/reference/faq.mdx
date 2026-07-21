@@ -58,8 +58,10 @@ description: Answers to the most common questions about Everstrat — what it is
 
     - **Entry premium** — you deposit at the premium price (higher than base price). The difference goes
       to existing EVE holders, not the protocol. See [Fees & costs](/using-everstrat/fees-and-costs).
-    - **Performance fee** — up to **20%** of NAV growth above the strategy's high-water mark, paid to
-      the DAO treasury. This reduces NAV growth flowing to you rather than appearing as a direct charge.
+    - **Performance fee** — a configurable bps rate (max **20%**) on the **accrued Uniswap V3
+      trading fees** earned by the strategy. It is settled by **minting EVE to the DAO treasury**,
+      which dilutes existing EVE holders proportionally — no ETH moves out of the protocol. See
+      [Fees & costs](/using-everstrat/fees-and-costs).
     - **Gas** — standard Sepolia network gas on every on-chain action, including deposit, exit
       submission, and claim.
     - **Slippage** — price can move between submission and settlement.
