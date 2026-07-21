@@ -1,0 +1,127 @@
+---
+title: Exiting & redeeming
+description: How to burn EVE and receive ETH back — covering immediate exits, the queued batch process, slippage protection, and the escape hatch.
+---
+
+<Callout type="warn" title="Testnet only">
+  Everstrat is currently on **Arbitrum Sepolia testnet (chain id 421614)**. Tokens have no monetary
+  value. Do not send real funds.
+</Callout>
+
+When you exit Everstrat you burn EVE tokens and receive ETH at the current **base price**
+(`NAV / EVE supply`). There are two exit paths depending on how much free ETH the AMM is holding at
+that moment.
+
+## Two exit paths
+
+<Tabs items={["Immediate exit", "Queued exit"]}>
+  <Tab>
+    If the AMM's free ETH balance is large enough to cover your redemption, you receive ETH in the
+    **same transaction**. No waiting. No extra steps.
+
+    Immediate exits have **no minimum size**.
+
+    Slippage protection on this path is `maxTokensToBurn` — a hard cap on how much EVE can be burned
+    for the ETH you requested. If the price moves against you beyond that cap, the transaction reverts.
+    (`priceTolerance` plays no role in an immediate exit.)
+  </Tab>
+  <Tab>
+    If the AMM does not have enough free liquidity, your exit request joins a **batch queue**. Your EVE
+    is escrowed and you wait for the keeper to settle the batch. See the lifecycle below.
+
+    Queued exits must be worth at least **0.001 ETH** by default (`DEFAULT_MIN_BATCH_EXIT_ETH`). This
+    minimum can be raised by governance up to a maximum of **0.05 ETH**
+    (`MIN_BATCH_EXIT_ETH_UPPER_BOUND`).
+  </Tab>
+</Tabs>
+
+## Queued exit lifecycle
+
+<Steps>
+  <Step>
+    **Submit your exit request.** You call the exit function with the ETH amount you want back
+    (`requestedETH`), a cap on the EVE you are willing to burn (`maxTokensToBurn`), and a
+    `priceTolerance`. Your EVE tokens are escrowed — they leave your wallet and are held by the
+    protocol until the batch is settled.
+  </Step>
+  <Step>
+    **Keeper prices the batch.** A keeper bot monitors the queue. When conditions are met, it prices
+    the batch, locking in a final base price for all requests in that batch. That price is validated
+    against the AMM's last settled base price, so a batch cannot be priced far from the protocol's
+    checkpointed price.
+  </Step>
+  <Step>
+    **Keeper processes the batch.** The keeper sends ETH to cover the batch and marks each request as
+    fulfilled.
+  </Step>
+  <Step>
+    **ETH is credited to your claimable balance.** After processing, the ETH you are owed is recorded
+    in `claimableBalances[yourAddress]`. It is not sent to you automatically (pull-over-push pattern).
+  </Step>
+  <Step>
+    **Call Claim to withdraw your ETH.** You call the `claim()` function to pull your ETH out of the
+    protocol and into your wallet.
+  </Step>
+</Steps>
+
+## Slippage protection (`priceTolerance`)
+
+Price can fall between the moment you submit your exit request and the moment the keeper prices the
+batch. `priceTolerance` sets your floor: if the final batch price has dropped by more than your
+tolerance relative to the price at the time of your request, your request is **closed for slippage** —
+your EVE is returned to you and you receive no ETH. You can resubmit at any time.
+
+`priceTolerance` applies only to queued exits; immediate exits are protected by `maxTokensToBurn`
+instead (see above).
+
+## Escape hatch — cancelling a redemption
+
+There are two situations where you can cancel a pending exit and get your escrowed EVE back:
+
+<Accordions type="single">
+  <Accordion title="Before the batch is priced">
+    Any time before the keeper has priced a batch, you can call `cancelRedemption(batchId)` to cancel
+    your request and retrieve your EVE. There is no time constraint for this — you can cancel an
+    unpriced batch immediately after submitting.
+  </Accordion>
+  <Accordion title="After 3 days from pricing without payout">
+    Once a keeper has priced a batch (`batch.pricedAt` is set), a **3-day clock**
+    (`MAX_BATCH_PROCESSING_TIME`) starts. If 3 days pass after pricing and you have still not received
+    your ETH, you can call `cancelRedemption(batchId)` to reclaim your escrowed EVE. Before that 3-day
+    window expires the call reverts.
+
+    Note: the 3-day clock starts from when the batch is **priced**, not from when you submitted your
+    exit request.
+  </Accordion>
+</Accordions>
+
+<Callout type="info">
+  For full technical details on how the exit queue is implemented, see
+  [The redemption queue, in depth](/how-everstrat-works/redemption-queue).
+</Callout>
+
+## Step-by-step exit
+
+<Steps>
+  <Step>
+    **Open the app and connect your wallet** on Arbitrum Sepolia.
+  </Step>
+  <Step>
+    **Enter the EVE amount** you want to burn. The app shows your estimated ETH at the current base
+    price.
+  </Step>
+  <Step>
+    **Set your price tolerance.** This bounds how much the price can fall before your queued request
+    is automatically cancelled and your EVE returned.
+  </Step>
+  <Step>
+    **Confirm the transaction.** If the AMM has enough free ETH, you receive ETH immediately.
+    Otherwise, your request enters the queue.
+  </Step>
+  <Step>
+    **If queued, wait for the keeper to settle, then Claim.** Check the app for the status of your
+    batch. Once it is processed, call Claim to withdraw your ETH.
+  </Step>
+</Steps>
+
+For a guided walkthrough of your first exit, see [Your first exit](/get-started/burn-and-redeem).

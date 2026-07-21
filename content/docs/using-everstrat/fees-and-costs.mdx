@@ -1,0 +1,77 @@
+---
+title: Fees & costs
+description: A complete breakdown of what interacting with Everstrat costs you — protocol fees, the bonding curve premium, performance fees, gas, and slippage.
+---
+
+<Callout type="warn" title="Testnet only">
+  Everstrat is currently on **Arbitrum Sepolia testnet (chain id 421614)**. Tokens have no monetary
+  value. Do not send real funds.
+</Callout>
+
+Here is everything that affects how much ETH you actually receive relative to what you put in.
+
+## Cost breakdown
+
+| Cost | Paid to | Amount |
+| --- | --- | --- |
+| Protocol fee on deposit | — | None |
+| Protocol fee on exit | — | None |
+| Entry premium (bonding curve) | Existing EVE holders | Difference between premium price and base price |
+| Performance fee (UniCLStrat strategy) | DAO treasury | Up to 20% of NAV growth above high-water mark |
+| Gas | Arbitrum Sepolia validators | Standard network gas |
+| Slippage | — | Price movement between quote and execution |
+
+## No protocol fee on deposit or exit
+
+The Everstrat AMM does not charge a protocol fee when you deposit ETH or when you burn EVE. Your full
+deposit is forwarded to the protocol, and the full ETH value of your EVE is redeemed on exit. This is
+confirmed in the contract code — there is no fee deduction in the `enter()` or `exit()` paths.
+
+## The entry premium — a real cost, not a protocol fee
+
+When you deposit, you pay the **premium price**, which is higher than the **base price** (NAV /
+supply). See [Depositing & minting](/using-everstrat/depositing-and-minting) for the formula and a
+worked example.
+
+<Callout type="info">
+  The gap between the premium price you pay and the base price is **not money paid to the protocol**.
+  It is distributed to all existing EVE holders by slightly increasing the NAV backing each EVE already
+  in circulation. This is how the bonding curve incentivizes early participation and discourages rapid
+  in-and-out cycling. It is still a real cost to you as a new depositor — you are paying above the
+  current redemption value of EVE.
+</Callout>
+
+## Performance fee
+
+The UniCLStrat strategy (the on-chain yield strategy the keeper deploys into) charges a **performance
+fee of up to 20%** on NAV growth above its high-water mark.
+
+Key details:
+
+- The maximum rate is capped at **20%** (`MAX_PERFORMANCE_FEE_BPS = 2000` basis points). The live rate
+  is set at deployment and may be lower.
+- The fee only accrues on growth **above the high-water mark** — the highest NAV the strategy has
+  previously reached. If NAV falls and then recovers, the fee applies only to the net new gain above
+  the previous peak.
+- After the fee is taken, the high-water mark is reset to the current NAV.
+- Fees are paid to the **DAO treasury** in native ETH (unwrapped from WETH via the Converter).
+
+This fee reduces the NAV growth that flows through to EVE holders. It does not appear as a separate
+charge on your account — it is reflected in a lower NAV than you would see without it.
+
+## Gas
+
+Every on-chain interaction — deposit, exit submission, and claim — costs gas. Arbitrum Sepolia gas
+fees are low, but they are non-zero. On a queued exit, you pay gas twice: once to submit and once to
+claim. (The keeper pays gas to price and process the batch.)
+
+## Slippage
+
+Price can move between the time you request an action and the time it settles:
+
+- **On deposit:** controlled by `minTokensToMint`. If you would receive fewer EVE than your floor, the
+  transaction reverts.
+- **On exit:** controlled by `priceTolerance`. If the settled price on a queued exit has dropped more
+  than your tolerance, your request is closed for slippage and your EVE is returned.
+
+Neither of these is a fee — they are protections against adverse price movement, not charges.

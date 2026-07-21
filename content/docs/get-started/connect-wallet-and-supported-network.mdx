@@ -1,39 +1,30 @@
 ---
-title: Connect wallet and supported network
-description: Wallet prerequisites, supported chain, and the current network assumptions in the live web3 app.
+title: Connect your wallet
+description: How to connect a compatible wallet, add Arbitrum Sepolia, and get testnet ETH before using the app.
 ---
 
-## Supported Chain
-
-The app currently supports one network:
-
-| Item | Value |
-| --- | --- |
-| Network | Arbitrum Sepolia |
-| Chain ID | `421614` |
-| Source of truth | `frontend-app/web3-app/src/config/index.ts` |
-
-## Wallet Flow
-
-The app uses RainbowKit and wagmi for connection state, then replaces the generic account button
-with a custom account dialog.
-
 <Steps>
-  <Step>Open the app and connect through the wallet control in the header.</Step>
-  <Step>If you are on the wrong chain, the transaction flow forces a switch to Arbitrum Sepolia.</Step>
-  <Step>After connection, the header opens account details instead of the default wallet modal.</Step>
+  <Step>
+    **Use a supported wallet.** The app connects wallets through RainbowKit and wagmi. Any wallet
+    supported by that setup — MetaMask, Coinbase Wallet, WalletConnect-compatible wallets, and others —
+    will work.
+  </Step>
+  <Step>
+    **Add and switch to Arbitrum Sepolia (chain id 421614).** The app only supports this single
+    testnet network. If you connect on a different chain, the app will prompt you to switch
+    automatically.
+  </Step>
+  <Step>
+    **Get testnet ETH.** You need Arbitrum Sepolia ETH to deposit. Search for an Arbitrum Sepolia
+    faucet and request test funds — they're free and have no real-world value.
+  </Step>
+  <Step>
+    **Click Connect Wallet** in the top-right corner of the app. Select your wallet from the modal,
+    approve the connection, and you're ready to go.
+  </Step>
 </Steps>
 
-## What The Account Dialog Adds
-
-- wallet identity and connector metadata
-- subgraph-backed summary metrics
-- recent protocol activity
-- queued burn cancellation when the action is currently available
-
-Read more in [Account details and activity feed](/app/account-details-and-activity-feed).
-
-<Callout type="info" title="WalletConnect project id">
-  Real wallet connections require `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`. The app ships with a
-  placeholder fallback for local builds, but that fallback is not a production configuration.
+<Callout type="warn" title="Testnet only">
+  Everstrat runs on **Arbitrum Sepolia testnet only**. Never send mainnet ETH or any real-value token
+  to the app or its contracts. All tokens on testnet have no monetary value.
 </Callout>

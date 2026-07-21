@@ -1,0 +1,92 @@
+---
+title: Depositing & minting
+description: How to deposit ETH and mint EVE, including the bonding curve premium, slippage protection, and the one-time bootstrap rule.
+---
+
+<Callout type="warn" title="Testnet only">
+  Everstrat is currently on **Arbitrum Sepolia testnet (chain id 421614)**. Tokens have no monetary
+  value. Do not send real funds.
+</Callout>
+
+When you deposit ETH you receive **EVE** tokens minted at the current **premium price**. This page
+explains what that price is, how it is calculated, and what to watch out for.
+
+## The premium price
+
+Everstrat uses a bonding curve. There are two prices:
+
+- **Base price** — the "fair value" of one EVE, calculated as `NAV / EVE supply`. This is the price
+  you receive when you *exit*.
+- **Premium price** — the price you pay when you *enter*, calculated as
+  `NAV / (EVE supply × connectorWeight)`. Because the connector weight is less than 1, the premium
+  price is always higher than the base price.
+
+The gap between the two prices is not a protocol fee. It accrues to existing EVE holders, slightly
+increasing the value of every EVE already in circulation. This is by design — the bonding curve rewards
+early participants and provides a buffer that protects the pool against rapid in-and-out cycling.
+
+### Worked example
+
+The following numbers are **illustrative**. They show the math; they are not live values.
+
+| Parameter | Value |
+| --- | --- |
+| Total NAV | 1,000 ETH |
+| EVE supply | 1,000 EVE |
+| Connector weight | 0.5 |
+
+**Base price** = 1,000 / 1,000 = **1.0 ETH per EVE**
+
+**Premium price** = 1,000 / (1,000 × 0.5) = 1,000 / 500 = **2.0 ETH per EVE**
+
+You deposit **2 ETH** → you receive 2 / 2.0 = **1 EVE**.
+
+After your deposit: NAV = 1,002 ETH, supply = 1,001 EVE, so base price ≈ 1,002 / 1,001 ≈
+**1.001 ETH per EVE**. Existing holders' per-EVE value ticked up slightly because you paid a premium
+above base.
+
+<Callout type="info">
+  These are illustrative numbers used to explain the formula. Real-time NAV, supply, and prices are
+  shown in the app.
+</Callout>
+
+## Slippage protection (`minTokensToMint`)
+
+Price can move between the moment you request a deposit and the moment your transaction settles. When
+you submit a deposit you specify `minTokensToMint` — the fewest EVE you are willing to accept. If the
+price moves against you and you would receive fewer EVE than that floor, the transaction reverts
+automatically. You lose only the gas cost.
+
+## The one-time bootstrap rule
+
+The very first deposit into a fresh Everstrat deployment has special rules:
+
+- Your deposit must be worth at least **$1,000** (`MIN_INITIAL_DEPOSIT_USD`).
+- **1 EVE** is permanently minted to a dead address (`0x000…dEaD`) to anchor the supply.
+- You, as the first depositor, receive the remainder of the minted EVE.
+
+This bootstrap step happens only once per deployment. As a regular user joining an already-running
+protocol, you will never encounter it.
+
+## Step-by-step deposit
+
+<Steps>
+  <Step>
+    **Open the app and connect your wallet** on Arbitrum Sepolia (chain id 421614). See
+    [Connect your wallet](/get-started/connect-wallet-and-supported-network) if you need help.
+  </Step>
+  <Step>
+    **Enter the ETH amount** you want to deposit. The app will show you the estimated EVE you will
+    receive at the current premium price.
+  </Step>
+  <Step>
+    **Review the price and slippage floor.** Confirm that the estimated EVE meets your expectations.
+    Adjust the slippage tolerance if needed.
+  </Step>
+  <Step>
+    **Confirm the transaction** in your wallet. Your EVE tokens appear in your balance once the
+    transaction is included in a block.
+  </Step>
+</Steps>
+
+For a guided walkthrough of your first deposit, see [Your first deposit](/get-started/first-mint).

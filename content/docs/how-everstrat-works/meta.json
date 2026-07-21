@@ -1,0 +1,11 @@
+{
+  "title": "How Everstrat Works",
+  "icon": "Workflow",
+  "pages": [
+    "architecture",
+    "eve-and-nav",
+    "pricing-and-bonding-curve",
+    "strategies-and-yield",
+    "redemption-queue"
+  ]
+}

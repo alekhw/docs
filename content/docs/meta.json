@@ -5,7 +5,10 @@
   "pages": [
     "index",
     "get-started",
-    "introduction",
+    "using-everstrat",
+    "how-everstrat-works",
+    "risk-and-trust",
+    "reference",
     "protocol",
     "contracts",
     "app",
@@ -16,6 +19,6 @@
     "developers",
     "operations",
     "engineering",
-    "reference"
+    "introduction"
   ]
 }

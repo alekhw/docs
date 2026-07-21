@@ -1,0 +1,70 @@
+---
+title: Tracking your position
+description: What you can see in the Everstrat app today — your balances, the bonding curve view, the activity feed, and an honest note about Dashboard prototype status.
+---
+
+<Callout type="warn" title="Testnet only">
+  Everstrat is currently on **Arbitrum Sepolia testnet (chain id 421614)**. Tokens have no monetary
+  value. Do not send real funds.
+</Callout>
+
+The Everstrat app gives you several ways to monitor your position and the protocol's state. Here is
+what is available today and what each view shows.
+
+## What you can see
+
+<Cards>
+  <Card title="EVE balance & NAV share" />
+  <Card title="Curve page" />
+  <Card title="Dashboard page" />
+  <Card title="Activity feed" />
+</Cards>
+
+## What is reliably live
+
+The following data is sourced directly from on-chain state and the subgraph indexer:
+
+- **Your EVE balance** — read from the EVE token contract on Arbitrum Sepolia.
+- **Your share of NAV** — derived from the current on-chain NAV and EVE supply.
+- **Mint and burn actions** — the deposit and exit flows write to the chain; the app reflects
+  confirmed transactions.
+- **Activity feed** — your mint, burn, and redemption history from the subgraph. Each event
+  corresponds to a real transaction.
+- **Bonding curve (Curve page)** — prices are calculated from live on-chain NAV and supply.
+
+## Dashboard — prototype status
+
+<Callout type="info" title="Prototype">
+  **The Dashboard is currently a prototype.** Several of its metrics display placeholder values rather
+  than live data. Do not rely on Dashboard figures for decisions about when to enter or exit.
+
+  Features still being wired up include certain real-time protocol-level metrics shown on the
+  Dashboard overview. Your wallet balances, transaction history in the activity feed, and the Curve
+  page are live and accurate.
+
+  This page will be updated as Dashboard metrics are connected to real data sources.
+</Callout>
+
+## Reading the Curve page
+
+The Curve page shows you the current shape of the bonding curve:
+
+- **Base price** (`NAV / supply`) — the price at which you can exit right now.
+- **Premium price** (`NAV / (supply × connectorWeight)`) — the price at which a new deposit would be
+  priced right now.
+- How those prices move as you simulate different deposit or exit sizes.
+
+Use it to understand the cost of entering at the current pool size and to see how much of a premium
+you are paying relative to the exit (base) price.
+
+## Reading the activity feed
+
+The activity feed is powered by the Everstrat subgraph, which indexes events emitted by the AMM and
+ExitQueue contracts on Arbitrum Sepolia. Each entry shows:
+
+- **Event type** — mint, burn, exit request, batch priced, batch processed, or claim.
+- **Amount** — ETH deposited or EVE minted/burned.
+- **Timestamp and transaction hash** — so you can verify any event on the block explorer.
+
+If a queued exit request is in flight, the feed shows its current status (submitted → priced →
+processed → claimed).

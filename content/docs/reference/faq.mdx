@@ -1,19 +1,103 @@
 ---
 title: FAQ
-description: Concise answers to the most likely product and protocol questions that arise from the current repository state.
+description: Answers to the most common questions about Everstrat — what it is, how to use it, fees, risks, and the network it runs on.
 ---
 
+<Callout type="warn" title="Testnet only">
+  Everstrat is on **Arbitrum Sepolia testnet (chain id 421614)**. Tokens have no monetary value. Do not
+  send real funds.
+</Callout>
+
 <Accordions type="single">
-  <Accordion title="Is this live on mainnet?">
-    The current shipped frontend configuration in this repository is for Arbitrum Sepolia, not mainnet.
+  <Accordion title="Is Everstrat live on mainnet?">
+    No. Everstrat is deployed on **Arbitrum Sepolia testnet** (chain id 421614). There is no mainnet
+    deployment. EVE tokens and any ETH you interact with on this testnet have no monetary value.
   </Accordion>
-  <Accordion title="Does every burn settle immediately?">
-    No. Burns use the protocol redemption path and can enter `ExitQueue` if AMM liquidity is insufficient.
+  <Accordion title="What is EVE and what backs it?">
+    EVE is a token that represents your share of the protocol's net asset value (NAV). When you deposit
+    ETH, the AMM mints EVE proportional to your share of the total NAV. When you exit, you burn EVE and
+    receive ETH back at the current NAV per EVE (the base price). The NAV is made up of ETH held across
+    the AMM, Controller, StrategyManager, and any deployed yield strategies. See
+    [EVE and NAV](/how-everstrat-works/eve-and-nav) for the full formula.
   </Accordion>
-  <Accordion title="Why can the activity feed lag behind my transaction?">
-    Historical UI uses the GoldSky subgraph, which is eventually consistent relative to the chain.
+  <Accordion title="How do I deposit ETH and receive EVE?">
+    Connect your wallet on Arbitrum Sepolia, enter an ETH amount, and confirm the transaction. The AMM
+    calculates how much EVE to mint using the premium price (which is higher than the redemption base
+    price). You can set a `minTokensToMint` floor to protect against slippage. See
+    [Depositing & minting](/using-everstrat/depositing-and-minting) for a step-by-step walkthrough.
   </Accordion>
-  <Accordion title="Is there an audit linked in this repository?">
-    No dedicated audit artifact is currently documented in the repository snapshot used by these docs.
+  <Accordion title="How do I exit and get my ETH back?">
+    Go to the exit screen, enter the amount of EVE to burn, and submit. If the AMM has enough free ETH,
+    your exit settles immediately. If not, it enters the exit queue and you claim ETH after the batch is
+    processed. See [Exiting & redeeming](/using-everstrat/exiting-and-redeeming) for the full flow.
+  </Accordion>
+  <Accordion title="Why did my exit get queued, and how long does it take?">
+    Your exit is queued when the AMM does not have enough free ETH to settle it immediately — for
+    example, because most of the NAV is deployed in a yield strategy. Once queued, a keeper prices the
+    batch (at the AMM's base price, not an oracle price) and processes it. After processing, ETH is
+    credited to your claimable balance and you must call `claim()` to withdraw it (pull-over-push). If
+    the keeper has not processed the batch within **3 days** of pricing, you can invoke the escape hatch
+    (`cancelRedemption`) to cancel the request and recover your EVE.
+  </Accordion>
+  <Accordion title="Can I cancel a queued exit?">
+    Yes, in two situations:
+
+    - **Before the batch is priced:** you can cancel at any time with no restrictions.
+    - **After the batch is priced:** you can cancel only after **3 days have passed** since the batch
+      was priced (the escape hatch). Inside that window, the cancel call will revert.
+
+    If the settled price has dropped more than your `priceTolerance` below the price at request time,
+    the protocol automatically closes your request and returns your EVE — you do not need to take
+    action.
+  </Accordion>
+  <Accordion title="What fees does Everstrat charge?">
+    There is **no protocol fee** on deposit or exit — your full ETH is forwarded on entry, and the full
+    ETH value of your EVE is redeemed on exit.
+
+    Costs you do pay:
+
+    - **Entry premium** — you deposit at the premium price (higher than base price). The difference goes
+      to existing EVE holders, not the protocol. See [Fees & costs](/using-everstrat/fees-and-costs).
+    - **Performance fee** — up to **20%** of NAV growth above the strategy's high-water mark, paid to
+      the DAO treasury. This reduces NAV growth flowing to you rather than appearing as a direct charge.
+    - **Gas** — standard Arbitrum Sepolia network gas on every on-chain action, including deposit, exit
+      submission, and claim.
+    - **Slippage** — price can move between submission and settlement.
+  </Accordion>
+  <Accordion title="Can I lose money?">
+    Yes. NAV can fall if the yield strategy loses value or if the protocol encounters an issue. You
+    receive ETH proportional to NAV at the time you exit — if NAV has fallen since you deposited, you
+    receive less ETH than you put in. Because this is testnet, no real money is at risk right now, but
+    the mechanism is real. See [Key risks](/risk-and-trust/key-risks) for a full breakdown.
+  </Accordion>
+  <Accordion title="Has Everstrat been audited?">
+    No audit is documented in this repository. The protocol is on Arbitrum Sepolia testnet and should
+    be treated as unaudited. Do not treat testnet deployment as a signal of production readiness.
+  </Accordion>
+  <Accordion title="What network are the contracts on?">
+    All contracts are on **Arbitrum Sepolia** (chain id 421614). See
+    [Contract addresses](/reference/contract-addresses) for the full list of deployed addresses.
+  </Accordion>
+  <Accordion title="My wallet is connected but transactions are not starting">
+    Check that your wallet is switched to **Arbitrum Sepolia** (chain id 421614). Everstrat does not
+    support any other network. If you see a network mismatch prompt, approve the switch. If transactions
+    still do not initiate, refresh the page and reconnect your wallet.
+  </Accordion>
+  <Accordion title="The AMM shows a paused or excessive-deviation error">
+    The AMM can be paused by the ADMIN_ROLE or SECURITY_ROLE in an emergency, or transactions can revert
+    with `AMMExcessiveDeviation` if the EVE (base) price has moved more than the allowed deviation
+    (default 5%) from its checkpoint. If you see this error, wait for the team to reset the price
+    checkpoint (an ADMIN_ROLE or SECURITY_ROLE action) before retrying. You cannot work around this
+    yourself.
+  </Accordion>
+  <Accordion title="My queued exit is still pending after several days">
+    If more than 3 days have passed since your batch was priced, you can use the escape hatch to cancel
+    the request and recover your EVE. If the batch has not been priced yet, you can cancel at any time.
+    See the question above on cancelling a queued exit.
+  </Accordion>
+  <Accordion title="The activity feed is lagging behind my transaction">
+    The activity history uses the GoldSky subgraph, which indexes on-chain events with a short delay.
+    Your transaction may have settled on-chain before the subgraph reflects it. Wait a minute and
+    refresh — if it still does not appear, check the transaction hash directly on Arbiscan.
   </Accordion>
 </Accordions>

@@ -1,76 +1,30 @@
 ---
 title: Everstrat Docs
-description: Product, protocol, app, data, and operations documentation for the Everything Strategy monorepo.
+description: Product, protocol, and operational documentation for the Everstrat protocol on Arbitrum Sepolia.
 icon: House
 ---
 
-This site documents the current monorepo snapshot behind Everstrat / Everything Strategy:
-the smart contracts, the Arbitrum Sepolia web3 app, the GoldSky subgraph, and the
-operational assumptions that tie them together.
-
-<Cards>
-  <Card
-    title="Get Started"
-    href="/get-started/overview"
-  >
-    User-facing onboarding, wallet/network requirements, first mint, and burn guidance.
-  </Card>
-  <Card
-    title="Protocol"
-    href="/protocol/high-level-architecture"
-  >
-    Architecture, lifecycle, mint path, redemption path, and the queued exit model.
-  </Card>
-  <Card
-    title="Contracts"
-    href="/contracts/overview"
-  >
-    Contract-by-contract responsibilities, roles, upgradeability, and integration edges.
-  </Card>
-  <Card
-    title="Developers"
-    href="/developers/contract-addresses-and-deployments"
-  >
-    Deployments, addresses, event model, entities, and subgraph access patterns.
-  </Card>
-</Cards>
-
-## What This Site Covers
-
-<Tabs items={["Product", "Protocol", "Operations"]}>
-  <Tab>
-    <ul>
-      <li>What Everstrat promises to users and how that maps to the web3 app.</li>
-      <li>How mint, burn, slippage, queueing, and activity history appear in the shipped UI.</li>
-      <li>Where docs tone aligns with the landing page and where it deliberately becomes technical.</li>
-    </ul>
-  </Tab>
-  <Tab>
-    <ul>
-      <li>AMM and EVE as immutable core contracts.</li>
-      <li>Controller, ExitQueue, StrategyManager, and Oracle as upgradeable management contracts.</li>
-      <li>Immediate redemption versus queued redemption, including keeper-priced batches.</li>
-    </ul>
-  </Tab>
-  <Tab>
-    <ul>
-      <li>Current Arbitrum Sepolia deployment snapshot from frontend config.</li>
-      <li>GoldSky subgraph deployment and entity model used by the account dialog.</li>
-      <li>Runtime configuration for the docs app, the web3 app, and indexing workflows.</li>
-    </ul>
-  </Tab>
-</Tabs>
-
-## Recommended Reading Paths
-
-<Cards>
-  <Card title="I want to use the app" href="/get-started/overview" />
-  <Card title="I need the contract model" href="/contracts/overview" />
-  <Card title="I need queue details" href="/protocol/queued-redemption-lifecycle" />
-  <Card title="I need addresses and endpoints" href="/operations/current-deployments" />
-</Cards>
-
-<Callout type="idea" title="Scope policy">
-  These docs are intentionally about current behavior. If a topic is not fully settled in the
-  repository, the page calls that out explicitly instead of filling gaps with future-state prose.
+<Callout type="warn" title="Testnet only">
+  Everstrat is currently deployed on **Arbitrum Sepolia** (chain id **421614**). Do not send real funds.
+  All activity uses testnet ETH with no real-money value.
 </Callout>
+
+Everstrat lets you deposit ETH to receive EVE tokens, which represent your share of managed on-chain
+strategies. Strategies are executed by a permissioned controller; you can exit at any time through
+immediate redemption or the queued exit model. This site documents the product, protocol, and
+operational details for users, integrators, and contributors.
+
+<Cards>
+  <Card title="Get Started" href="/get-started/overview">
+    Wallet setup, network requirements, first mint, and how to exit your position.
+  </Card>
+  <Card title="Using Everstrat" href="/using-everstrat/what-is-everstrat">
+    What Everstrat is, how EVE tracks value, and how to read your position in the app.
+  </Card>
+  <Card title="How Everstrat Works" href="/how-everstrat-works/architecture">
+    System architecture, the mint and redemption paths, and the queued exit model.
+  </Card>
+  <Card title="Risk & Trust" href="/risk-and-trust/key-risks">
+    Key risks, trust assumptions, governance controls, and security posture.
+  </Card>
+</Cards>

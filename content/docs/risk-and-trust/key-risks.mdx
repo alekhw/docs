@@ -1,0 +1,115 @@
+---
+title: Key risks
+description: A plain account of what can go wrong when you hold or transact EVE. None of these risks are downplayed.
+---
+
+<Callout type="warn" title="Testnet only">
+  Everstrat is on **Arbitrum Sepolia testnet**. Tokens have no monetary value. The deployment may be
+  reset at any time. Do not send real funds.
+</Callout>
+
+Understanding these risks is part of using the protocol. Each one is described plainly below — what it
+is and what it means for you.
+
+## NAV can fall
+
+<Callout type="warn">
+  EVE's value tracks the portfolio's net asset value (NAV). If the strategy portfolio loses value,
+  every EVE token is worth less ETH. There is no principal protection, no floor price, and no guarantee
+  of recovery.
+</Callout>
+
+Your ETH is deployed into on-chain strategies. Those strategies can produce losses. When they do, the
+NAV falls and so does the ETH you would receive on exit.
+
+## Impermanent loss
+
+<Callout type="warn">
+  The current active strategy (UniCLStrat) provides concentrated liquidity on Uniswap V3. In volatile
+  markets, concentrated LP positions can underperform simply holding the underlying assets — this is
+  impermanent loss.
+</Callout>
+
+Impermanent loss is not a failure of the protocol; it is an inherent property of providing liquidity
+across a price range. If the market moves sharply, you may exit with less ETH-equivalent value than if
+you had held outside the protocol.
+
+## Single-strategy concentration
+
+<Callout type="warn">
+  Today essentially all pooled capital flows into one strategy: UniCLStrat. That strategy's
+  performance is your performance — if it performs poorly, there is no diversification to cushion the
+  impact.
+</Callout>
+
+More strategies may be added in future, which would change this profile — but that change requires
+governance action and is not guaranteed.
+
+## Exit queue delays
+
+<Callout type="warn">
+  If the AMM does not have enough free ETH to fulfil your exit immediately, your exit request is placed
+  in a queue. You may have to wait for the keeper bot to process it. If the keeper goes offline, your
+  ETH is not immediately accessible.
+</Callout>
+
+The protocol provides an escape hatch: if a batch has been priced for more than 3 days without being
+processed, you can call `cancelRedemption` to recover your EVE tokens. You receive EVE back — not ETH.
+You would then need to attempt a new exit.
+
+The escape hatch is also available at any time before a batch has been priced (no time constraint
+applies then).
+
+## Queued-exit slippage
+
+When your exit is queued, the price used for settlement is determined later — when the keeper prices
+the batch. If the EVE price at settlement has fallen more than your chosen `priceTolerance` below the
+price at request time, the request is closed and your EVE is returned. You do not exit that round and
+must try again.
+
+Setting a wider `priceTolerance` makes settlement more likely but exposes you to more price movement.
+Setting it narrow protects you from settlement at a much worse price, but increases the chance of your
+request being closed.
+
+## Oracle dependence (limited)
+
+Normal deposits and withdrawals do not use the oracle. However, the oracle **is** used for:
+
+- The bootstrap USD minimum check ($1,000 minimum initial deposit)
+- USD-denominated price views in the frontend
+- Strategy asset valuation within UniCLStrat
+
+If the Chainlink price feed becomes stale or malfunctions, these paths can be blocked. Deposits and
+redemptions that trigger these checks would be unavailable until the feed recovers.
+
+## Fail-closed freeze
+
+<Callout type="warn">
+  If any registered strategy cannot report its NAV — because its `navInETH()` function reverts — the
+  entire protocol freezes. Deposits, withdrawals, and price updates all stop until the strategy is
+  fixed or removed by governance (which requires the 48-hour timelock).
+</Callout>
+
+This is an intentional safety feature: the protocol will not process entries or exits at a price it
+cannot verify. The downside is that a malfunctioning strategy causes temporary unavailability for all
+users, not just those in that strategy.
+
+## Price-deviation guard
+
+Each deposit and withdrawal checks the current EVE price against a recent checkpoint. If the price has
+moved more than the configured maximum (default 5%, maximum 20%) since the last checkpoint, the
+transaction reverts. This prevents exploitation of sudden price swings, but it also means transactions
+can fail during genuine market volatility. Recovery requires `ADMIN_ROLE` or `SECURITY_ROLE` to reset
+the checkpoint.
+
+## Testnet status
+
+This deployment is on Arbitrum Sepolia. EVE tokens have no monetary value. The entire deployment may be
+reset, redeployed with different parameters, or taken offline at any time. No aspect of this protocol
+should be treated as a production, real-money system until explicitly announced otherwise.
+
+---
+
+For how the protocol's roles and governance controls work, see
+[Trust & governance](/risk-and-trust/trust-and-governance).
+For the security model and audit status, see [Security & audits](/risk-and-trust/security-and-audits).
