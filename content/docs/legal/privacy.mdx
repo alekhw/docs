@@ -1,0 +1,193 @@
+---
+title: Privacy Notice
+description: What Everstrat collects when you use the website, the app or these docs, why we collect it, who receives it, and how to have it deleted.
+---
+
+Last updated: 6 August 2026
+
+This policy covers three websites: **everstrat.xyz**, **app.everstrat.xyz** and **docs.everstrat.xyz**.
+
+It does not cover the Everstrat smart contracts themselves. Those run on a public blockchain, and no one can edit or delete what is written there. See [Blockchain data](#blockchain-data) below.
+
+<Callout type="warn" title="Testnet only">
+  Everstrat is deployed on **Sepolia testnet (chain id 11155111)**. Tokens have no monetary value.
+  Do not send real funds.
+</Callout>
+
+## Who is responsible
+
+These sites are operated by **everstrat.xyz**.
+
+Privacy enquiries: **ping@everstrat.xyz**
+
+If you are in the EU or UK and are not satisfied with our response, you may complain to your national data protection authority.
+
+## The short version
+
+We collect very little, and most of it is optional.
+
+- Analytics load only if you accept them. Decline and nothing is sent.
+- We never send your wallet address to any analytics service.
+- The YouTube videos on the roadmap do not contact Google until you press play.
+- If you give us your email for launch updates, we keep the email. We do not keep your IP address.
+
+## What we collect
+
+### Analytics, only with your consent
+
+We use Google Analytics 4 on all three sites to understand how people find the project and which parts of it they read.
+
+Nothing is loaded from Google and no cookies are set until you press **Accept** on the consent banner. If you decline, or ignore the banner, no analytics cookies are written and no analytics data is sent.
+
+If you accept, Google Analytics receives:
+
+- the pages you visit and when
+- the website or campaign link that sent you, including any `utm_` parameters
+- approximate location, derived from your IP address and no more precise than city level
+- device type, browser, operating system and screen size
+- a randomly generated identifier stored in the `_ga` cookies, which lets us tell a returning visitor from a new one
+- specific actions: opening the Everstrat app, playing a roadmap video, opening the docs, and following a link to X, Telegram or GitHub
+
+Google discards your full IP address after deriving the approximate location. It is not stored in our reports and we never see it.
+
+**We do not send Google your wallet address, your email, or anything that identifies you personally.** No page on either site puts a wallet address in its URL, so none can leak that way.
+
+Google acts as our processor for this data. Google's own handling is described in the [Google Privacy Policy](https://policies.google.com/privacy).
+
+### Launch updates email
+
+If you enter your email address to be told when Everstrat launches, we store:
+
+- the address as you typed it, and a lower-cased copy used to prevent duplicates
+- the date and time you submitted it
+- a note that it came from the launch form
+- a one-way keyed hash of your IP address and of your browser's user agent string
+
+The last point is worth being precise about. We do **not** store your IP address or your user agent. We store an HMAC-SHA256 hash of each, computed with a secret key held on the server. The hashes let us spot one source submitting hundreds of addresses. They cannot be reversed into an IP address, and we cannot use them to look you up.
+
+When you submit the form, your email address is also posted to a private Telegram group used by the team, so that someone sees the signup. Telegram receives the address, the time and the signup source. Telegram's handling of that message is governed by the [Telegram Privacy Policy](https://telegram.org/privacy).
+
+We use this address for one thing: to tell you when Everstrat launches. We do not sell it, rent it, or add it to any other list.
+
+### Team access cookie
+
+Parts of app.everstrat.xyz are restricted while the project is in testing. If you enter the access password, we set a cookie named `eve_team_access` that lasts fourteen days.
+
+The cookie holds an expiry timestamp, a random value and a signature. It contains no personal data, cannot be read by scripts on the page, and is only sent back to our own server.
+
+### Server logs
+
+Our hosting provider, Vercel, records standard request logs including IP addresses, for security and to keep the sites running. We do not use these logs for analytics and do not combine them with anything else.
+
+### YouTube videos
+
+The roadmap on everstrat.xyz shows monthly recap videos hosted on YouTube.
+
+The video player is not loaded with the page. It is created only at the moment you press play. Until you do, your browser makes no request to YouTube or to any other Google service, whatever you chose on the consent banner.
+
+Once you press play, YouTube receives your IP address and may set its own cookies, exactly as if you had opened the video on youtube.com. That is Google's processing, under the [Google Privacy Policy](https://policies.google.com/privacy).
+
+### Wallet connections
+
+When you connect a wallet to app.everstrat.xyz, your wallet address becomes visible to the services the app needs to read the blockchain and submit your transaction:
+
+| Service | What it receives |
+| --- | --- |
+| Alchemy | Your address and the calls the app makes to read chain state |
+| Goldsky | Queries against the Everstrat subgraph |
+| WalletConnect | Connection data, if you connect through WalletConnect rather than a browser extension |
+
+We do not store your wallet address on our servers, and we do not link it to any email address or analytics record.
+
+### Blockchain data
+
+Transactions you sign are written to the Sepolia blockchain. That record is public, permanent and outside anyone's control, including ours.
+
+We cannot edit it, delete it, or make it private. This is a property of public blockchains rather than a choice we have made, and no request under any law can change it. Consider it carefully before transacting.
+
+## Cookies
+
+| Cookie | Set by | Purpose | Lifetime |
+| --- | --- | --- | --- |
+| `_ga`, `_ga_*` | Google Analytics | Distinguishes visitors and sessions. Only set if you accept. | Up to 2 years |
+| `eve_team_access` | Everstrat | Keeps you signed in to the restricted app area | 14 days |
+| Consent choice | Everstrat | Remembers whether you accepted or declined analytics, so we stop asking | Stored in your browser, until you clear it |
+
+The consent choice is kept in your browser's local storage rather than in a cookie, and never leaves your device.
+
+The three sites are separate domains, so each asks you separately. Answering on one does not answer for the others.
+
+## Why we are allowed to do this
+
+For readers in the EU and UK, our legal bases under the GDPR are:
+
+| What | Basis |
+| --- | --- |
+| Analytics | Your consent, which you may withdraw at any time |
+| Launch updates email | Your consent, given by submitting the form |
+| Abuse-prevention hashes | Legitimate interest in keeping the signup form usable |
+| Team access cookie | Strictly necessary for a service you asked for |
+| Server logs | Legitimate interest in security and availability |
+
+## How long we keep things
+
+| Data | Retention |
+| --- | --- |
+| Launch updates email | Until we send the launch announcement, or until you ask us to remove it, whichever comes first |
+| Abuse-prevention hashes | 12 months |
+| Analytics | 14 months, after which Google deletes it |
+| Team access cookie | 14 days |
+| Server logs | As set by Vercel, currently 30 days |
+
+## Withdrawing consent
+
+To stop analytics after accepting, clear your browser's site data for the site in question. The banner will appear again and you can decline.
+
+Declining is remembered. We do not re-prompt people who have said no.
+
+To have your email removed from the launch list, write to **ping@everstrat.xyz** from that address, or with it in the message. We will delete the record and confirm.
+
+## Your rights
+
+If you are in the EU or UK, you have the right to ask us for a copy of the personal data we hold about you, to have it corrected, to have it deleted, to restrict or object to how we use it, and to receive it in a portable form. Similar rights apply in several other jurisdictions.
+
+In practice the only personal data we hold that is tied to an identifiable person is an email address you gave us voluntarily. Write to **ping@everstrat.xyz** and we will act on your request within 30 days.
+
+We cannot act on requests concerning blockchain data, for the reasons given above.
+
+## Who receives your data
+
+We do not sell or rent your data, and we do not share it for anyone else's advertising.
+
+These are every third party that receives any of it, and what each one gets:
+
+| Recipient | What it receives | When |
+| --- | --- | --- |
+| Google | Analytics events, approximate location, device and browser details | Only if you accept analytics |
+| Google (YouTube) | Your IP address and its own cookies | Only if you press play on a roadmap video |
+| Telegram | Your email address, the time, and the signup source | When you join the launch list |
+| Neon | Stores the launch list database | When you join the launch list |
+| Vercel | Hosts all three sites and records request logs | Every visit |
+| Alchemy | Your wallet address and the chain reads the app makes | When you connect a wallet |
+| Goldsky | Subgraph queries made by the app | When you use the app |
+| WalletConnect | Wallet connection data | Only if you connect via WalletConnect |
+
+We may also disclose data where the law requires it. If that ever happens we will say so here unless we are forbidden from doing so.
+
+## Where your data goes
+
+The sites are hosted by Vercel and run in its Frankfurt region. The database holding the launch list is operated by Neon. Both describe where the infrastructure runs, not where anyone is based.
+
+Google, Telegram, Vercel, Alchemy, Goldsky and WalletConnect are all capable of processing data outside the EU, including in the United States. Where required, those transfers rely on the European Commission's standard contractual clauses or an equivalent mechanism offered by the provider.
+
+## Children
+
+These sites are not intended for anyone under 18, and we do not knowingly collect data from children.
+
+## Changes
+
+If we change this policy we will update the date at the top. If the change is substantial, such as adding a new service that receives your data, we will say so on the site rather than relying on you to notice.
+
+## Contact
+
+Privacy enquiries: **ping@everstrat.xyz**

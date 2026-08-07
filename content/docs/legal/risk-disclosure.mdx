@@ -1,0 +1,108 @@
+---
+title: Risk Disclosure
+description: What you are accepting by using Everstrat. Unaudited testnet software, with no guarantee of yield, liquidity, redemption, maintenance or continuation.
+---
+
+Last updated: 6 August 2026
+
+<Callout type="warn" title="Testnet only">
+  Everstrat is deployed on **Sepolia testnet (chain id 11155111)**. Tokens have no monetary value.
+  The deployment may be reset at any time. Do not send real funds.
+</Callout>
+
+This statement sets out the risks of using Everstrat. It is not exhaustive, and the risks are not
+listed in order of importance.
+
+The detailed technical account lives in [Key risks](/risk-and-trust/key-risks),
+[Security and audits](/risk-and-trust/security-and-audits) and
+[Trust and governance](/risk-and-trust/trust-and-governance). Those pages are part of this
+disclosure rather than a summary of it. Read them before you transact.
+
+These sites are operated by **everstrat.xyz**. Questions about this statement go to
+**ping@everstrat.xyz**.
+
+## Nothing here has monetary value
+
+Everstrat runs on a public test network. The ETH you deposit is testnet ETH, which is distributed
+free by faucets and cannot be exchanged for anything. EVE tokens minted against it are equally
+without value.
+
+This has one important consequence: **anyone asking you to send real funds to Everstrat is
+defrauding you.** There is no sale, no presale, no allocation and no mainnet deployment. Treat any
+message, site, token or account claiming otherwise as an impersonation attempt, including ones that
+copy this documentation.
+
+## The code is not audited
+
+No third party has audited the smart contracts. There is no completed audit report, no bug bounty
+and no formal verification.
+
+Verified source code on a block explorer means the published source matches the deployed bytecode.
+It does not mean the code is correct, and it is not a substitute for an audit.
+
+The current position on audits, and what would have to happen before one, is described in
+[Security and audits](/risk-and-trust/security-and-audits).
+
+## Your deposit is exposed to strategy performance
+
+EVE tracks the net asset value of a portfolio. If the strategies lose value, every EVE is worth less
+ETH. There is no principal protection, no floor price and no guarantee of recovery.
+
+Essentially all pooled capital currently flows into a single strategy providing concentrated
+liquidity on Uniswap V3, so that strategy's performance is your performance, with no diversification
+to soften it. Concentrated liquidity positions can also underperform simply holding the underlying
+assets. See [Key risks](/risk-and-trust/key-risks).
+
+## Exiting is not guaranteed to be immediate
+
+If the AMM lacks free ETH to fill your exit, the request is queued and waits for a keeper to process
+it. If the keeper is offline, your ETH is not accessible in the meantime.
+
+An escape hatch exists: you can recover your EVE tokens, though not ETH, under the conditions
+described in [Key risks](/risk-and-trust/key-risks). Recovering EVE leaves you holding EVE, and you
+would need to attempt a new exit.
+
+## Privileged roles exist
+
+Everstrat is not a system with no operators. Management contracts are upgradeable behind a timelock,
+an emergency pause can halt activity, and a keeper processes queued exits.
+
+These powers are real and they are held by people. What each role can and cannot do is set out in
+[Trust and governance](/risk-and-trust/trust-and-governance). Anyone describing this protocol as
+fully autonomous or fully decentralised is overstating it.
+
+## Transactions are irreversible and public
+
+Transactions you sign are written to the blockchain, and no one can reverse or delete them. Nobody
+can recover a private key, undo a mistaken transaction, or restore access to a lost wallet.
+
+Wallet addresses and transaction histories are public and permanent. This applies on testnet as it
+does anywhere else.
+
+## The software depends on services nobody here controls
+
+The interface relies on RPC providers, a subgraph indexer, wallet software, an oracle and the
+Ethereum test network itself. Any of them can be slow, wrong, unavailable or compromised, and the
+interface can display stale or incorrect figures as a result.
+
+On-chain state is authoritative. What an interface shows is not.
+
+## Nothing is promised to continue
+
+No one is obliged to keep the site online, maintain the contracts, process the exit queue, respond to
+an incident, answer questions, or deliver anything shown on the roadmap. Development may stop and the
+deployment may be reset or replaced without notice.
+
+## This is not advice, and not an offer
+
+Nothing in this documentation or the interface is investment, financial, legal, accounting or tax
+advice, a recommendation, a suitability assessment, or an offer or solicitation to buy or sell
+anything.
+
+You are responsible for deciding whether using this software is lawful where you are, and for any tax
+consequences of doing so.
+
+## Changes
+
+This statement changes as the software does. Substantial changes will be announced rather than made
+quietly, and the date at the top will always reflect the current version.
