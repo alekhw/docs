@@ -1,6 +1,7 @@
 import { RootProvider } from "fumadocs-ui/provider/next";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { AnalyticsConsent } from "@/components/analytics-consent";
 import { siteConfig } from "@/lib/config";
 import { rootMetadata } from "@/lib/metadata";
 import { getSiteJsonLd, JsonLd } from "@/lib/structured-data";
@@ -24,6 +25,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
       <body className="flex flex-col min-h-screen">
         <JsonLd data={getSiteJsonLd()} />
         <RootProvider>{children}</RootProvider>
+        <AnalyticsConsent />
       </body>
     </html>
   );
