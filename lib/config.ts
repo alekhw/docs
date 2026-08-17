@@ -42,8 +42,8 @@ export const siteConfig = {
     appleTouchIconPrecomposed: "/apple-touch-icon-precomposed.png",
   },
   repository: {
-    owner: "Guide-DAO-Organization",
-    name: "hackerhouse",
+    owner: "everstrat-xyz",
+    name: "contracts",
     branch: "main",
   },
   seo: {
