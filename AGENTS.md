@@ -6,7 +6,7 @@ It is specific to the Everstrat Docs application.
 
 ## Mission
 
-This workspace is the documentation delivery app for the Everstrat / Everything Strategy project.
+This workspace is the documentation delivery app for the Everstrat project.
 
 Agents working here should optimize for:
 

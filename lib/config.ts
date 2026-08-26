@@ -2,9 +2,9 @@ export const siteConfig = {
   name: "Everstrat Docs",
   shortName: "Everstrat Docs",
   brandName: "Everstrat",
-  projectName: "Everything Strategy",
+  projectName: "Everstrat",
   description:
-    "Product, protocol, app, data, security, and operations documentation for the Everything Strategy monorepo.",
+    "Product, protocol, app, data, security, and operations documentation for the Everstrat monorepo.",
   locale: "en",
   openGraphLocale: "en_US",
   category: "technology",

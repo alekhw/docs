@@ -1,6 +1,6 @@
 # Everstrat Docs
 
-This workspace contains the public documentation site for the Everstrat / Everything Strategy monorepo.
+This workspace contains the public documentation site for the Everstrat monorepo.
 
 It is built with Fumadocs on top of Next.js App Router and is intended to document the real state of the project across protocol contracts, the web3 client, operational flows, and supporting architecture artifacts.
 
