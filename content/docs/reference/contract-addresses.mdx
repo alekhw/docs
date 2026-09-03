@@ -1,36 +1,78 @@
 ---
 title: Contract addresses
-description: Deployed contract addresses for Everstrat on Sepolia testnet.
+description: Deployed Everstrat contract addresses on Base Sepolia and Ethereum mainnet.
 ---
 
-<Callout type="warn" title="Testnet contracts">
-  These are **Sepolia testnet** contracts (chain id 11155111). There is no mainnet deployment.
-  These addresses have no monetary value and should not be used with real funds.
+<Callout type="warn" title="Only the Base Sepolia deployment is usable">
+  **Base Sepolia** (chain id 84532) is a testnet. Its EVE has no monetary value.
+
+  Contracts also exist on **Ethereum mainnet** (chain id 1), but that deployment is **not
+  bootstrapped and not open**: no EVE has been minted, the AMM holds no ETH, and setup is still in
+  progress. Do not send funds to the mainnet addresses. Finding them on-chain is not a launch
+  announcement.
 </Callout>
 
-## Deployed contracts
+## Base Sepolia (chain id 84532)
 
 | Contract | Address |
 | --- | --- |
-| EVE token | `0xFcf9F72C41E1BfA481d145933486DeF934a6C006` |
-| AMM | `0xad8afa3c697D7D3B87E73e30BD9ADd42098593f6` |
-| Controller | `0xB4a9F1df239A408998358dE3Ba8e11F0f267da7A` |
-| ExitQueue | `0x56d60283b42B8125389eAEc9a3c9AFE04Aa9e8f6` |
-| StrategyManager | `0xd4Bb0bEF88b6be67CD3285f8A56fa74839f36728` |
-| Oracle | `0xce2b65C769479f2CbbFcFf7213EC0917A5b26Dd3` |
-| Registry | `0x88a9692069fF43A439Ff876E28A8df5769175254` |
-| Converter | `0xacB3567e20418D3B668233cF2eDB31D0801C163F` |
-| Timelock | `0x5E19AcCDDedAf0A185C5627f41b1AB98179CC064` |
+| Registry | `0x0Ce7a232d00Fc736c40D1962d8625b3660bf36df` |
+| Admin timelock (48h) | `0x2c8fc98Bc95Cae5c4CdF6077D58F29F64AB2c346` |
+| EVE token | `0x411F40B28D81B4Fd065D9979278461cF1AA05604` |
+| AMM | `0xb5e2C8603750eF91d36Cf370c01ff3586a1a89dE` |
+| Controller | `0x5b68fB7937287c381B7748AC1c45e6d43Ab4fCD1` |
+| StrategyManager | `0x41e679603F13e76Fd6109cEC1b79749E38BF451e` |
+| Oracle | `0x9dE3F11D8D084B221564b0245B99D2E55A2bB11d` |
+| ExitQueue | `0xdEb613a747542DFed1712fa452EC258D299a677C` |
+| Converter | `0x4CDb224a030D6270B2a11dF549eF20b6D6e16001` |
+| UniswapV3ConverterAdapter | `0x905E82E66f47b7870DdA632B09791f7D4B5e757F` |
+| UniCLStrat | `0xD1f6BFc53614dBA0609a0dC9fb54903DF8940b0f` |
+| Whitelist | `0x68c263565C38aDA5772E06EA0e6454af7c4B4C05` |
+| QueueKeeperExecutor | `0x0D028126C996A5E4719e5981dd55Bb5e1d95d0F4` |
+| StrategyKeeperExecutor | `0x97d1bD09b199A56015e55665B24D1932b6585223` |
+
+Look these up on [BaseScan (Sepolia)](https://sepolia.basescan.org/).
+
+## Ethereum mainnet (chain id 1)
+
+Deployed, not bootstrapped, not enabled for use. Listed so that anyone who finds these contracts
+on-chain can identify them, not as an invitation to interact with them.
+
+| Contract | Address |
+| --- | --- |
+| Registry | `0x46AA1bd55c19be90d8767e0C22732A7DD31D993D` |
+| Admin timelock (48h) | `0xF0911198Ef0a4b4234546fa5F50d6d1D45091774` |
+| EVE token | `0x3A373227AECE982F07B9D14711a05d7a879859D4` |
+| AMM | `0x42c618D9457BE7cb3b836F7FD3332E2800C48a8b` |
+| Controller | `0x9097868dcbda5a630729015DE1ddeCd66d74052c` |
+| StrategyManager | `0x94916ab93C669E7c734f844dB019Ce9449a3b5C9` |
+| Oracle | `0xF5B0C0ab00F92f6B8DC5F6314507FACC9c610c26` |
+| ExitQueue | `0x70E284502e99e150Fde1C07B4E8171ffc365423c` |
+| Converter | `0xc8700441A8ca74aE5390F137bf3Dd659CaD570de` |
+| Whitelist | `0x225B517a68A869020D99F51fFf0Ab43D47Ce3B48` |
+| QueueKeeperExecutor | `0xb7D76E4334e9E23B6edFF77e0C05B07E938a090B` |
+| StrategyKeeperExecutor | `0xE94F714fbBF85c421b6FB80D3Ce0DFA20110EA29` |
+
+No strategy is deployed on mainnet yet, so there is no `UniCLStrat` or converter adapter in the list
+above. Look these up on [Etherscan](https://etherscan.io/).
+
+## Verifying an address
+
+Every address on this page was checked to have contract code on the chain it is listed under. You
+can repeat that check yourself with `eth_getCode`, or by opening the address in the explorer linked
+under each table.
+
+The upgradeable contracts — Controller, StrategyManager, Oracle, ExitQueue, Converter — are listed
+at their **proxy** addresses, which are the addresses to call. The Registry, EVE, and both keeper
+executors are static contracts deployed at the addresses shown.
 
 ## Source of truth
 
-These addresses are copied directly from:
+These addresses come from the deployment itself and are verified on-chain.
 
-- `frontend-app/web3-app/src/config/index.ts` — `CONFIG.CONTRACTS`
-- `frontend-app/web3-app/subgraph/src/config.ts` — the auto-generated subgraph config
-
-The two files are kept in sync by `scripts/sync-config.mjs` and agree exactly. If they ever disagree, the source of truth is `frontend-app/web3-app/src/config/index.ts`.
-
-## Verifying addresses
-
-You can look up any of these addresses on [Etherscan (Sepolia)](https://sepolia.etherscan.io/). If an address on this page ever disagrees with the config files above, treat the config files as correct and open an issue or PR to update this page.
+<Callout type="warn" title="The app config has not caught up yet">
+  `frontend-app/web3-app/src/config/index.ts` and the subgraph config it feeds still point at an
+  earlier **Ethereum Sepolia** deployment. Until that migration lands, treat this page as correct
+  for Base Sepolia and mainnet, and read those config files only for what the deployed app is
+  currently talking to.
+</Callout>
