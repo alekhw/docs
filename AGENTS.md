@@ -71,7 +71,7 @@ Agents should:
 
 - write in technical English
 - document current behavior, not speculative future behavior
-- keep terminology consistent with `smart-contracts`, `frontend-app/web3-app`, and `mermaid`
+- keep terminology consistent with `smart-contracts` (a git submodule tracking `everstrat-xyz/contracts`), `frontend-app/web3-app`, and `smart-contracts/mermaid`
 - prefer explicit constraints, edge cases, and operational details over marketing phrasing
 
 When protocol behavior changes, check whether docs content must be updated.
@@ -155,11 +155,11 @@ At minimum, agents touching this workspace should run `bun run lint` unless bloc
 
 Changes in these locations often require docs updates:
 
-- `smart-contracts/src`
-- `smart-contracts/script`
+- `smart-contracts/src` (submodule → `everstrat-xyz/contracts`)
+- `smart-contracts/script` (submodule)
 - `frontend-app/web3-app/src/config`
 - `frontend-app/web3-app/src/features`
-- `mermaid/*.md`
+- `smart-contracts/mermaid/*.md` (submodule)
 
 If a task touches protocol behavior or frontend behavior outside this workspace, agents should check whether docs now drift from reality.
 
