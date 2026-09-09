@@ -178,7 +178,7 @@ Notes:
 When documenting the project:
 
 - prefer concrete, current behavior over aspirational descriptions
-- keep terminology aligned with `smart-contracts`, `web3-app`, and Mermaid architecture diagrams
+- keep terminology aligned with `smart-contracts` (git submodule → `everstrat-xyz/contracts`), `web3-app`, and the Mermaid architecture diagrams in `smart-contracts/mermaid`
 - update docs when protocol flows, permissions, deployment assumptions, or frontend behavior change
 - document user-facing and operator-facing constraints, not just ideal happy paths
 
@@ -186,9 +186,9 @@ When documenting the project:
 
 This workspace should stay aligned with:
 
-- `../../smart-contracts`
+- `../../smart-contracts` (git submodule → `everstrat-xyz/contracts`)
 - `../web3-app`
 - `../landing`
-- `../../mermaid`
+- `../../smart-contracts/mermaid`
 
 In practice, if those workspaces change, docs often need changes too.
