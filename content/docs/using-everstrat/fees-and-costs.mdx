@@ -3,9 +3,11 @@ title: Fees & costs
 description: A complete breakdown of what interacting with Everstrat costs you — protocol fees, the bonding curve premium, performance fees, gas, and slippage.
 ---
 
-<Callout type="warn" title="Testnet only">
-  Everstrat is currently on **Sepolia testnet (chain id 11155111)**. Tokens have no monetary
-  value. Do not send real funds.
+<Callout type="warn" title="Testing phase — treat as a test protocol">
+  Everstrat is deployed on **Ethereum mainnet** (chain id 1), but it is in a **testing phase** and
+  should be treated as a **test protocol**. Entry is invite-gated, the software is experimental and
+  unaudited, and deposits are real ETH at real risk. Do not deposit more than you can afford to
+  lose entirely.
 </Callout>
 
 Here is everything that affects how much ETH you actually receive relative to what you put in.
@@ -18,7 +20,7 @@ Here is everything that affects how much ETH you actually receive relative to wh
 | Protocol fee on exit | — | None |
 | Entry premium (bonding curve) | Existing EVE holders | Difference between premium price and base price |
 | Performance fee | DAO treasury | A configurable bps rate (max 20%) on accrued Uniswap V3 LP trading fees, settled by minting EVE (diluting existing holders) |
-| Gas | Sepolia validators | Standard network gas |
+| Gas | Ethereum mainnet validators | Standard network gas |
 | Slippage | — | Price movement between quote and execution |
 
 ## No protocol fee on deposit or exit
@@ -64,7 +66,7 @@ dilution over time as the keeper harvests. For the full mechanics, see
 
 ## Gas
 
-Every on-chain interaction — deposit, exit submission, and claim — costs gas. Sepolia gas
+Every on-chain interaction — deposit, exit submission, and claim — costs gas. Ethereum mainnet gas
 fees are low, but they are non-zero. On a queued exit, you pay gas twice: once to submit and once to
 claim. (The keeper pays gas to price and process the batch.)
 

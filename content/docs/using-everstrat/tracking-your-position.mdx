@@ -3,9 +3,11 @@ title: Tracking your position
 description: What you can see in the Everstrat app today — your balances, the bonding curve view, the activity feed, and an honest note about Dashboard prototype status.
 ---
 
-<Callout type="warn" title="Testnet only">
-  Everstrat is currently on **Sepolia testnet (chain id 11155111)**. Tokens have no monetary
-  value. Do not send real funds.
+<Callout type="warn" title="Testing phase — treat as a test protocol">
+  Everstrat is deployed on **Ethereum mainnet** (chain id 1), but it is in a **testing phase** and
+  should be treated as a **test protocol**. Entry is invite-gated, the software is experimental and
+  unaudited, and deposits are real ETH at real risk. Do not deposit more than you can afford to
+  lose entirely.
 </Callout>
 
 The Everstrat app gives you several ways to monitor your position and the protocol's state. Here is
@@ -24,7 +26,7 @@ what is available today and what each view shows.
 
 The following data is sourced directly from on-chain state and the subgraph indexer:
 
-- **Your EVE balance** — read from the EVE token contract on Sepolia.
+- **Your EVE balance** — read from the EVE token contract on Ethereum mainnet.
 - **Your share of NAV** — derived from the current on-chain NAV and EVE supply.
 - **Mint and burn actions** — the deposit and exit flows write to the chain; the app reflects
   confirmed transactions.
@@ -60,7 +62,7 @@ you are paying relative to the exit (base) price.
 ## Reading the activity feed
 
 The activity feed is powered by the Everstrat subgraph, which indexes events emitted by the AMM and
-ExitQueue contracts on Sepolia. Each entry shows:
+ExitQueue contracts on Ethereum mainnet. Each entry shows:
 
 - **Event type** — mint, burn, exit request, batch priced, batch processed, or claim.
 - **Amount** — ETH deposited or EVE minted/burned.

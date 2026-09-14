@@ -5,22 +5,28 @@ description: Current GoldSky endpoint, deployment naming pattern, and the config
 
 ## Public endpoint
 
-`https://api.goldsky.com/api/public/project_cm7aaq2gvh5ak01wf890nferb/subgraphs/everything-strategy-sepolia/v0.1.0/gn`
+`https://api.goldsky.com/api/public/project_cm7aaq2gvh5ak01wf890nferb/subgraphs/everything-strategy-mainnet/prod/gn`
 
 ## Current config snapshot
 
 | Item | Value |
 | --- | --- |
-| Network | `sepolia` |
-| `startBlock` | `11132106` |
-| Config file | `frontend-app/web3-app/subgraph/config/deployments/sepolia.json` |
+| Network | `mainnet` |
+| Config file | `frontend-app/web3-app/subgraph/config/deployments/mainnet.json` |
 | Auto-generated | `frontend-app/web3-app/subgraph/src/config.ts` |
+| Registry start block | `25880839` |
+| EVE start block | `25882614` |
+
+EVE start block differs from the rest because the active EVE token is a post-`DeployAll`
+redeployment (block `25882614`), re-registered under the Registry `EVE` key; the original
+`DeployAll` EVE at `0x3A37…859D4` (block `25880841`) never had supply and is unused.
 
 ## Deployment naming pattern
 
-The versioned subgraph name is `everything-strategy-sepolia/v0.1.0`. Earlier examples in the repo
-history used shorter names such as `everything-strategy/v0.1.x` — those are stale; the live endpoint
-above is the current source of truth, sourced from `frontend-app/web3-app/src/config/index.ts`.
+The versioned subgraph name is `everything-strategy-mainnet/prod`. Earlier history used
+`everything-strategy-sepolia/v0.1.x` and `everything-strategy/v0.1.x` — those are stale; the live
+endpoint above is the current source of truth, sourced from
+`frontend-app/web3-app/src/config/index.ts`.
 
 <Callout type="warn" title="Drift watch">
   The subgraph README, `.env.example`, and historical commit examples include older values.

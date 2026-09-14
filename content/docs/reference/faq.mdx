@@ -3,15 +3,18 @@ title: FAQ
 description: Answers to the most common questions about Everstrat — what it is, how to use it, fees, risks, and the network it runs on.
 ---
 
-<Callout type="warn" title="Testnet only">
-  Everstrat is on **Sepolia testnet (chain id 11155111)**. Tokens have no monetary value. Do not
-  send real funds.
+<Callout type="warn" title="Mainnet deployment is invite-gated">
+  Contracts are deployed on **Ethereum mainnet** (chain id 1), but entry is **invite-gated** via the
+  Whitelist while the invite period is active. Follow official channels for invite availability.
 </Callout>
 
 <Accordions type="single">
   <Accordion title="Is Everstrat live on mainnet?">
-    No. Everstrat is deployed on **Sepolia testnet** (chain id 11155111). There is no mainnet
-    deployment. EVE tokens and any ETH you interact with on this testnet have no monetary value.
+    Contracts are deployed on **Ethereum mainnet** (chain id 1) — see
+    [Contract addresses](/reference/contract-addresses) — but the deployment is
+    **invite-gated** and not open for general entry yet: entry requires a whitelist invite
+    while the invite period is active. Treat the mainnet deployment as not launched until
+    that changes.
   </Accordion>
   <Accordion title="What is EVE and what backs it?">
     EVE is a token that represents your share of the protocol's net asset value (NAV). When you deposit
@@ -21,7 +24,7 @@ description: Answers to the most common questions about Everstrat — what it is
     [EVE and NAV](/how-everstrat-works/eve-and-nav) for the full formula.
   </Accordion>
   <Accordion title="How do I deposit ETH and receive EVE?">
-    Connect your wallet on Sepolia, enter an ETH amount, and confirm the transaction. The AMM
+    Connect your wallet on Ethereum mainnet, enter an ETH amount, and confirm the transaction. The AMM
     calculates how much EVE to mint using the premium price (which is higher than the redemption base
     price). You can set a `minTokensToMint` floor to protect against slippage. See
     [Depositing & minting](/using-everstrat/depositing-and-minting) for a step-by-step walkthrough.
@@ -62,27 +65,28 @@ description: Answers to the most common questions about Everstrat — what it is
       trading fees** earned by the strategy. It is settled by **minting EVE to the DAO treasury**,
       which dilutes existing EVE holders proportionally — no ETH moves out of the protocol. See
       [Fees & costs](/using-everstrat/fees-and-costs).
-    - **Gas** — standard Sepolia network gas on every on-chain action, including deposit, exit
+    - **Gas** — standard Ethereum mainnet gas on every on-chain action, including deposit, exit
       submission, and claim.
     - **Slippage** — price can move between submission and settlement.
   </Accordion>
   <Accordion title="Can I lose money?">
     Yes. NAV can fall if the yield strategy loses value or if the protocol encounters an issue. You
     receive ETH proportional to NAV at the time you exit — if NAV has fallen since you deposited, you
-    receive less ETH than you put in. Because this is testnet, no real money is at risk right now, but
-    the mechanism is real. See [Key risks](/risk-and-trust/key-risks) for a full breakdown.
+    receive less ETH than you put in. Everstrat is in a testing phase: treat it as a test protocol
+    and only deposit what you can afford to lose entirely. See [Key risks](/risk-and-trust/key-risks) for a full breakdown.
   </Accordion>
   <Accordion title="Has Everstrat been audited?">
-    No audit is documented in this repository. The protocol is on Sepolia testnet and should
-    be treated as unaudited. Do not treat testnet deployment as a signal of production readiness.
+    No audit is documented in this repository. The protocol is in a testing phase and should
+    be treated as unaudited. Do not treat deployment as a signal of production readiness.
   </Accordion>
   <Accordion title="What network are the contracts on?">
-    All contracts are on **Sepolia** (chain id 11155111). See
-    [Contract addresses](/reference/contract-addresses) for the full list of deployed addresses.
+    The production contracts are on **Ethereum mainnet** (chain id 1); a Base Sepolia testnet
+    deployment also exists. See [Contract addresses](/reference/contract-addresses) for the full
+    list of deployed addresses.
   </Accordion>
   <Accordion title="My wallet is connected but transactions are not starting">
-    Check that your wallet is switched to **Sepolia** (chain id 11155111). Everstrat does not
-    support any other network. If you see a network mismatch prompt, approve the switch. If transactions
+    Check that your wallet is switched to **Ethereum mainnet** (chain id 1). Everstrat does not
+    support any other network in the app. If you see a network mismatch prompt, approve the switch. If transactions
     still do not initiate, refresh the page and reconnect your wallet.
   </Accordion>
   <Accordion title="The AMM shows a paused or excessive-deviation error">

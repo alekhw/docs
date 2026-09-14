@@ -13,20 +13,23 @@ npm run build
 ```
 
 Both `codegen` and `build` run `npm run config:sync` first, which regenerates `src/config.ts` from
-`config/deployments/sepolia.json`.
+`config/deployments/mainnet.json`.
 
 ## Deploy workflow
 
 ```bash
 goldsky login
-goldsky subgraph deploy everything-strategy-sepolia/v0.1.0 --path .
+goldsky subgraph deploy everything-strategy-mainnet/v0.X.Y --path .
 ```
+
+The live `prod` tag serves the current endpoint; see
+[Subgraph deployments](/operations/subgraph-deployments) for the current public endpoint URL.
 
 ## Change rule
 
 When redeploying contracts:
 
-1. Update `frontend-app/web3-app/subgraph/config/deployments/sepolia.json` with the new addresses
+1. Update `frontend-app/web3-app/subgraph/config/deployments/mainnet.json` with the new addresses
    and `startBlock`.
 2. Run `npm run config:sync` (or any of `codegen`/`build` which invoke it) to regenerate
    `src/config.ts`.

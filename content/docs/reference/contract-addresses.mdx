@@ -3,13 +3,13 @@ title: Contract addresses
 description: Deployed Everstrat contract addresses on Base Sepolia and Ethereum mainnet.
 ---
 
-<Callout type="warn" title="Only the Base Sepolia deployment is usable">
+<Callout type="warn" title="Mainnet is deployed but not open for general entry">
   **Base Sepolia** (chain id 84532) is a testnet. Its EVE has no monetary value.
 
-  Contracts also exist on **Ethereum mainnet** (chain id 1), but that deployment is **not
-  bootstrapped and not open**: no EVE has been minted, the AMM holds no ETH, and setup is still in
-  progress. Do not send funds to the mainnet addresses. Finding them on-chain is not a launch
-  announcement.
+  Contracts also exist on **Ethereum mainnet** (chain id 1). That deployment is behind the invite
+  whitelist (`Whitelist.disabled()` is still `false`), so entry requires an invite and setup is
+  still in progress. Do not send funds to the mainnet addresses unless invited. Finding them
+  on-chain is not a launch announcement.
 </Callout>
 
 ## Base Sepolia (chain id 84532)
@@ -35,14 +35,15 @@ Look these up on [BaseScan (Sepolia)](https://sepolia.basescan.org/).
 
 ## Ethereum mainnet (chain id 1)
 
-Deployed, not bootstrapped, not enabled for use. Listed so that anyone who finds these contracts
-on-chain can identify them, not as an invitation to interact with them.
+Deployed and bootstrap-funded (~1045 EVE supply, NAV held by the Controller), but **invite-gated**:
+the Whitelist invite period is still active, so entry requires an invite. Listed so that anyone who
+finds these contracts on-chain can identify them, not as an invitation to interact with them.
 
 | Contract | Address |
 | --- | --- |
 | Registry | `0x46AA1bd55c19be90d8767e0C22732A7DD31D993D` |
 | Admin timelock (48h) | `0xF0911198Ef0a4b4234546fa5F50d6d1D45091774` |
-| EVE token | `0x3A373227AECE982F07B9D14711a05d7a879859D4` |
+| EVE token | `0x8FE6A43672fCa70d41e112B8426387665fD061EC` |
 | AMM | `0x42c618D9457BE7cb3b836F7FD3332E2800C48a8b` |
 | Controller | `0x9097868dcbda5a630729015DE1ddeCd66d74052c` |
 | StrategyManager | `0x94916ab93C669E7c734f844dB019Ce9449a3b5C9` |
@@ -53,8 +54,9 @@ on-chain can identify them, not as an invitation to interact with them.
 | QueueKeeperExecutor | `0xb7D76E4334e9E23B6edFF77e0C05B07E938a090B` |
 | StrategyKeeperExecutor | `0xE94F714fbBF85c421b6FB80D3Ce0DFA20110EA29` |
 
-No strategy is deployed on mainnet yet, so there is no `UniCLStrat` or converter adapter in the list
-above. Look these up on [Etherscan](https://etherscan.io/).
+No strategy is deployed on mainnet yet (`StrategyManager.strategies()` returns an empty list), so
+there is no `UniCLStrat` or converter adapter in the list above. Look these up on
+[Etherscan](https://etherscan.io/).
 
 ## Verifying an address
 
@@ -70,9 +72,7 @@ executors are static contracts deployed at the addresses shown.
 
 These addresses come from the deployment itself and are verified on-chain.
 
-<Callout type="warn" title="The app config has not caught up yet">
-  `frontend-app/web3-app/src/config/index.ts` and the subgraph config it feeds still point at an
-  earlier **Ethereum Sepolia** deployment. Until that migration lands, treat this page as correct
-  for Base Sepolia and mainnet, and read those config files only for what the deployed app is
-  currently talking to.
-</Callout>
+The app config is now in sync with this page: `frontend-app/web3-app/src/config/index.ts` and the
+subgraph config it feeds (`subgraph/config/deployments/mainnet.json`) point at the same mainnet
+deployment. The earlier warning about them pointing at an Ethereum Sepolia deployment no longer
+applies.

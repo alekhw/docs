@@ -1,6 +1,6 @@
 ---
 title: Mint UI
-description: The current frontend behavior for deposit input, simulation, and transaction submission.
+description: The current frontend behavior for deposit input, risk acknowledgment, simulation, and transaction submission.
 ---
 
 ## Mint UI Features
@@ -10,6 +10,23 @@ description: The current frontend behavior for deposit input, simulation, and tr
 - live price-driven output calculation
 - simulated write before submission
 - slippage-protected minimum output
+
+## Risk acknowledgment gate
+
+Before the first mint per wallet (per network), a dialog requires the user to
+explicitly accept two statements:
+
+1. They understand Everstrat is an experimental protocol in a testing phase,
+   have read the [Risk Disclosure](/legal/risk-disclosure), and accept the risk
+   of losing their entire deposit.
+2. They confirm they are not a US person and not a citizen or resident of any
+   other restricted jurisdiction.
+
+Both checkboxes must be checked before **I accept — continue to mint** enables.
+The acknowledgment is stored in `localStorage` per wallet address and chain
+(`everstrat:risk-acknowledgment:<address>:<chainId>`), versioned so that
+updating the acknowledgment text invalidates prior accepts. Burn is never
+gated, and switching wallets or networks requires acknowledging again.
 
 ## Transaction Shape
 

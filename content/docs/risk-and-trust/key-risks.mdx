@@ -3,9 +3,11 @@ title: Key risks
 description: A plain account of what can go wrong when you hold or transact EVE. None of these risks are downplayed.
 ---
 
-<Callout type="warn" title="Testnet only">
-  Everstrat is on **Sepolia testnet**. Tokens have no monetary value. The deployment may be
-  reset at any time. Do not send real funds.
+<Callout type="warn" title="Testing phase — treat as a test protocol">
+  Everstrat is deployed on **Ethereum mainnet** (chain id 1), but it is in a **testing phase** and
+  should be treated as a **test protocol**. Entry is invite-gated, the software is experimental and
+  unaudited, and deposits are real ETH at real risk. Do not deposit more than you can afford to
+  lose entirely.
 </Callout>
 
 Understanding these risks is part of using the protocol. Each one is described plainly below — what it
@@ -102,11 +104,12 @@ transaction reverts. This prevents exploitation of sudden price swings, but it a
 can fail during genuine market volatility. Recovery requires `ADMIN_ROLE` or `SECURITY_ROLE` to reset
 the checkpoint.
 
-## Testnet status
+## Testing-phase status
 
-This deployment is on Sepolia. EVE tokens have no monetary value. The entire deployment may be
-reset, redeployed with different parameters, or taken offline at any time. No aspect of this protocol
-should be treated as a production, real-money system until explicitly announced otherwise.
+Everstrat is deployed on Ethereum mainnet but is in a testing phase and should be treated as a test
+protocol. The deployment may be suspended, redeployed with different parameters, or taken offline at
+any time. Deposits are real ETH and no aspect of this protocol should be treated as a production,
+real-money system until explicitly announced otherwise.
 
 ---
 

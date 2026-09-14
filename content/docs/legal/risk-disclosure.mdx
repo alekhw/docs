@@ -1,13 +1,15 @@
 ---
 title: Risk Disclosure
-description: What you are accepting by using Everstrat. Unaudited testnet software, with no guarantee of yield, liquidity, redemption, maintenance or continuation.
+description: What you are accepting by using Everstrat. Unaudited software in a testing phase, with no guarantee of yield, liquidity, redemption, maintenance or continuation.
 ---
 
-Last updated: 6 August 2026
+Last updated: 14 September 2026
 
-<Callout type="warn" title="Testnet only">
-  Everstrat is deployed on **Sepolia testnet (chain id 11155111)**. Tokens have no monetary value.
-  The deployment may be reset at any time. Do not send real funds.
+<Callout type="warn" title="Testing phase — treat as a test protocol">
+  Everstrat is deployed on **Ethereum mainnet** (chain id 1), but it is in a **testing phase** and
+  should be treated as a **test protocol**. Entry is invite-gated, the software is experimental and
+  unaudited, and deposits are real ETH at real risk. Do not deposit more than you can afford to
+  lose entirely.
 </Callout>
 
 This statement sets out the risks of using Everstrat. It is not exhaustive, and the risks are not
@@ -21,16 +23,18 @@ disclosure rather than a summary of it. Read them before you transact.
 These sites are operated by **everstrat.xyz**. Questions about this statement go to
 **ping@everstrat.xyz**.
 
-## Nothing here has monetary value
+## Testing phase — treat as a test protocol
 
-Everstrat runs on a public test network. The ETH you deposit is testnet ETH, which is distributed
-free by faucets and cannot be exchanged for anything. EVE tokens minted against it are equally
-without value.
+Everstrat is in a **testing phase**. The contracts run on Ethereum mainnet, so the ETH you deposit
+is real and so are any losses. Being on mainnet does not make this a production system: the
+protocol should be treated as a **test protocol** — experimental, invite-gated, unaudited, and
+subject to change or suspension without notice.
 
-This has one important consequence: **anyone asking you to send real funds to Everstrat is
-defrauding you.** There is no sale, no presale, no allocation and no mainnet deployment. Treat any
-message, site, token or account claiming otherwise as an impersonation attempt, including ones that
-copy this documentation.
+Because real funds are now involved, **verifying you are on the official deployment matters.**
+Only interact with the addresses listed in [Contract addresses](/reference/contract-addresses).
+Anyone asking you to send funds to a different "Everstrat" contract, site or token is defrauding
+you. There is no sale, no presale and no allocation. Treat any message, site, token or account
+claiming otherwise as an impersonation attempt, including ones that copy this documentation.
 
 ## The code is not audited
 
@@ -76,13 +80,13 @@ fully autonomous or fully decentralised is overstating it.
 Transactions you sign are written to the blockchain, and no one can reverse or delete them. Nobody
 can recover a private key, undo a mistaken transaction, or restore access to a lost wallet.
 
-Wallet addresses and transaction histories are public and permanent. This applies on testnet as it
+Wallet addresses and transaction histories are public and permanent. This applies on mainnet as it
 does anywhere else.
 
 ## The software depends on services nobody here controls
 
 The interface relies on RPC providers, a subgraph indexer, wallet software, an oracle and the
-Ethereum test network itself. Any of them can be slow, wrong, unavailable or compromised, and the
+Ethereum network itself. Any of them can be slow, wrong, unavailable or compromised, and the
 interface can display stale or incorrect figures as a result.
 
 On-chain state is authoritative. What an interface shows is not.

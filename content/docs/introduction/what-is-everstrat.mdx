@@ -11,18 +11,16 @@ The landing page positions the product as **Everstrat** with the promise:
 In the monorepo, that promise resolves into several concrete surfaces:
 
 - **smart contracts** that accept ETH, mint EVE, and manage redemptions
-- **a web3 app** that exposes mint, burn, and account history on Sepolia
+- **a web3 app** that exposes mint, burn, and account history on Ethereum mainnet
 - **a subgraph** that turns raw protocol events into account and queue history
 - **docs** that explain how those surfaces relate
 
 ## Naming
 
 The product is **Everstrat** everywhere a user sees it: the landing page, the app, and these docs.
-The older name **Everything Strategy** survives in two places:
-
-- the on-chain name of the EVE token (`name()` returns `Everything Strategy`), because the token
-  contract is immutable
-- infrastructure identifiers such as the GoldSky subgraph slug `everything-strategy-sepolia`
+The older name **Everything Strategy** survives in infrastructure identifiers such as the GoldSky
+subgraph slug `everything-strategy-mainnet`. The active mainnet EVE token was redeployed under the
+new name — `name()` on `0x8FE6…61EC` returns `Everstrat`.
 
 ## What Users Actually Interact With
 
