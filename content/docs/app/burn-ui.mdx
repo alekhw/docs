@@ -19,6 +19,12 @@ AMM.exit(requestedEth, burnAmount, burnPriceTolerance)
 AMM.cancelRedemption(batchId)
 ```
 
+`requestedEth` is the quoted ETH for `burnAmount` at the current base price, reduced by a 0.1%
+buffer (`BURN_REQUEST_BUFFER_BPS`). `exit()` reverts with `AMMTooMuchETHRequested` if the requested
+ETH would need more EVE than `burnAmount` at execution-time NAV, so an unbuffered quote fails on any
+NAV drop between quote and inclusion. With the buffer, `burnAmount` acts as the maximum burn and
+any EVE not needed stays in the wallet.
+
 ## Important Detail
 
 The pending-request block is based on direct contract reads into the current batch, not on
