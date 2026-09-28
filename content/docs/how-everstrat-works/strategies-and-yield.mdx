@@ -24,12 +24,19 @@ This means:
 
 ## UniCLStrat — concentrated-liquidity on Uniswap V3
 
-UniCLStrat is the first (and currently only) registered strategy. It earns yield by providing
-**concentrated liquidity** on a Uniswap V3 WETH/paired-token pool.
+UniCLStrat is the strategy contract Everstrat runs today. Each deployed instance earns yield by
+providing **concentrated liquidity** on one Uniswap V3 pool that pairs WETH with another token.
+Four instances are registered on mainnet, one per pool — see [Live strategies](#live-strategies).
 
 <Cards>
   <Card title="Wrap ETH to WETH">
     Received ETH is wrapped into WETH via the Converter module before entering the Uniswap pool.
+  </Card>
+  <Card title="Swap part of the ETH into the paired token">
+    A concentrated position needs both of the pool's tokens, in a ratio set by the current price and
+    the range. The strategy swaps part of its WETH — roughly half while the price sits mid-range — into
+    the paired token (USDC, USDT, or UNI) via the Converter. That part of the strategy's value then
+    moves with the paired token rather than with ETH.
   </Card>
   <Card title="Provide liquidity in a price range">
     The strategy mints a concentrated LP position around the current pool price, earning a share of
@@ -48,6 +55,25 @@ UniCLStrat is the first (and currently only) registered strategy. It earns yield
     ETH via the Oracle. This feeds the AMM's pricing.
   </Card>
 </Cards>
+
+## Live strategies
+
+As of September 2026, four UniCLStrat instances are registered with the mainnet StrategyManager:
+
+| Uniswap V3 pool | Fee tier | Strategy | Pool address |
+| --- | --- | --- | --- |
+| USDC / WETH | 0.30% | `0x5E12FFD5e0F69d37B581D06b68ad6c53609cac38` | `0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8` |
+| USDC / WETH | 0.01% | `0x59C476c1817b23791d96F35b9f468E6d9A242252` | `0xE0554a476A092703abdB3Ef35c80e0D76d32939F` |
+| WETH / USDT | 0.30% | `0x3Fb6B9174427CA4FF38728398F4F4CB526F66501` | `0x4e68Ccd3E89f51C3074ca5072bbAC773960dFa36` |
+| UNI / WETH | 0.30% | `0x956fE55DB50527E75c1fcA679adE509AD89cAFDd` | `0x1d42064Fc4Beb5F8aAF85F4617AE8b3b5B8Bd801` |
+
+The strategy list can change through governance; `StrategyManager.strategies()` is the source of
+truth. The app's dashboard shows each strategy's pool, capital, and results, and links to the pool
+on Uniswap.
+
+Because each position holds both tokens, roughly half of the capital deployed to strategies is held
+in the paired tokens — mostly USD stablecoins — rather than in ETH. The exact split moves with price
+and rebalances.
 
 ## The calm-period check
 
@@ -118,8 +144,12 @@ UniCLStrat carries risks that any concentrated-liquidity strategy carries:
   the underperforming token. The LP position value can fall below the equivalent value of simply
   holding WETH.
 
-  **Single-strategy concentration.** Currently all protocol ETH flows into one strategy. A bug in
-  UniCLStrat or the Uniswap V3 pool could affect the entire protocol NAV.
+  **Not a pure ETH position.** Roughly half of deployed capital is held in the paired tokens, mostly
+  USD stablecoins. Measured in ETH, strategy NAV therefore falls when ETH rises against the dollar and
+  rises when ETH falls, independently of the fees earned.
+
+  **Single-contract concentration.** Capital is spread across four pools, but all of them run the
+  same UniCLStrat code. A bug in UniCLStrat could affect all protocol NAV deployed to strategies.
 
   For a full treatment of these and other risks, see [Key risks](/risk-and-trust/key-risks).
 </Callout>
