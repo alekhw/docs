@@ -36,16 +36,17 @@ Impermanent loss is not a failure of the protocol; it is an inherent property of
 across a price range. If the market moves sharply, you may exit with less ETH-equivalent value than if
 you had held outside the protocol.
 
-## Single-strategy concentration
+## Single-contract concentration
 
 <Callout type="warn">
-  Today essentially all pooled capital flows into one strategy: UniCLStrat. That strategy's
-  performance is your performance — if it performs poorly, there is no diversification to cushion the
-  impact.
+  Today essentially all pooled capital flows into UniCLStrat. It is spread across four Uniswap V3
+  pools, one UniCLStrat instance per pool, but every instance runs the same contract code. A bug in
+  UniCLStrat could affect all protocol NAV deployed to strategies, and the pools share similar market
+  exposure, so the spread across pools offers only limited diversification.
 </Callout>
 
-More strategies may be added in future, which would change this profile — but that change requires
-governance action and is not guaranteed.
+Strategies built on different code may be added in future, which would change this profile — but that
+change requires governance action and is not guaranteed.
 
 ## Exit queue delays
 

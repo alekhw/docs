@@ -52,10 +52,11 @@ The current position on audits, and what would have to happen before one, is des
 EVE tracks the net asset value of a portfolio. If the strategies lose value, every EVE is worth less
 ETH. There is no principal protection, no floor price and no guarantee of recovery.
 
-Essentially all pooled capital currently flows into a single strategy providing concentrated
-liquidity on Uniswap V3, so that strategy's performance is your performance, with no diversification
-to soften it. Concentrated liquidity positions can also underperform simply holding the underlying
-assets. See [Key risks](/risk-and-trust/key-risks).
+Essentially all pooled capital currently flows into a single strategy contract, UniCLStrat, which
+provides concentrated liquidity on Uniswap V3. Capital is spread across several pools, but every pool
+runs the same contract code, so a flaw in that contract could affect all capital deployed to
+strategies, and the spread across pools offers only limited diversification. Concentrated liquidity
+positions can also underperform simply holding the underlying assets. See [Key risks](/risk-and-trust/key-risks).
 
 ## Exiting is not guaranteed to be immediate
 
