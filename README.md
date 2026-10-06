@@ -208,7 +208,7 @@ When reconnecting the existing documentation project:
 - leave Root Directory empty so Vercel builds from the repository root
 - remove any project-level Ignored Build Step that still filters `frontend-app`
 - keep the existing environment variables, domains, and integrations
-- retain `NEXT_PUBLIC_SITE_URL` for the production documentation domain
+- retain `NEXT_PUBLIC_SITE_URL` for the production documentation domain 
 - set `VERCEL_DEEP_CLONE=true` if builds need complete Git history for last-modified timestamps
 
 The repository migration does not change the Vercel project configuration.
