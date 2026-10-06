@@ -1,6 +1,12 @@
 # Everstrat Docs
 
-This workspace contains the public documentation site for the Everstrat monorepo.
+This repository contains the public documentation site for Everstrat.
+
+The application lives at the root of [`everstrat-xyz/docs`](https://github.com/everstrat-xyz/docs).
+It was extracted from `frontend-app/everstrat-docs` in
+[`Guide-DAO-Organization/hackerhouse`](https://github.com/Guide-DAO-Organization/hackerhouse)
+with its Git history. The application and landing page still live in that source monorepo
+until their separate migrations are completed.
 
 It is built with Fumadocs on top of Next.js App Router and is intended to document the real state of the project across protocol contracts, the web3 client, operational flows, and supporting architecture artifacts.
 
@@ -28,7 +34,7 @@ The docs application is responsible for:
 ## Project Structure
 
 ```text
-frontend-app/everstrat-docs/
+docs/
 ├── app/
 │   ├── (docs)/[[...slug]]/page.tsx   # Root-routed documentation pages
 │   ├── (docs)/layout.tsx             # Docs layout and shared UI shell
@@ -136,8 +142,10 @@ NEXT_PUBLIC_SITE_URL=https://docs.example.com
 
 ### Install
 
+Run all commands from this repository's root.
+
 ```bash
-bun install
+bun install --frozen-lockfile
 ```
 
 ### Run
@@ -186,9 +194,21 @@ When documenting the project:
 
 This workspace should stay aligned with:
 
-- `../../smart-contracts` (git submodule → `everstrat-xyz/contracts`)
-- `../web3-app`
-- `../landing`
-- `../../smart-contracts/mermaid`
+- [`everstrat-xyz/contracts`](https://github.com/everstrat-xyz/contracts): protocol code and Mermaid diagrams
+- [`frontend-app/web3-app`](https://github.com/Guide-DAO-Organization/hackerhouse/tree/main/frontend-app/web3-app): application and subgraph
+- [`frontend-app/landing`](https://github.com/Guide-DAO-Organization/hackerhouse/tree/main/frontend-app/landing): landing page
 
 In practice, if those workspaces change, docs often need changes too.
+
+## Vercel Repository Connection
+
+When reconnecting the existing documentation project:
+
+- select `everstrat-xyz/docs` and production branch `main`
+- leave Root Directory empty so Vercel builds from the repository root
+- remove any project-level Ignored Build Step that still filters `frontend-app`
+- keep the existing environment variables, domains, and integrations
+- retain `NEXT_PUBLIC_SITE_URL` for the production documentation domain
+- set `VERCEL_DEEP_CLONE=true` if builds need complete Git history for last-modified timestamps
+
+The repository migration does not change the Vercel project configuration.

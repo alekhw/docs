@@ -1,6 +1,11 @@
 # AGENTS.md
 
-This file defines how agents should work inside the `frontend-app/everstrat-docs` workspace.
+This file defines how agents should work at the root of the `everstrat-xyz/docs` repository.
+The app was extracted from `frontend-app/everstrat-docs` in
+`Guide-DAO-Organization/hackerhouse` with its Git history.
+
+Paths to the application and landing page below refer to the source monorepo, not local
+directories in this repository. Protocol sources and diagrams live in `everstrat-xyz/contracts`.
 
 It is specific to the Everstrat Docs application.
 
@@ -124,10 +129,9 @@ Do not hardcode production URLs or secrets into source files.
 
 ## Validation
 
-Run validation from this workspace:
+Run validation from this repository's root:
 
 ```bash
-cd frontend-app/everstrat-docs
 bun run docs:gen
 bun run lint
 bun run types:check

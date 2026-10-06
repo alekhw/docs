@@ -1,18 +1,25 @@
 ---
 title: Monorepo structure
-description: Engineering-facing summary of how the repository is partitioned.
+description: Engineering-facing summary of the source monorepo and the standalone documentation repository.
 ---
 
 ## Main Workspaces
 
+The application and landing page currently remain in
+[`Guide-DAO-Organization/hackerhouse`](https://github.com/Guide-DAO-Organization/hackerhouse):
+
 - `frontend-app/landing`
 - `frontend-app/web3-app`
 - `frontend-app/web3-app/subgraph`
-- `frontend-app/everstrat-docs`
-- `smart-contracts`
-- `mermaid`
+- `smart-contracts`, a submodule pointing to [`everstrat-xyz/contracts`](https://github.com/everstrat-xyz/contracts)
+
+The documentation application has moved from `frontend-app/everstrat-docs` into
+[`everstrat-xyz/docs`](https://github.com/everstrat-xyz/docs). Its `app`, `content/docs`,
+`components`, and `lib` directories now live at the repository root.
+
+Protocol implementation and supporting Mermaid diagrams live in `everstrat-xyz/contracts`.
 
 ## Why This Matters
 
-Documentation is distributed across these workspaces. There is no single standalone “docs truth”
-directory outside the docs app itself.
+The docs site builds independently, but its content must stay aligned with the application,
+subgraph, and protocol sources in the other repositories and workspaces.

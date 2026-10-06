@@ -43,7 +43,7 @@ export const siteConfig = {
   },
   repository: {
     owner: "everstrat-xyz",
-    name: "contracts",
+    name: "docs",
     branch: "main",
   },
   seo: {
