@@ -140,7 +140,7 @@ bun run build
 
 Important:
 
-- `bun run lint` runs Biome in write mode and may modify files
+- `bun run lint` checks Biome without changing files; `bun run lint:fix` applies safe fixes
 - `bun run docs:gen` refreshes generated `.source` files when docs collections change
 - `bun run types:check` regenerates Next route types before TypeScript checking
 
