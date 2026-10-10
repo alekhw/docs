@@ -1,7 +1,7 @@
 "use client";
 
 import Script from "next/script";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import {
@@ -21,9 +21,8 @@ import {
  * people who declined. This gates the tag itself: nothing is requested from any
  * Google host until someone presses Accept.
  *
- * Styled with fumadocs tokens rather than the Everstrat palette the other two
- * apps use, because these docs have a light and dark theme and hardcoded hex
- * would be unreadable in one of them.
+ * Uses the shared Fumadocs theme tokens so the banner follows the Everstrat
+ * palette in both light and dark mode.
  */
 export function AnalyticsConsent() {
   const [choice, setChoice] = useState<ConsentChoice | null>(null);
@@ -40,18 +39,26 @@ export function AnalyticsConsent() {
     setMounted(true);
   }, []);
 
-  // Reserves the fixed bar's height so it does not sit on top of the end of the
-  // page. Measured rather than hardcoded because the copy wraps on narrow
-  // viewports.
-  useEffect(() => {
+  // Reserve space for the page and sticky navigation. The bar also has to stay
+  // clear of the sidebar's theme switch and the mobile drawer. Measure it
+  // because the copy wraps on narrow viewports.
+  useLayoutEffect(() => {
     const bar = barRef.current;
-    if (!bar) return;
-    const measure = () => setReserve(bar.offsetHeight);
+    if (!mounted || choice !== null || !bar) return;
+    const root = document.documentElement;
+    const measure = () => {
+      const height = Math.ceil(bar.getBoundingClientRect().height);
+      setReserve(height);
+      root.style.setProperty("--docs-consent-height", `${height}px`);
+    };
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(bar);
-    return () => observer.disconnect();
-  }, []);
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty("--docs-consent-height");
+    };
+  }, [choice, mounted]);
 
   function answer(next: ConsentChoice) {
     writeConsent(next);

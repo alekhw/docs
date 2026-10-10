@@ -6,7 +6,7 @@ export function baseOptions(): BaseLayoutProps {
   return {
     nav: {
       title: (
-        <span className="group inline-flex items-center gap-2.5 rounded-md transition-opacity hover:opacity-80">
+        <span className="inline-flex items-center gap-2.5 rounded-md">
           <Image
             src={siteConfig.assets.logo}
             alt=""
@@ -15,7 +15,7 @@ export function baseOptions(): BaseLayoutProps {
             height={22}
             loading="eager"
             priority
-            className="h-auto w-auto shrink-0 transition-transform duration-200 ease-out group-hover:scale-110"
+            className="h-auto w-auto shrink-0 dark:invert"
           />
           <span className="text-sm font-semibold tracking-tight">
             {siteConfig.seo.siteTitle}

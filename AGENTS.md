@@ -17,7 +17,7 @@ Agents working here should optimize for:
 
 - accurate documentation of shipped behavior
 - clean Fumadocs and Next.js integration
-- consistent visual alignment with the landing page brand
+- consistent visual alignment with the application and Everstrat brand
 - safe updates to content, search, metadata, and LLM export routes
 
 This is not a generic starter Fumadocs app anymore. Treat it as a product-facing docs surface.
@@ -83,13 +83,19 @@ When protocol behavior changes, check whether docs content must be updated.
 
 ## Design Rules
 
-This workspace should visually align with `frontend-app/landing`.
+This workspace should visually align with the Everstrat application, especially
+the Portfolio (Dashboard) and Metrics (Stats) screens. The landing page remains a
+secondary brand reference. In the local sibling `../app`, consult
+`src/components/ui/analytics-layout.ts`, `src/features/Header/components/AppHeader.tsx`,
+and the Dashboard and Stats components before changing the docs theme.
 
 Current expectations:
 
-- treat the landing page as the brand reference
-- preserve the `SuisseIntl`-style typography stack used here
-- preserve the warm neutral background and glassmorphism controls unless the task explicitly changes branding
+- use the application palette: warm `#F5F4F3` canvas, white panels, soft neutral surfaces, and `#AAFF92` active navigation
+- match the application's restrained borders, 20–24 px panel radii, and muted sage, blue, and sand section accents
+- preserve the existing Inter / Swiss grotesk typography direction and translucent controls
+- keep reading widths comfortable, page headers compact, and navigation cards clearly actionable; avoid decorative motion and redundant home-page pagination
+- maintain corresponding dark theme tokens with readable foregrounds and semantic callouts; the black brand mark must invert to white in dark mode, including the mobile header
 - avoid introducing unrelated design systems or off-brand palettes
 
 Use Fumadocs primitives, but theme them to match the product brand.
