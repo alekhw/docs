@@ -1,9 +1,5 @@
 {
   "title": "Risk & Trust",
   "icon": "TriangleAlert",
-  "pages": [
-    "key-risks",
-    "trust-and-governance",
-    "security-and-audits"
-  ]
+  "pages": ["key-risks", "trust-and-governance", "security-and-audits"]
 }

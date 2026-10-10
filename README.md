@@ -29,7 +29,7 @@ The docs application is responsible for:
 - Fumadocs MDX collections
 - Tailwind CSS 4
 - Biome
-- TypeScript 6
+- TypeScript 7
 
 ## Project Structure
 
@@ -137,8 +137,8 @@ NEXT_PUBLIC_SITE_URL=https://docs.example.com
 
 ### Prerequisites
 
-- Bun 1.3+ recommended
-- Node.js 20+ recommended
+- Bun 1.4.3 (see `.bun-version` and `packageManager`)
+- Node.js 24 LTS (see `.node-version`)
 
 ### Install
 
@@ -176,8 +176,9 @@ bun run build
 
 Notes:
 
-- `bun run lint` runs `biome check --write`, `biome format --write`, and `tsc --noEmit`
-- `bun run lint` may modify files
+- `bun run lint` checks Biome without modifying files
+- `bun run lint:fix` applies safe Biome fixes
+- `bun run check` combines lint and Next route/TypeScript checks
 - `bun run docs:gen` refreshes generated Fumadocs source files under `.source`
 - `bun run types:check` regenerates Next route types before running TypeScript
 
@@ -208,7 +209,12 @@ When reconnecting the existing documentation project:
 - leave Root Directory empty so Vercel builds from the repository root
 - remove any project-level Ignored Build Step that still filters `frontend-app`
 - keep the existing environment variables, domains, and integrations
+- use Node.js 24 and the Next.js preset; `vercel.json` pins Bun 1.4.3 for frozen installs and Turbopack builds
 - retain `NEXT_PUBLIC_SITE_URL` for the production documentation domain 
 - set `VERCEL_DEEP_CLONE=true` if builds need complete Git history for last-modified timestamps
 
 The repository migration does not change the Vercel project configuration.
+
+Native Takumi OG rendering stays outside the Turbopack server bundle through
+`serverExternalPackages` in `next.config.mjs`. MDX collection generation remains
+in `postinstall` and `docs:gen`.
