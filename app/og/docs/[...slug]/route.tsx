@@ -1,7 +1,7 @@
 import { ImageResponse } from "@takumi-rs/image-response";
-import { generate as DefaultImage } from "fumadocs-ui/og/takumi";
 import { notFound } from "next/navigation";
 import { siteConfig } from "@/lib/config";
+import { SocialImage } from "@/lib/social-image";
 import { getPageImage, source } from "@/lib/source";
 
 export const revalidate = false;
@@ -15,10 +15,9 @@ export async function GET(
   if (!page) notFound();
 
   return new ImageResponse(
-    <DefaultImage
+    <SocialImage
       title={page.data.title}
-      description={page.data.description}
-      site={siteConfig.seo.siteTitle}
+      description={page.data.description ?? siteConfig.description}
     />,
     {
       width: 1200,

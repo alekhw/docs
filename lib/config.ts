@@ -32,7 +32,7 @@ export const siteConfig = {
     sitemap: "/sitemap.xml",
   },
   assets: {
-    logo: "/eve-logo-only.svg",
+    logo: "/logo.svg",
     favicon: "/favicon.ico",
     icon16: "/favicon-16x16.png",
     icon32: "/favicon-32x32.png",
@@ -40,6 +40,12 @@ export const siteConfig = {
     icon512: "/icon-512.png",
     appleTouchIcon: "/apple-touch-icon.png",
     appleTouchIconPrecomposed: "/apple-touch-icon-precomposed.png",
+  },
+  links: {
+    website:
+      process.env.NEXT_PUBLIC_WEBSITE_URL?.trim() || "https://everstrat.xyz/",
+    app:
+      process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://app.everstrat.xyz/",
   },
   repository: {
     owner: "everstrat-xyz",
@@ -50,8 +56,8 @@ export const siteConfig = {
     siteTitle: "Everstrat.xyz | Docs",
     titleTemplate: "%s | Everstrat Docs",
     defaultSocialImageAlt: "Everstrat Docs social preview image",
-    themeColor: "#111111",
-    backgroundColor: "#ffffff",
+    themeColor: "#f5f4f3",
+    backgroundColor: "#f5f4f3",
   },
   search: {
     language: "english" as const,
@@ -84,6 +90,10 @@ export function getAbsoluteUrl(
 export function getGitHubRepoUrl(): string {
   const { owner, name } = siteConfig.repository;
   return `https://github.com/${owner}/${name}`;
+}
+
+export function getGitHubOrganizationUrl(): string {
+  return `https://github.com/${siteConfig.repository.owner}`;
 }
 
 export function getGitHubContentUrl(pathname: string): string {

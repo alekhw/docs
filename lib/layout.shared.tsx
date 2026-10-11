@@ -1,28 +1,41 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
-import Image from "next/image";
-import { getGitHubRepoUrl, siteConfig } from "./config";
+import { AppWindow, Globe } from "lucide-react";
+import { EverstratLogo } from "@/components/everstrat-logo";
+import { getGitHubOrganizationUrl, siteConfig } from "./config";
 
 export function baseOptions(): BaseLayoutProps {
   return {
     nav: {
-      title: (
-        <span className="inline-flex items-center gap-2.5 rounded-md">
-          <Image
-            src={siteConfig.assets.logo}
-            alt=""
-            aria-hidden="true"
-            width={22}
-            height={22}
-            loading="eager"
-            priority
-            className="h-auto w-auto shrink-0 dark:invert"
-          />
-          <span className="text-sm font-semibold tracking-tight">
-            {siteConfig.seo.siteTitle}
-          </span>
-        </span>
-      ),
+      title: <EverstratLogo />,
     },
-    githubUrl: getGitHubRepoUrl(),
+    links: [
+      {
+        type: "icon",
+        label: "Everstrat website",
+        text: "Everstrat website",
+        url: siteConfig.links.website,
+        external: true,
+        on: "menu",
+        icon: (
+          <span title="Everstrat website" className="inline-flex">
+            <Globe aria-hidden="true" />
+          </span>
+        ),
+      },
+      {
+        type: "icon",
+        label: "Open Everstrat app",
+        text: "Open Everstrat app",
+        url: siteConfig.links.app,
+        external: true,
+        on: "menu",
+        icon: (
+          <span title="Open Everstrat app" className="inline-flex">
+            <AppWindow aria-hidden="true" />
+          </span>
+        ),
+      },
+    ],
+    githubUrl: getGitHubOrganizationUrl(),
   };
 }

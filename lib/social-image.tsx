@@ -1,4 +1,10 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { siteConfig } from "@/lib/config";
+
+const brandMark = `data:image/svg+xml;base64,${readFileSync(
+  join(process.cwd(), "public", siteConfig.assets.logo.slice(1)),
+).toString("base64")}`;
 
 type SocialImageProps = {
   eyebrow?: string;
@@ -7,7 +13,7 @@ type SocialImageProps = {
 };
 
 export function SocialImage({
-  eyebrow = `${siteConfig.brandName} Documentation`,
+  eyebrow = "Documentation",
   title,
   description,
 }: SocialImageProps) {
@@ -17,67 +23,74 @@ export function SocialImage({
         width: "100%",
         height: "100%",
         display: "flex",
-        position: "relative",
-        overflow: "hidden",
-        background:
-          "radial-gradient(circle at top left, rgba(201, 177, 153, 0.24), transparent 32%), linear-gradient(135deg, #0f0f0f 0%, #151515 42%, #211b19 100%)",
-        color: "#f6f1eb",
-        fontFamily:
-          "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        padding: 32,
+        background: siteConfig.seo.backgroundColor,
+        color: "#171916",
+        fontFamily: "sans-serif",
       }}
     >
       <div
         style={{
-          position: "absolute",
-          inset: 36,
-          borderRadius: 36,
-          border: "1px solid rgba(255, 255, 255, 0.14)",
-          background: "rgba(255, 255, 255, 0.05)",
+          width: "100%",
+          height: "100%",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          padding: "48px 56px",
+          border: "1px solid rgba(23, 25, 22, 0.09)",
+          borderTop: "6px solid #aec3a3",
+          borderRadius: 24,
+          background: "#ffffff",
+          padding: "36px 48px",
         }}
       >
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 12,
-            padding: "12px 18px",
-            borderRadius: 999,
-            background: "rgba(255, 255, 255, 0.08)",
-            border: "1px solid rgba(255, 255, 255, 0.08)",
-            fontSize: 24,
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-            color: "rgba(246, 241, 235, 0.8)",
+            justifyContent: "space-between",
           }}
         >
-          <span
+          <div
             style={{
-              width: 10,
-              height: 10,
-              borderRadius: 999,
-              background: "#d7b38a",
-              boxShadow: "0 0 24px rgba(215, 179, 138, 0.7)",
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+              fontSize: 28,
+              fontWeight: 700,
+              letterSpacing: "-0.025em",
+              color: "#000000",
             }}
-          />
-          {eyebrow}
+          >
+            <span>EVER</span>
+            {/* biome-ignore lint/performance/noImgElement: Social image renderers require a native image element. */}
+            <img src={brandMark} alt="" width={54} height={58} />
+            <span>STRAT</span>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              borderRadius: 999,
+              padding: "12px 20px",
+              background: "#aaff92",
+              fontSize: 22,
+              fontWeight: 600,
+            }}
+          >
+            {eyebrow}
+          </div>
         </div>
 
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: 22,
-            maxWidth: 900,
+            gap: 20,
           }}
         >
           <div
             style={{
-              fontSize: 72,
-              lineHeight: 1.04,
+              fontSize: title.length > 60 ? 52 : title.length > 35 ? 60 : 72,
+              lineHeight: 1.08,
               fontWeight: 700,
               letterSpacing: "-0.04em",
             }}
@@ -86,10 +99,10 @@ export function SocialImage({
           </div>
           <div
             style={{
-              fontSize: 32,
-              lineHeight: 1.35,
-              color: "rgba(246, 241, 235, 0.74)",
-              maxWidth: 840,
+              fontSize: 28,
+              lineHeight: 1.4,
+              color: "#696d65",
+              maxWidth: 920,
             }}
           >
             {description}
@@ -99,14 +112,13 @@ export function SocialImage({
         <div
           style={{
             display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            fontSize: 24,
-            color: "rgba(246, 241, 235, 0.72)",
+            paddingTop: 20,
+            borderTop: "1px solid rgba(23, 25, 22, 0.09)",
+            fontSize: 20,
+            color: "#696d65",
           }}
         >
-          <div>{siteConfig.seo.siteTitle}</div>
-          <div>{siteConfig.projectName}</div>
+          {siteConfig.seo.siteTitle}
         </div>
       </div>
     </div>

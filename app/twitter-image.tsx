@@ -1,4 +1,4 @@
-import { ImageResponse } from "next/og";
+import { ImageResponse } from "@takumi-rs/image-response";
 import { siteConfig } from "@/lib/config";
 import { SocialImage } from "@/lib/social-image";
 
@@ -12,10 +12,9 @@ export const contentType = "image/png";
 export default function TwitterImage() {
   return new ImageResponse(
     <SocialImage
-      eyebrow={siteConfig.seo.siteTitle}
       title={siteConfig.name}
       description={siteConfig.description}
     />,
-    size,
+    { ...size, format: "png" },
   );
 }

@@ -110,6 +110,8 @@ These are generated from shared helpers rather than hardcoded in individual page
 ## Metadata And Public URL
 
 The app uses `NEXT_PUBLIC_SITE_URL` to compute absolute metadata URLs.
+The sidebar links use the official website and application URLs by default. Override
+`NEXT_PUBLIC_WEBSITE_URL` or `NEXT_PUBLIC_APP_URL` to point them at another environment.
 Optional verification tags can be supplied with:
 
 - `GOOGLE_SITE_VERIFICATION`
