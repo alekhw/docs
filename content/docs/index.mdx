@@ -12,13 +12,12 @@ icon: House
 </Callout>
 
 Everstrat lets you deposit ETH to receive EVE tokens, which represent your share of managed on-chain
-strategies. Authenticated keepers coordinate a permissioned Controller. At the
+strategies. Keepers run routine queue and strategy operations through permissioned executor
+contracts. At the
 [dated deployment snapshot](/operations/current-deployments#exit-liquidity-at-this-block),
-new successful exits queue because AMM has no free ETH. After successful processing, you
-claim credited ETH separately. Code supports immediate redemption only if enough free AMM ETH
-becomes available. Pause state, valuation, liquidity, and request rules still apply.
-This site documents the product, protocol, and
-operational details for users, integrators, and contributors.
+new exits queue, and you claim ETH in a separate transaction once your request is processed.
+This site documents the product, protocol, and operational details for users, integrators,
+and contributors.
 
 <Cards>
   <Card title="Introduction" href="/introduction/what-is-everstrat">

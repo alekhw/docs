@@ -31,10 +31,9 @@ Redemption depends on pause state, available valuation, liquidity, and queue con
   </Step>
   <Step>
     **Redeem EVE for ETH.** At the [dated snapshot](/operations/current-deployments#exit-liquidity-at-this-block),
-    new successful exits queue because AMM has no free ETH. Immediate redemption is conditional
-    on sufficient free AMM ETH becoming available. Queued EVE is held
-    by the AMM until processing or eligible cancellation. After processing, you submit a separate
-    **Claim** transaction to withdraw credited ETH.
+    new exits queue. The AMM holds your EVE in escrow while the request is pending. After
+    processing, you submit a separate **Claim** transaction to withdraw credited ETH.
+    [The redemption queue](/how-everstrat-works/redemption-queue) has the full rules.
   </Step>
 </Steps>
 

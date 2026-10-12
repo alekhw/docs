@@ -26,14 +26,12 @@ additionally checks queued settlement against the request-time price. Read
 [Pricing & the bonding curve](/how-everstrat-works/pricing-and-bonding-curve#transaction-protections)
 for the exact protection on each path. Keep ETH in your wallet for gas.
 
-## Current queued flow and conditional immediate exits
+## When an exit queues
 
-At the [dated snapshot](/operations/current-deployments#exit-liquidity-at-this-block), AMM free ETH
-is zero and routine float top-up is disabled. New successful exits therefore queue; deposits
-forwarded to Controller do not replenish AMM free ETH.
-
-Code supports immediate burning and ETH payment in one transaction only if sufficient free
-AMM ETH becomes available. That branch needs no separate Claim, but is not funded at the snapshot.
+At the [dated snapshot](/operations/current-deployments#exit-liquidity-at-this-block), all AMM
+ETH was reserved for existing claims, so new exits queue. If the AMM has enough unreserved ETH
+when you submit, the exit instead settles in one transaction and needs no Claim.
+[The redemption queue](/how-everstrat-works/redemption-queue) explains this check.
 
 On the queued path, EVE is escrowed on the AMM and the request waits in ExitQueue.
 Keepers must price and process it. Submission, processing, and withdrawal are separate events:
@@ -44,13 +42,13 @@ Keepers must price and process it. Submission, processing, and withdrawal are se
 | Processed successfully | EVE is burned and ETH is credited, but still held for your Claim. |
 | Claimed | A separate Claim transaction transfers credited ETH to your wallet. |
 | Closed for slippage | EVE is returned instead of ETH; review a fresh quote before trying again. |
-| Cancelled | Escrowed EVE is returned; this is not an ETH redemption. |
+| Cancelled | Escrowed EVE is returned and no ETH is paid. |
 
 ## Claim credited ETH
 
 When ETH is available to claim, select **Claim** on **Portfolio**, confirm in your wallet,
 and wait for confirmation. A successful Claim withdraws the available credited balance, which
-can include more than one processed request. It is not necessarily a one-request payout.
+can include more than one processed request.
 
 Processed requests cannot be cancelled. Their credited ETH remains claimable after the
 queue processing window ends. AMM pause alone does not block Claim or eligible cancellation.
@@ -60,12 +58,10 @@ queue processing window ends. AMM pause alone does not block Claim or eligible c
 An existing pending request in the current batch can block another exit submission.
 Review the request on Portfolio instead of repeatedly clicking Burn.
 
-Cancellation is available before batch pricing, or after the processing window expires
-for a request that is still unprocessed. During the priced processing window, cancellation
-is blocked. Strictly more than three days after pricing, an unprocessed request cannot
-be settled at all: cancel it to recover EVE. Waiting longer will not make that request
-payable. A later redemption requires a new request and quote. Already credited ETH remains
-claimable. Cancellation returns EVE, not ETH.
+Cancellation is available before batch pricing, or after the three-day processing window
+for a request that is still unprocessed. During that window, cancellation is blocked.
+Once the window has passed, an unprocessed request can no longer be settled: cancel it to
+recover EVE, then submit a new request if you still want to exit.
 
 For the exact minimum size, batch timing, tolerance checks, and cancellation boundary,
 see [The redemption queue, in depth](/how-everstrat-works/redemption-queue).
@@ -74,8 +70,8 @@ The queue keeper's scheduling policy is described in
 
 ## Common blockers
 
-- **Minimum queued amount:** use the live warning and ETH quote, not a fixed remembered EVE
-  threshold. The minimum is ETH-denominated, so its EVE equivalent changes with price.
+- **Minimum queued amount:** rely on the live warning and ETH quote. The minimum is
+  ETH-denominated, so its EVE equivalent changes with price.
 - **AMM paused or NAV unavailable:** normal exit submission may be blocked. Check current
   state; do not assume a previously displayed quote is still usable.
 - **Keeper delay or insufficient liquidity:** there is no guaranteed completion time.

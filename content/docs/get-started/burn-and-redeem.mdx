@@ -32,8 +32,8 @@ Use Ethereum mainnet and keep ETH in your wallet for gas. Review
 
 ## What happens next
 
-At the [dated snapshot](/operations/current-deployments#exit-liquidity-at-this-block), AMM free ETH
-is zero and routine float top-up is disabled, so new successful exits queue.
+At the [dated snapshot](/operations/current-deployments#exit-liquidity-at-this-block), the AMM
+had no unreserved ETH, so new exits queue.
 
 <Tabs items={["Queued exit (current snapshot)", "Immediate exit (conditional)"]}>
   <Tab>
@@ -45,14 +45,14 @@ is zero and routine float top-up is disabled, so new successful exits queue.
     3. Select **Claim** and confirm the separate transaction in your wallet to withdraw that ETH.
 
     Settlement is not guaranteed. If closed for slippage, the request returns EVE instead of ETH.
-    Strictly more than three days after pricing, an unprocessed request cannot be paid; cancel
-    it to recover EVE. Processed requests must be claimed, and already credited ETH remains claimable.
+    Strictly more than three days after pricing, an unprocessed request can no longer be paid;
+    cancel it to recover EVE. Credited ETH stays claimable.
     See [Exiting & redeeming](/using-everstrat/exiting-and-redeeming) for conditions.
   </Tab>
   <Tab>
-    Code supports this branch only if enough unreserved AMM ETH becomes available. It is not
-    funded at the dated snapshot. If available and the exit succeeds, EVE is burned and ETH
-    is transferred to your wallet in the same transaction. No separate Claim is needed.
+    If the AMM has enough unreserved ETH when you submit, EVE is burned and ETH is sent to
+    your wallet in the same transaction. No separate Claim is needed. At the dated snapshot
+    the AMM had no unreserved ETH, so this path was unavailable.
   </Tab>
 </Tabs>
 

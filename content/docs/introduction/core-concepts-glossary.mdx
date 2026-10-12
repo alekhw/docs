@@ -13,7 +13,7 @@ use the complete [Reference glossary](/reference/glossary).
 | **NAV** | Net asset value: the portfolio's ETH-valued assets after the protocol's accounting deductions. It is used to value EVE. |
 | **Keeper** | Automation that submits authorized strategy and queue operations when conditions permit. It does not guarantee execution or settlement timing. |
 | **Deposit** | Sending ETH to the protocol to mint EVE at the entry price. |
-| **Redemption** | Exchanging EVE for ETH. The dated deployment snapshot queues new successful exits; after processing, you submit Claim separately. Immediate payment requires enough free AMM ETH. |
+| **Redemption** | Exchanging EVE for ETH. An exit settles immediately only when the AMM has enough unreserved ETH; otherwise it queues, and you submit Claim after processing. |
 
 Next: [Before you start](/get-started/overview). Detailed NAV, pricing, and queue rules live in
 [How Everstrat Works](/how-everstrat-works/architecture).

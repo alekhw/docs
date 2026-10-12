@@ -37,7 +37,7 @@ tokens. A reverted transaction can still consume gas.
   [Risk Disclosure](/legal/risk-disclosure) and continue only if both statements are true.
 - **Wallet confirmation:** verify the AMM destination, ETH amount, and gas estimate. Native ETH
   minting does not require an ERC-20 EVE approval.
-- **Submitted:** a transaction hash means submission, not success. Wait for its receipt.
+- **Submitted:** a transaction hash means the transaction was sent. Wait for its receipt to confirm success.
 - **Confirmed:** EVE is minted and your wallet balance updates. Review the deposit on **Portfolio**.
   Indexed activity may take longer to update than current RPC balances.
 - **Cancelled or failed:** declining a wallet prompt does not mint EVE. A reverted transaction does
@@ -53,7 +53,7 @@ tokens. A reverted transaction can still consume gas.
 - **Quote moved beyond slippage:** refresh and review the new output before deciding whether to retry.
 - **First deposit into a new deployment:** the one-time bootstrap has additional conditions.
   See [Bootstrap rules](/how-everstrat-works/pricing-and-bonding-curve#bootstrap-rules).
-  These are deployment initialization rules, not a recurring deposit minimum.
+  These rules apply once, when a deployment initializes supply.
 
 Next: [Exiting & redeeming](/using-everstrat/exiting-and-redeeming) and
 [Tracking your position](/using-everstrat/tracking-your-position).
