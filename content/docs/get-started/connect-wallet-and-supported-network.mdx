@@ -1,25 +1,32 @@
 ---
 title: Connect your wallet
-description: How to connect a compatible wallet and switch to Ethereum mainnet before using the app.
+description: Connect a compatible wallet, switch to Ethereum, and redeem wallet-linked invite access.
 ---
 
 <Steps>
   <Step>
-    **Use a supported wallet.** The app connects wallets through RainbowKit and wagmi. Any wallet
-    supported by that setup — MetaMask, Coinbase Wallet, WalletConnect-compatible wallets, and others —
-    will work.
+    **Open the official app and prepare your invite.** During the invite period, `/mint`,
+    `/portfolio`, and `/metrics` require an access session; without one they redirect to `/`.
+    Use your invitation link or code. A wallet connection alone does not grant access.
   </Step>
   <Step>
-    **Switch to Ethereum mainnet (chain id 1).** The app only supports mainnet. If you connect on a
-    different chain, the app will prompt you to switch automatically.
+    **Connect your wallet.** Select **Connect Wallet** and choose a detected browser wallet,
+    or WalletConnect if that option is configured. The app uses wagmi with its own wallet dialog,
+    not RainbowKit. Approve the connection in your wallet.
   </Step>
   <Step>
-    **Have real ETH available.** Deposits are real mainnet ETH. Everstrat is in a testing phase —
-    treat it as a test protocol and only deposit what you can afford to lose entirely.
+    **Switch to Ethereum mainnet (chain ID 1).** If connected on another network, select the
+    app's **Wrong network** button and approve the switch in your wallet. Connecting alone
+    does not guarantee a completed network switch.
   </Step>
   <Step>
-    **Click Connect Wallet** in the top-right corner of the app. Select your wallet from the modal,
-    approve the connection, and you're ready to go.
+    **Accept the invite with this wallet.** Enter your code if needed, select **Accept invite**,
+    and review and sign the access message. This signature is not a deposit transaction and costs
+    no gas. The invite is linked to the wallet that redeems it; use that wallet for subsequent access.
+  </Step>
+  <Step>
+    **Keep real ETH available for deposits and gas.** Invite access does not make funds testnet
+    funds. Review [Before you start](/get-started/overview) before minting.
   </Step>
 </Steps>
 

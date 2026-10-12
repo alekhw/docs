@@ -16,7 +16,7 @@ description: Definitions for share pricing, net NAV, queue liabilities, fees, an
 | **Batch** | Group of queued requests assigned one final base price by Controller. Processing still depends on tolerance and liquidity. |
 | **Exit queue** | Request metadata and batch lifecycle in ExitQueue; EVE escrow is held in AMM. |
 | **Escape hatch** | Cancellation of an unprocessed request strictly more than three days after batch pricing, returning EVE. Unpriced requests can be cancelled without that delay. |
-| **Performance fee** | Configurable share of eligible realized strategy fees, settled by treasury EVE minting. The snapshot rate is 15%, with a 20% code cap. Mint amount uses `feeETH × liveSupply / (NAV − feeETH)`. |
+| **Performance fee** | Configurable share of eligible accrued Uniswap V3 LP fees, settled by treasury EVE minting. The snapshot rate is 15%, with a 20% code cap. Mint amount uses `feeETH × liveSupply / (NAV − feeETH)`. |
 | **Fee dilution** | Treasury fee EVE reduces existing holders' share of NAV. Premium-priced deposits follow a different mint formula and are not the same fee mechanism. |
 | **Keeper executor** | On-chain contract holding KEEPER that validates an allowlisted Mimic caller and coordinates routine Controller work. |
 | **Immediate redemption** | EVE burn and ETH payment in the same transaction when free AMM ETH suffices. |
@@ -24,6 +24,6 @@ description: Definitions for share pricing, net NAV, queue liabilities, fees, an
 | **Claim** | User withdrawal of already credited AMM ETH. It can combine several processed redemptions. |
 | **priceTolerance** | Maximum accepted downside from request-time base price to final batch price. Out-of-tolerance processing returns EVE. |
 | **minTokensToMint** | User's minimum EVE output for a mint transaction. |
-| **maxTokensToBurn** | User's maximum EVE input for the requested immediate ETH exit. |
+| **maxTokensToBurn** | User's maximum EVE input for either an immediate burn or queued escrow at exit submission. |
 
 For dated values, see [Current deployments](/operations/current-deployments).

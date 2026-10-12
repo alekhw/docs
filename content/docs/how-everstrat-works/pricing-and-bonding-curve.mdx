@@ -44,7 +44,8 @@ and batch pricing. ETH denomination does not remove the oracle dependency of ass
 ## Transaction protections
 
 - Minting enforces the caller's `minTokensToMint`.
-- Immediate redemption enforces `maxTokensToBurn` for the requested ETH.
+- Exit submission enforces `maxTokensToBurn` for the requested ETH on both paths,
+  capping immediate burning or queued escrow.
 - Queued redemption compares batch price with request-time price using `priceTolerance`.
 - Pause controls and fail-closed NAV can stop entry, exit submission, and batch pricing.
 

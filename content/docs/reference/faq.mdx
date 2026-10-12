@@ -19,8 +19,10 @@ description: Answers to the most common questions about Everstrat — what it is
   <Accordion title="What is EVE and what backs it?">
     EVE is a token that represents your share of the protocol's net asset value (NAV). When you deposit
     ETH, the AMM mints EVE at the premium entry price. When you exit, you burn EVE and
-    receive ETH back at the current NAV per EVE (the base price). The NAV is made up of ETH held across
-    the AMM, Controller, StrategyManager, and any deployed yield strategies. See
+    redeem at the applicable base price. Gross assets include registered strategy NAV, ETH on
+    Controller and StrategyManager, free AMM ETH, and supported ERC-20 balances valued through
+    Oracle. Net NAV subtracts in-window priced, unprocessed queued liabilities; live EVE supply
+    excludes their matching escrow. ETH already reserved for claims is excluded from free AMM ETH. See
     [EVE and NAV](/how-everstrat-works/eve-and-nav) for the full formula.
   </Accordion>
   <Accordion title="How do I deposit ETH and receive EVE?">
@@ -30,18 +32,24 @@ description: Answers to the most common questions about Everstrat — what it is
     [Depositing & minting](/using-everstrat/depositing-and-minting) for a step-by-step walkthrough.
   </Accordion>
   <Accordion title="How do I exit and get my ETH back?">
-    Go to the exit screen, enter the amount of EVE to burn, and submit. If the AMM has enough free ETH,
-    your exit settles immediately. If not, it enters the exit queue and you claim ETH after the batch is
-    processed. See [Exiting & redeeming](/using-everstrat/exiting-and-redeeming) for the full flow.
+    Select Burn, enter EVE, and approve the AMM allowance if requested. Then confirm the separate
+    Burn transaction. At the [dated snapshot](/operations/current-deployments#exit-liquidity-at-this-block),
+    AMM free ETH is zero, so new successful exits queue. After pricing and successful processing,
+    submit Claim to withdraw credited ETH. Code supports immediate settlement only if sufficient
+    free AMM ETH becomes available. See [Exiting & redeeming](/using-everstrat/exiting-and-redeeming).
   </Accordion>
   <Accordion title="Why did my exit get queued, and how long does it take?">
-    Your exit is queued when the AMM does not have enough free ETH to settle it immediately — for
-    example, because most of the NAV is deployed in a yield strategy. Once queued, a keeper prices the
-    batch at the AMM's base price and processes it. NAV behind that price can depend on feeds and
+    An exit queues when AMM free ETH is insufficient. At the dated snapshot, its entire ETH balance
+    is locked for existing claims and automatic immediate-exit float top-up is disabled.
+    Deposits go to Controller, so even idle Controller ETH does not mean AMM can pay immediately.
+    The keeper's 24-hour automatic-pricing minimum is measured from batch creation, not each request;
+    it is not a settlement guarantee. A keeper prices the batch at the AMM's base price and
+    must process eligible requests within three days. NAV behind that price can depend on feeds and
     pool TWAPs. After processing, ETH is
     credited to your claimable balance and you must call `claim()` to withdraw it (pull-over-push). If
-    a request is still unprocessed **strictly more than 3 days** after pricing, you can invoke the escape hatch
-    (`cancelRedemption`) to cancel the request and recover your EVE.
+    a request is still unprocessed **strictly more than 3 days** after pricing, it can no longer be
+    processed. Invoke the escape hatch (`cancelRedemption`) to recover EVE; waiting longer will
+    not make that request payable. Any new exit needs a new request and quote.
   </Accordion>
   <Accordion title="Can I cancel a queued exit?">
     Yes, in two situations:
@@ -50,7 +58,8 @@ description: Answers to the most common questions about Everstrat — what it is
     - **After the batch is priced:** an unprocessed request can be cancelled only **strictly more than
       3 days** after pricing. At exactly three days, cancellation is still blocked.
 
-    Processed requests cannot be cancelled; claim their credited ETH instead.
+    Processed requests cannot be cancelled; claim their credited ETH instead. Already credited
+    ETH remains claimable after the batch processing window ends.
 
     If the settled price has dropped more than your `priceTolerance` below the price at request time,
     the protocol automatically closes your request and returns your EVE — you do not need to take
@@ -64,8 +73,8 @@ description: Answers to the most common questions about Everstrat — what it is
 
     - **Entry premium** — you deposit at the premium price (higher than base price). The difference goes
       to existing EVE holders, not the protocol. See [Fees & costs](/using-everstrat/fees-and-costs).
-    - **Performance fee** — **15%** at the [October 11 snapshot](/operations/current-deployments),
-      configurable up to **20%**, on eligible **realized Uniswap V3
+    - **Performance fee** — **15%** at the [dated snapshot](/operations/current-deployments),
+      configurable up to **20%**, on eligible **accrued Uniswap V3 LP
       trading fees** earned by the strategy. It is settled by **minting EVE to the DAO treasury**,
       which dilutes existing EVE holders proportionally — no ETH moves out of the protocol. See
       [Fees & costs](/using-everstrat/fees-and-costs).
@@ -77,7 +86,8 @@ description: Answers to the most common questions about Everstrat — what it is
     Yes. NAV can fall if the yield strategy loses value or if the protocol encounters an issue. You
     receive ETH proportional to NAV at the time you exit — if NAV has fallen since you deposited, you
     receive less ETH than you put in. Everstrat is in a testing phase: treat it as a test protocol
-    and only deposit what you can afford to lose entirely. See [Key risks](/risk-and-trust/key-risks) for a full breakdown.
+    and only deposit what you can afford to lose entirely. There is no insurance protecting
+    deposits. See [Key risks](/risk-and-trust/key-risks) for a full breakdown.
   </Accordion>
   <Accordion title="Has Everstrat been audited?">
     No completed independent audit report was verified in the repositories reviewed on October 11.
@@ -101,8 +111,9 @@ description: Answers to the most common questions about Everstrat — what it is
     Already credited ETH can still be claimed, and eligible queued requests can still be cancelled.
   </Accordion>
   <Accordion title="My queued exit is still pending after several days">
-    If more than 3 days have passed since your batch was priced, you can use the escape hatch to cancel
-    the request and recover your EVE. If the batch has not been priced yet, you can cancel at any time.
+    A still-unprocessed request cannot be paid more than 3 days after pricing. Use the escape hatch
+    to cancel it and recover EVE. If already processed, claim the credited ETH instead.
+    If the batch has not been priced yet, you can cancel at any time.
     See the question above on cancelling a queued exit.
   </Accordion>
   <Accordion title="The activity feed is lagging behind my transaction">

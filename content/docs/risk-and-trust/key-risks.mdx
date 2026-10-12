@@ -5,7 +5,8 @@ description: Capital, valuation, governance, liquidity, and automation risks for
 
 <Callout type="warn" title="Experimental mainnet deployment">
   Entry is invite-gated. Deposits are real ETH at real risk. No principal protection or
-  guaranteed return exists; do not deposit more than you can afford to lose entirely.
+  guaranteed return exists, and there is no insurance protecting deposits; do not deposit
+  more than you can afford to lose entirely.
 </Callout>
 
 ## NAV and capital losses
@@ -16,7 +17,7 @@ Deposits growing aggregate NAV do not establish investment returns.
 
 ## Concentrated-liquidity exposure
 
-The registered strategies at the [October 11 snapshot](/operations/current-deployments)
+The registered strategies at the [dated deployment snapshot](/operations/current-deployments)
 use four Uniswap v3 pools. Concentrated LP positions can underperform holding their
 underlying assets, lose value, or require swaps to satisfy ETH withdrawals.
 
@@ -31,13 +32,16 @@ If AMM has insufficient free ETH, an exit is queued. The Mimic queue and strateg
 price requests and make liquidity available for processing. Gas caps, outages, failed reads,
 pauses, strategy capacity, and liquidity conditions can delay this work.
 
-The snapshot's queue keeper minimum age was 24 hours before automatic pricing.
+The snapshot's queue keeper minimum age was 24 hours since batch creation before automatic
+pricing, not since each request.
 After pricing, a separate three-day processing window applies.
 Neither is a promise that ETH will arrive at the end of that period.
 
 An unpriced request can be cancelled. A priced, unprocessed request can be cancelled
 **strictly more than three days after pricing**. Cancellation returns EVE, not ETH;
-processed requests instead require a separate claim transaction.
+strictly after this deadline, that request cannot be processed at all. Recover EVE through
+cancellation; a later redemption requires a new request. Processed requests instead require
+a separate claim transaction and their credited ETH does not expire with the batch window.
 
 Automatic AMM immediate-liquidity top-up was disabled at the snapshot.
 Do not assume an always-funded immediate-exit buffer.
@@ -48,7 +52,7 @@ A queued exit is priced later than submission. A final batch price outside the u
 `priceTolerance` causes EVE to be returned when the request is processed, rather than
 settling ETH. Wider tolerance accepts more downside; narrower tolerance can prevent an exit.
 
-Mint and immediate-burn bounds protect execution against the user's limits.
+Mint-output and exit-input bounds protect execution against the user's limits, including queued escrow.
 The deployed AMM does **not** provide a 5% checkpoint guard or a principal-loss limit.
 
 ## Oracle and pool dependence

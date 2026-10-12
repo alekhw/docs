@@ -33,7 +33,7 @@ confirmed in the contract code — there is no fee deduction in the `enter()` or
 
 When you deposit, you pay the **premium price**. With the snapshot's connector weight of 0.9,
 it is higher than the **base price** (net NAV / live supply); at weight 1 the prices equal.
-See [Depositing & minting](/using-everstrat/depositing-and-minting) for the formula and a
+See [Pricing & the bonding curve](/how-everstrat-works/pricing-and-bonding-curve) for the formula and a
 worked example.
 
 <Callout type="info">
@@ -80,7 +80,8 @@ Price can move between the time you request an action and the time it settles:
 
 - **On deposit:** controlled by `minTokensToMint`. If you would receive fewer EVE than your floor, the
   transaction reverts.
-- **On immediate exit:** `maxTokensToBurn` caps EVE spent for the requested ETH.
+- **On exit submission:** `maxTokensToBurn` caps the EVE input for the requested ETH,
+  both for immediate burning and queued escrow.
 - **On queued exit:** controlled by `priceTolerance`. If the settled price has dropped more
   than your tolerance, your request is closed for slippage and your EVE is returned.
 

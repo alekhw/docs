@@ -18,7 +18,7 @@ Registry lookups distinguish registered peer authorization from role membership.
 - ETH NAV, health, pause state, and deposit/withdrawal capacity
 - `deposit`, `investIdleETH`, `withdraw`, `rebalance`, and `sync`
 - pending and settled performance-fee calculations
-- an ADMIN emergency exit
+- `emergencyExit` for ADMIN or SECURITY, requiring a paused strategy
 
 It does **not** define a safety score, withdrawal-priority field, or a generic queued
 strategy withdrawal hook. StrategyManager's deposit and withdrawal weights are separate

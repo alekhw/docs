@@ -1,12 +1,14 @@
 ---
 title: Current deployments
-description: Ethereum mainnet addresses, live settings, and pending governance operations verified on October 11, 2026.
+description: Ethereum mainnet addresses, exit liquidity, and governance state at block 26,179,157.
 ---
 
 ## Verification boundary
 
-This snapshot was checked on **October 11, 2026**, at Ethereum mainnet block
-**26,169,646** (13:56:11 UTC). It describes that block, not an automatically refreshed status.
+This read-only snapshot is pinned to Ethereum mainnet block **26,179,157**
+(**October 12, 2026, 21:42:47 UTC**), hash
+`0x3d555940233dd8faf3cc6d8225a3563c32a9bd696182d30c6875ed8e5ad2ed19`.
+It describes that block, not an automatically refreshed status.
 The app uses chain ID **1**.
 
 Entry remains invite-gated: `Whitelist.disabled()` returned `false`.
@@ -38,19 +40,36 @@ Upgradeable components are listed at their **proxy addresses**, which integratio
 | --- | --- | --- |
 | `AMM.connectorWeight()` | `0.9 × 10^18` | Entry price is base price divided by 0.9 |
 | `AMM.minBatchExitETH()` | `0.001 ETH` | Minimum for a queued exit, not a universal mint minimum |
-| `StrategyManager.performanceFeeBps()` | `1500` | 15% of eligible realized strategy fees; not 15% of deposits |
+| `StrategyManager.performanceFeeBps()` | `1500` | 15% of eligible accrued Uniswap V3 LP fees; not 15% of deposits |
 | `StrategyManager.daoTreasury()` | `0x1780C78eB50cD28dC349CEA8452eD1F7206D8fF9` | Recipient of fee EVE |
 | `Timelock.getMinDelay()` | `172800 seconds` | 48-hour scheduling delay |
-| `Controller.version()` | `1.0.0` | The proposed 1.1.0 upgrade was not executed |
+| `Controller.version()` | `1.1.0` | 018 executed; ADMIN or KEEPER may withdraw from a single strategy |
 | Both keeper executors' `version()` | `2.1.0-mimic` | Mimic executor contracts |
-| `QueueKeeperExecutor.minBatchAge()` | `86400 seconds` | 24 hours before automatic batch pricing |
+| `QueueKeeperExecutor.minBatchAge()` | `86400 seconds` | Automatic pricing eligibility starts 24 hours after batch creation, not after each request |
 | `StrategyKeeperExecutor.controllerReserveETH()` | `0.05 ETH` | Controller reserve target |
 | `StrategyKeeperExecutor.minWithdrawETH()` | `0.0001 ETH` | Strategy withdrawal threshold |
 | `StrategyKeeperExecutor.exitLiquidityTargetETH()` | `0` | Automatic AMM float top-up disabled |
 | `Whitelist.disabled()` | `false` | Invite checks remain active |
 
 The three-day queue processing window starts **after pricing**, independently of the
-keeper's 24-hour minimum batch age.
+keeper's minimum age since batch creation. A still-unprocessed request cannot be processed
+strictly more than three days after pricing; it must be cancelled to recover EVE.
+Already credited ETH remains claimable.
+
+## Exit liquidity at this block
+
+| Read | Result (wei) |
+| --- | --- |
+| AMM ETH balance | `3050180077552095` |
+| `AMM.lockedForClaims()` | `3050180077552095` |
+| `AMM.freeBalance()` | `0` |
+
+All ETH held by AMM was reserved for existing claims. Every new successful positive-size
+exit at this block would therefore queue, subject to the queued minimum and other checks.
+Deposits are forwarded to Controller, and `exitLiquidityTargetETH = 0` disables routine
+AMM float top-up. Immediate redemption is a conditional code path, not the current funded
+user path. Authorized liquidity transfers can change this state; recheck free balance before
+assuming an immediate exit is available. This snapshot does not establish historical exit counts.
 
 ## Registered strategies
 
@@ -80,15 +99,29 @@ Allowlisting alone does not prove uninterrupted off-chain task execution.
 
 ## Pending migration
 
-| Governance record | Chain state at the snapshot | Effect if executed |
+| Governance record | Chain state at the snapshot | Effect |
 | --- | --- | --- |
-| [018: Controller 1.1.0](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/018-controller-upgrade-v1.1.0) | **Ready**, not executed | Adds ADMIN access to the single-strategy withdrawal function |
-| [019: register v2 strategies](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/019-strategy-manager-register-unicl-v2-strategies) | **Unset**, not scheduled | Adds four v2 replacements; does not remove v1 |
-| [020: drain and remove v1](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/020-strategy-manager-drain-remove-unicl-v1-strategies) | All four operations **Unset**, not scheduled | Withdraws from and removes the old strategies |
+| [018: Controller 1.1.0](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/018-controller-upgrade-v1.1.0) | **Done**, executed | Added ADMIN access to the single-strategy withdrawal function |
+| [019: register v2 strategies](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/019-strategy-manager-register-unicl-v2-strategies) | **Waiting**, scheduled | Adds four v2 replacements; does not remove v1 |
+| [020: drain and remove v1](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/020-strategy-manager-drain-remove-unicl-v1-strategies) | All four operations **Waiting**, scheduled | Withdraws from and removes the old strategies |
 
-Record 018 became executable on October 11 at 12:07:59 UTC.
-Its proposed implementation is `0xd4f4152a887253CFdD23d0289951176Ec13cd55D`;
-the proxy still used `0x6bf777b1173b49173cce5ec82505ebd7ce5cbefc` at the snapshot.
+Record 018 executed at block **26,176,319** (**October 12, 12:13:23 UTC**), in
+[this transaction](https://etherscan.io/tx/0xd3e005e636591e9c91c9c237be11d778baa1b31a18ca6b7af4ddb3750a9e2c33).
+The Controller proxy's implementation slot now points to
+`0xd4f4152a887253CFdD23d0289951176Ec13cd55D`.
+
+019's operation `0xf558cda6b3831a4fb393278e368ff3b319c04696e37ebb034d31c463fc9ed6a6`
+becomes Ready at **October 14, 2026, 15:58:23 UTC**. All four 020 operations become
+Ready at **October 14, 2026, 16:09:47 UTC**:
+
+- `0xfa9e716cf5547d760c68e8758a4900a0644df7490af3fbee8a9ccf56ed7493d5`
+- `0xe9438cb7438f47c22b1e74477c013d86870cb08f7080080844d3532dacef75c8`
+- `0xe680e96963678090ac5854516999bf7c770284e622e66c014e04c689b9265bd9`
+- `0x93ee86d5f12f2b739647a886d51e7dce3baeb77c02809d4c0d10fcf3b81f4cd2`
+
+Readiness is not automatic execution. Operations can also be cancelled.
+The linked proposal files describe intended payloads; their older status prose is not
+the authority for this pinned chain state.
 
 The v2 strategy addresses recorded in governance were deployed but **not registered** at this block:
 
@@ -99,10 +132,11 @@ The v2 strategy addresses recorded in governance were deployed but **not registe
 | WETH/USDT 0.30% | `0xE80bfd65A55855ead8Cb5f7040031426CB718Cc5` |
 | UNI/WETH 0.30% | `0xFC888a499c4172e393A258FbC6cAd1475a7e4129` |
 
-Registration in 019 can precede the Controller upgrade. The drain transactions in 020
-need 018 executed for ADMIN withdrawal authorization, and use 019 as their timelock predecessor.
+019 has no timelock predecessor. The drain transactions in 020 require the ADMIN withdrawal
+authorization already enabled by 018, and use 019 as their timelock predecessor.
 The basket can temporarily contain both generations. Do not describe migration as complete
-until execution receipts and the strategy list confirm it.
+until execution receipts and the strategy list confirm it. Refresh this snapshot after
+019/020 execute, including strategy and Converter caller registration.
 
 ## Data and source references
 

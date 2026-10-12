@@ -33,6 +33,8 @@ Unpriced requests remain equity. Processed requests instead reserve ETH in AMM
 - An unpriced request can be cancelled.
 - A priced, unprocessed request can be cancelled **strictly after** three days.
   At exactly three days, it is still in the processing window.
+- Strictly after three days, an unprocessed request cannot be processed (`ExitQueueBatchExpired`).
+  Cancellation returns EVE; it does not pay ETH. Already credited ETH remains claimable.
 - A processed request cannot be cancelled; its ETH remains claimable.
 
 Cancellation through AMM can close eligible requests while the queue is paused.

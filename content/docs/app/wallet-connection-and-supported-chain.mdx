@@ -5,10 +5,17 @@ description: Connection model, wrong-network handling, and how the app surfaces 
 
 ## Current Behavior
 
-- RainbowKit and wagmi provide the low-level connection state
+- wagmi provides connection state; the app owns its wallet selection and account dialogs
+- the dialog lists detected browser wallets and WalletConnect when that connector is configured
 - the app is configured for Ethereum mainnet only
-- unsupported chains trigger a dedicated switch flow
+- connecting on an unsupported chain shows a **Wrong network** button; the user selects it
+  and approves the Ethereum switch in their wallet
 - connected users see a custom account dialog
+
+Connecting does not by itself grant app access. During the invite period, `/mint`, `/portfolio`,
+and `/metrics` require an access session and otherwise redirect to `/`. Invite redemption
+requires a wallet-signed message and links access to that wallet. First mint can attach the
+invite voucher through `AMM.enterWithInvite(...)`.
 
 ## Why The Single-Chain Assumption Matters
 

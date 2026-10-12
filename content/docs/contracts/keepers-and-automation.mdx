@@ -28,11 +28,12 @@ The executor and protocol re-derive settlement values from on-chain state.
 
 The shared live-priced-batch cap is **25**. Request processing is also bounded by
 configured user limits and available liquidity. At the
-[October 11 snapshot](/operations/current-deployments), `minBatchAge()` was **24 hours**.
-That age is measured before automatic pricing, not from pricing or from the user's claim.
+[dated deployment snapshot](/operations/current-deployments), `minBatchAge()` was **24 hours**.
+That age is measured from batch creation, not each request, pricing, or the user's claim.
 
 Once priced, a batch has a separate three-day processing window. Processing creates
-claimable ETH in AMM; the user still submits the claim transaction.
+claimable ETH in AMM; the user still submits the claim transaction. Strictly after the window,
+unprocessed requests cannot be settled and must be cancelled to recover EVE.
 
 ## W2: strategy operations
 

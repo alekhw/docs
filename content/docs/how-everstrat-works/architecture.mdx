@@ -24,8 +24,9 @@ This design means:
   configuration. Other contracts just query the Registry at call time.
 - **Roles** (ADMIN, KEEPER, SECURITY, MINTER, …) are all managed in one place, making permission
   audits straightforward.
-- **A paused Registry** blocks calls that use the shared pause gate. AMM claims and eligible
-  cancellations remain callable; pausing is not a blanket freeze of all mutations.
+- **Pause controls are per contract.** Registry pause gates its own guarded mutations; it
+  does not pause every peer. AMM claims and eligible cancellations remain callable during
+  AMM pause.
 
 <DocsDiagram name="architecture" />
 
@@ -76,9 +77,10 @@ For the full role breakdown and governance model, see
     these into a total NAV that the AMM uses to price entries and exits.
   </Step>
   <Step>
-    **Exit.** You call the AMM with EVE. If free ETH is available, you receive ETH immediately at the
-    base price. If not, your request joins the ExitQueue — a keeper prices and processes the batch,
-    then you claim your ETH.
+    **Exit.** At the [dated snapshot](/operations/current-deployments#exit-liquidity-at-this-block),
+    AMM free ETH is zero and new successful exits queue. EVE is escrowed; keepers must price,
+    fund, and process the request before you can claim ETH. Code also supports an immediate
+    base-price exit if enough unreserved AMM ETH becomes available.
   </Step>
 </Steps>
 

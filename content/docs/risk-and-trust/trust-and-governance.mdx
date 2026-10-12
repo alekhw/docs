@@ -16,10 +16,10 @@ not principal protection or a guaranteed opportunity to exit before an upgrade.
 
 ## Role model
 
-| Role | Authority | Holder at the October 11 snapshot |
+| Role | Authority | Holder at the dated snapshot |
 | --- | --- | --- |
-| ADMIN | Parameters, peer registration, role management, strategy registration/removal, oracle configuration, unpausing, and UUPS upgrades | Timelock |
-| SECURITY | Designated pause/emergency paths and removal of supported ERC-20s from StrategyManager accounting | Security Safe |
+| ADMIN | Parameters, peer registration, role management, strategy registration/removal, single-strategy Controller withdrawal, oracle configuration, unpausing, and UUPS upgrades | Timelock |
+| SECURITY | Designated pause/emergency paths, supported ERC-20 accounting removal, and Whitelist signer revocation | Security Safe |
 | KEEPER | Controller strategy operations and queue pricing/processing | The two keeper executor contracts |
 | MINTER | EVE mint and burn functions | AMM and StrategyManager |
 | CONVERTER_CALLER | Approved strategy conversions | Registered strategies |
@@ -50,7 +50,12 @@ SECURITY cannot unpause or authorize UUPS upgrades. It can pause designated modu
 use their authorized emergency recovery paths, and remove a supported ERC-20 from
 StrategyManager. That removal is a configuration exception: it drops that token's value
 from NAV accounting without recovering its assets. It must not be described as
-configuration-free emergency authority.
+configuration-free emergency authority. `Whitelist.removeSigner()` is another configuration
+exception: SECURITY can revoke a signer while the Whitelist is enabled, but cannot add a
+signer or disable the Whitelist.
+
+Pausing is per contract, not a global Registry switch. Strategy emergency recovery requires
+the strategy to be paused and permits ADMIN or SECURITY.
 
 Cancellation of an eligible queued request and withdrawal of already claimable ETH
 remain available through AMM during pauses.
@@ -69,7 +74,8 @@ Fixed bytecode does not make economic behavior independent of governance.
 
 ## Current migration
 
-Controller 1.1.0 and UniCL v2 changes are not all live simply because they are on contracts main.
+Controller 1.1.0 is active after 018. UniCL v2 registration and v1 removal are still separate,
+scheduled operations at the dated snapshot; they are not live merely because source is merged.
 See [Pending migration](/operations/current-deployments#pending-migration) for their
 separate deployment, scheduling, and execution states.
 

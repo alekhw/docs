@@ -25,7 +25,7 @@ and remediation status. Coverage of v1 does not automatically cover a different 
 EVE, AMM, Registry, and individual UniCL strategy instances have fixed deployed bytecode.
 Controller, StrategyManager, ExitQueue, Oracle, and Converter are upgradeable.
 The timelock held ADMIN and had a 48-hour delay at the
-[October 11 snapshot](/operations/current-deployments).
+[dated deployment snapshot](/operations/current-deployments).
 
 Fixed AMM code is not a guarantee that its inputs remain unchanged: Registry peers, NAV
 logic, oracle feeds, connector weight, and other settings can change through authorized paths.
@@ -35,9 +35,13 @@ Performance-fee configuration and treasury EVE minting live in StrategyManager.
 
 ADMIN or SECURITY can pause designated modules and use designated emergency paths.
 SECURITY also has the specific ability to remove supported ERC-20s from StrategyManager
-accounting. It cannot unpause or authorize upgrades.
+accounting and revoke Whitelist signers while that gate is enabled. It cannot add Whitelist
+signers, disable that gate, unpause, or authorize upgrades.
 
-Pauses block normal entry, exit, and relevant operational calls.
+Pauses are per contract. Registry pause gates only its own guarded mutations; it does not
+pause every peer. A paused AMM blocks normal entry/exit, and other module pauses block
+their relevant operations. Strategy `emergencyExit()` permits ADMIN or SECURITY and requires
+the strategy to be paused.
 They do not block AMM's claim or eligible cancellation paths.
 The timelock is a review window, not a guarantee that an exit will settle before a change.
 
@@ -56,7 +60,8 @@ It does not recover those assets, and their value is no longer included in the r
 
 ## Actual price and execution protections
 
-AMM checks the user's mint minimum, immediate-burn maximum, and queued price tolerance.
+AMM checks the user's mint minimum, maximum EVE input for both immediate and queued exits,
+and queued price tolerance.
 Queued settlement outside tolerance returns EVE rather than crediting ETH.
 The queue bounds live priced batches to 25.
 

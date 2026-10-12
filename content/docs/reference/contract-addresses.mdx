@@ -4,8 +4,8 @@ description: Ethereum mainnet contract identification and the historical Base Se
 ---
 
 <Callout type="warn" title="Invite-gated mainnet deployment">
-  Ethereum mainnet uses real ETH. Entry remained invite-gated at the October 11, 2026
-  snapshot. Verify the network and full address. A deployed contract is not an unrestricted
+  Ethereum mainnet uses real ETH. Entry remained invite-gated at the
+  [dated snapshot](/operations/current-deployments). Verify the network and full address. A deployed contract is not an unrestricted
   launch announcement; do not send ETH directly to a contract address.
 </Callout>
 
@@ -16,10 +16,10 @@ registered core contracts, keeper executors, live settings, and registered strat
 The official EVE token is
 [`0x8FE6A43672fCa70d41e112B8426387665fD061EC`](https://etherscan.io/address/0x8FE6A43672fCa70d41e112B8426387665fD061EC).
 
-Four v1 UniCL strategies were registered at block **26,169,646**.
-Controller 1.1.0 and v2 registration/removal are separate pending governance operations,
-not a completed migration. Do not use the old "no mainnet strategies" or bootstrap-supply
-description to assess the current deployment.
+The dated snapshot records the registered strategy basket and migration operation states.
+Controller 1.1.0 is active after 018; 019/020 are scheduled, not a completed v2 migration.
+Recheck the snapshot and `StrategyManager.strategies()` as those operations execute.
+Do not use the old "no mainnet strategies" or bootstrap-supply description to assess the deployment.
 
 ## Verification
 

@@ -1,6 +1,6 @@
 ---
 title: Roles, permissions, and admin powers
-description: Timelocked governance, immediate emergency powers, and pending upgrades.
+description: Timelocked governance, immediate emergency powers, and strategy migration permissions.
 ---
 
 ## Governance authority
@@ -11,7 +11,8 @@ at the [dated deployment snapshot](/operations/current-deployments).
 
 Governance can configure the connector weight, queued-exit minimum, feeds, supported assets,
 strategy weights, performance-fee rate, treasury, and keeper parameters. It can register or remove
-strategies, grant roles, unpause modules, and authorize UUPS upgrades.
+strategies, grant roles, unpause modules, and authorize UUPS upgrades. Controller 1.1.0
+also permits ADMIN to call `withdrawFromStrategy(address,uint256)`.
 
 A proposal in the DAO Safe is not yet a scheduled timelock operation. The delay starts when
 the scheduling transaction executes. A Ready operation still needs an execution transaction.
@@ -19,19 +20,25 @@ the scheduling transaction executes. A Ready operation still needs an execution 
 ## Emergency authority
 
 `SECURITY_ROLE` permits pause and designated emergency recovery actions without the timelock.
-It does not authorize UUPS upgrades or unpause. One narrow configuration exception is
+It does not authorize UUPS upgrades or unpause. Specific configuration exceptions include
 `StrategyManager.removeSupportedERC20()`, which either ADMIN or SECURITY may call to exclude
 a supported token balance from NAV. This can restore accounting availability while reducing
-reported backing; it does not recover the excluded asset.
+reported backing; it does not recover the excluded asset. `Whitelist.removeSigner()` also
+allows ADMIN or SECURITY to revoke an invite-voucher signer while the Whitelist is enabled.
+Revocation is not permission to add signers or disable the Whitelist.
+
+Pause controls are per contract. Registry pause gates its own guarded mutations, not
+every peer contract. Strategy `emergencyExit()` requires that strategy to be paused and
+allows ADMIN or SECURITY; a pause does not prove all assets were recovered.
 
 A 48-hour review window does not guarantee a completed exit before execution. Queue timing,
 liquidity, and pauses can make an exit take longer.
 
 ## Pending protocol migration
 
-At the snapshot, Controller 1.0.0 is still active. Proposal 018 is Ready and would allow
-`withdrawFromStrategy()` to be called by ADMIN as well as KEEPER. Proposals 019 and 020
-register UniCL v2 and drain/remove v1 respectively; they remain proposed and unscheduled.
+The dated snapshot confirms 018 executed and Controller 1.1.0 is active. Operations 019
+and 020 are scheduled but not executed at that block. They register UniCL v2 and drain/remove
+v1 respectively; 020 depends on 019's execution. Scheduling does not change the active basket.
 See [Current deployments](/operations/current-deployments) for operation states.
 
 Sources: [governance records](https://github.com/everstrat-xyz/governance)

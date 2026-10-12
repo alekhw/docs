@@ -10,8 +10,8 @@ All protocol roles are checked through Registry. These assignments were verified
 
 | Role | Main power | Snapshot holder |
 | --- | --- | --- |
-| `ADMIN_ROLE` | Configuration, role grants, strategy registration, unpause, UUPS upgrades | 48-hour timelock |
-| `SECURITY_ROLE` | Pause and designated emergency recovery paths | Security Safe |
+| `ADMIN_ROLE` | Configuration, role grants, strategy registration, Controller single-strategy withdrawal, unpause, UUPS upgrades | 48-hour timelock |
+| `SECURITY_ROLE` | Pause, designated emergency recovery, supported ERC-20 accounting removal, Whitelist signer revocation | Security Safe |
 | `KEEPER_ROLE` | Controller strategy work, batch pricing and processing | QueueKeeperExecutor and StrategyKeeperExecutor |
 | `MINTER_ROLE` | EVE mint and burn | AMM and StrategyManager |
 | `CONVERTER_CALLER_ROLE` | Converter wrap, unwrap, and swap calls | Authorized registered strategies |
@@ -19,6 +19,10 @@ All protocol roles are checked through Registry. These assignments were verified
 
 Registry's `DEFAULT_ADMIN_ROLE` has **zero holders** at the snapshot. `ADMIN_ROLE` is
 self-administered, so zero default-admin holders does not remove governance authority.
+
+Controller 1.1.0 accepts ADMIN or KEEPER for `withdrawFromStrategy(address,uint256)`.
+Strategy `emergencyExit()` accepts ADMIN or SECURITY and requires a paused strategy.
+Registry pause affects its own guarded functions, not all peers.
 
 ## Contract identity is separate from roles
 
