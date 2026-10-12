@@ -7,6 +7,8 @@ description: Immediate redemption versus queued redemption at the AMM boundary.
 
 Burns originate from `AMM.exit(requestedEth, maxTokensToBurn, priceTolerance)`.
 
+See the [exit-path diagram](/using-everstrat/exiting-and-redeeming#everstrat-exit-diagram) for the liquidity-dependent branches.
+
 <Tabs items={["Immediate redemption", "Queued redemption"]}>
   <Tab>
     If the AMM can satisfy the ETH request, the user receives ETH immediately and the lifecycle ends

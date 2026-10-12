@@ -186,6 +186,40 @@ Notes:
 
 ## Writing Documentation
 
+### Diagrams
+
+Use `<DocsDiagram name="architecture" />` in MDX. The component is registered in
+`components/mdx.tsx` and renders static, accessible SVG on the server. Diagram
+definitions live in `lib/diagrams.ts`; the shared Everstrat light/dark skin lives
+in `components/docs-diagram.css`. No diagram runtime or client bundle is required.
+
+Available names: `architecture`, `mint`, `exit`, `queue`, `nav`, `strategies`, `data`.
+Embed each diagram on one canonical page. Other pages should link directly to its
+`#everstrat-{name}-diagram` anchor. Keep the surrounding prose complete so search
+and Markdown/LLM exports remain useful without the figure.
+
+| Diagram | Canonical page |
+| --- | --- |
+| `architecture` | `/how-everstrat-works/architecture` |
+| `mint` | `/using-everstrat/depositing-and-minting` |
+| `exit` | `/using-everstrat/exiting-and-redeeming` |
+| `queue` | `/how-everstrat-works/redemption-queue` |
+| `nav` | `/how-everstrat-works/eve-and-nav` |
+| `strategies` | `/how-everstrat-works/strategies-and-yield` |
+| `data` | `/developers/subgraph-and-data-access` |
+
+`bun run diagrams:gen` regenerates the self-contained HTML previews in
+`public/diagrams/` from the same definitions, renderer, and stylesheet. Run it after
+editing a diagram; the production build also runs it automatically. The figure's
+**Open** link opens its HTML preview. Previews follow the system color scheme and
+use Inter with a system-font fallback. Do not edit generated HTML directly.
+
+Diagrams use Diagram Design's minimal style and `fit` geometry, customized to the
+application palette and Inter typography. The SVG keeps its readable width inside
+a local keyboard-accessible horizontal scroller; print output scales to the page.
+
+### Content
+
 When documenting the project:
 
 - prefer concrete, current behavior over aspirational descriptions

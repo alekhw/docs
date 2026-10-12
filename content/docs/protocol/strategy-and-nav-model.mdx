@@ -8,9 +8,13 @@ description: How StrategyManager, Controller, and Oracle support ETH-first NAV a
 The protocol calculates NAV in **ETH first**:
 
 - total strategy NAV in ETH
-- plus Controller ETH balance that has not yet been distributed
+- plus idle ETH on StrategyManager, Controller, and the AMM (excluding locked claims)
+- plus the ETH value of supported ERC-20 balances on StrategyManager
+- minus in-window priced redemption liabilities
 
 USD views are derived later through Oracle conversion.
+
+See the [NAV and EVE pricing diagram](/how-everstrat-works/eve-and-nav#everstrat-nav-diagram).
 
 ## StrategyManager Responsibilities
 
@@ -21,8 +25,8 @@ USD views are derived later through Oracle conversion.
 
 ## Why This Matters To Pricing
 
-AMM price functions depend on protocol NAV. Because that NAV comes from StrategyManager in ETH
-terms, the enter/exit hot path stays oracle-free.
+AMM price functions consume protocol NAV in ETH. They do not directly request an ETH/USD quote
+for normal entry or exit; NAV computation can still depend on Oracle feeds for non-ETH assets.
 
 Read more in [StrategyManager](/contracts/strategy-manager) and
 [Trust assumptions](/security/trust-assumptions).

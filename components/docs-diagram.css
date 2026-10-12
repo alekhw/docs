@@ -1,0 +1,246 @@
+/* Everstrat skin for Diagram Design. Share these tokens with standalone output. */
+.docs-diagram {
+  --diagram-paper: #ffffff;
+  --diagram-surface: #f5f4f3;
+  --diagram-ink: #171916;
+  --diagram-muted: #60665d;
+  --diagram-rule: #d9ddd5;
+  --diagram-accent: #36542e;
+  --diagram-accent-fill: #aaff92;
+  --diagram-link: #496c86;
+  --diagram-sans: inherit;
+  --diagram-mono: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  margin: 2rem 0;
+  scroll-margin-top: calc(var(--fd-docs-row-3, 0px) + 16px);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--diagram-rule);
+  border-radius: 20px;
+  background: var(--diagram-paper);
+  color: var(--diagram-ink);
+  font-family: var(--diagram-sans);
+  line-height: 1.5;
+}
+
+.dark .docs-diagram {
+  --diagram-paper: #242725;
+  --diagram-surface: #2c2f2d;
+  --diagram-ink: #f3f5f1;
+  --diagram-muted: #adb5af;
+  --diagram-rule: #4a514b;
+  --diagram-accent: #aaff92;
+  --diagram-accent-fill: #30432c;
+  --diagram-link: #9eb1c2;
+}
+
+.diagram-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 24px 0;
+}
+
+.diagram-eyebrow,
+.diagram-tag {
+  color: var(--diagram-muted);
+  fill: var(--diagram-muted);
+  font-family: var(--diagram-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.diagram-title {
+  margin: 8px 0 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.diagram-open {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+  margin-top: 3px;
+  padding: 6px 10px;
+  border: 1px solid var(--diagram-rule);
+  border-radius: 8px;
+  color: var(--diagram-muted);
+  font-size: 11px;
+  text-decoration: none;
+}
+
+.diagram-open:hover {
+  background: var(--diagram-surface);
+  color: var(--diagram-ink);
+}
+.diagram-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+.diagram-scroll:focus-visible,
+.diagram-open:focus-visible {
+  outline: 2px solid var(--diagram-accent);
+  outline-offset: -3px;
+}
+.diagram-scroll > svg {
+  display: block;
+  width: 100%;
+  min-width: var(--diagram-width);
+}
+.diagram-paper {
+  fill: var(--diagram-paper);
+}
+.diagram-edge path {
+  stroke: var(--diagram-muted);
+}
+.diagram-edge-accent path {
+  stroke: var(--diagram-accent);
+}
+.diagram-edge-link path {
+  stroke: var(--diagram-link);
+}
+.diagram-marker-muted {
+  fill: var(--diagram-muted);
+}
+.diagram-marker-accent {
+  fill: var(--diagram-accent);
+}
+.diagram-marker-link {
+  fill: var(--diagram-link);
+}
+.diagram-edge-label rect {
+  fill: var(--diagram-paper);
+}
+.diagram-edge-label text {
+  fill: var(--diagram-muted);
+  font-family: var(--diagram-mono);
+  font-size: 10px;
+}
+.diagram-lifeline {
+  stroke: var(--diagram-rule);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+.diagram-node > rect,
+.diagram-node > polygon {
+  fill: var(--diagram-surface);
+  stroke: var(--diagram-rule);
+  stroke-width: 1;
+}
+.diagram-node-focal > rect {
+  fill: var(--diagram-accent-fill);
+  stroke: var(--diagram-accent);
+}
+.diagram-node-focal .diagram-tag {
+  fill: var(--diagram-ink);
+}
+.diagram-node-external > rect {
+  fill: var(--diagram-paper);
+  stroke: var(--diagram-link);
+  stroke-dasharray: 5 4;
+}
+.diagram-node-terminal > rect {
+  fill: var(--diagram-paper);
+}
+.diagram-node-title {
+  fill: var(--diagram-ink);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+.diagram-node-detail {
+  fill: var(--diagram-muted);
+  font-size: 10px;
+  font-family: var(--diagram-mono);
+}
+.diagram-node-focal .diagram-node-detail {
+  fill: var(--diagram-ink);
+}
+
+.diagram-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--diagram-rule);
+  color: var(--diagram-muted);
+  font-size: 11px;
+}
+.diagram-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.diagram-legend i {
+  display: inline-block;
+  width: 20px;
+  height: 0;
+  border-top: 1.5px solid var(--diagram-muted);
+}
+.diagram-legend .diagram-key-dashed {
+  border-top-style: dashed;
+}
+.diagram-legend .diagram-key-external {
+  border-color: var(--diagram-link);
+}
+.diagram-legend .diagram-key-focal {
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--diagram-accent);
+  border-radius: 2px;
+  background: var(--diagram-accent-fill);
+}
+.diagram-caption {
+  margin: 0;
+  padding: 0 24px 20px;
+  color: var(--diagram-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.diagram-scroll-hint {
+  display: none;
+  padding: 0 24px 16px;
+  color: var(--diagram-muted);
+  font-size: 11px;
+}
+.diagram-scroll-hint > span {
+  margin-left: 6px;
+}
+
+@media (max-width: 720px) {
+  .diagram-heading {
+    padding: 20px 20px 0;
+  }
+  .diagram-title {
+    font-size: 18px;
+  }
+  .diagram-scroll-hint {
+    display: block;
+  }
+}
+
+@media print {
+  .docs-diagram {
+    break-inside: avoid;
+    overflow: visible;
+  }
+  .diagram-scroll {
+    overflow-x: visible;
+  }
+  .diagram-scroll > svg {
+    min-width: 0;
+  }
+  .diagram-open,
+  .diagram-scroll-hint {
+    display: none;
+  }
+}

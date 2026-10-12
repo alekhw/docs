@@ -22,13 +22,15 @@ There is a minimum size for queued exits: your redemption must be worth at least
 default `minBatchExitETH`). The admin can raise this up to **0.05 ETH** if needed to keep batch sizes
 economical. Immediate exits have no minimum.
 
+<DocsDiagram name="queue" />
+
 ## Step-by-step: queued exit lifecycle
 
 <Steps>
   <Step>
-    **Your request joins the current batch.** Your EVE tokens are escrowed in the ExitQueue (not yet
-    burned). Your request records the base price at the time you submitted, which is used for the
-    slippage check later.
+    **Your request joins the current batch.** Your EVE tokens are escrowed on the AMM (not yet
+    burned), while the ExitQueue stores the request and batch metadata. Your request records the
+    base price at the time you submitted, which is used for the slippage check later.
   </Step>
   <Step>
     **A keeper prices the batch.** The keeper calls the Controller, which prices the batch on the
