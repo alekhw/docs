@@ -19,7 +19,7 @@ function claim() external
 function processRedemption(uint256 _batchId, address _user) external payable
 ```
 
-The ETH deposit is `msg.value`, not a separate `enter` argument.
+`enter` takes no ETH amount argument; the deposit is `msg.value`.
 During the active invite period, a new user needs valid invite authorization.
 
 ## Pricing and dependencies
@@ -50,7 +50,7 @@ only strictly more than three days after pricing. Processed requests must be cla
 
 - ADMIN configures parameters and unpauses.
 - ADMIN or SECURITY can pause.
-- `processRedemption` authenticates the registered Controller address, not a `CONTROLLER_ROLE`.
+- `processRedemption` checks the caller against the registered Controller address. There is no `CONTROLLER_ROLE`.
 - Entry, exit, and processing are pause-gated. Cancellation and claims remain callable while paused.
 
 See [Current deployments](/operations/current-deployments) for the dated mainnet snapshot.

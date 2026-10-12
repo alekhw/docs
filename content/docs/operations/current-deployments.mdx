@@ -8,7 +8,7 @@ description: Ethereum mainnet addresses, exit liquidity, and governance state at
 This read-only snapshot is pinned to Ethereum mainnet block **26,179,157**
 (**October 12, 2026, 21:42:47 UTC**), hash
 `0x3d555940233dd8faf3cc6d8225a3563c32a9bd696182d30c6875ed8e5ad2ed19`.
-It describes that block, not an automatically refreshed status.
+It does not refresh automatically.
 The app uses chain ID **1**.
 
 Entry remains invite-gated: `Whitelist.disabled()` returned `false`.
@@ -39,22 +39,21 @@ Upgradeable components are listed at their **proxy addresses**, which integratio
 | Getter | Result at the snapshot block | Meaning |
 | --- | --- | --- |
 | `AMM.connectorWeight()` | `0.9 × 10^18` | Entry price is base price divided by 0.9 |
-| `AMM.minBatchExitETH()` | `0.001 ETH` | Minimum for a queued exit, not a universal mint minimum |
-| `StrategyManager.performanceFeeBps()` | `1500` | 15% of eligible accrued Uniswap V3 LP fees; not 15% of deposits |
+| `AMM.minBatchExitETH()` | `0.001 ETH` | Minimum size of a queued exit; it does not apply to mints |
+| `StrategyManager.performanceFeeBps()` | `1500` | 15% of eligible accrued Uniswap V3 LP fees; it is not charged on deposits |
 | `StrategyManager.daoTreasury()` | `0x1780C78eB50cD28dC349CEA8452eD1F7206D8fF9` | Recipient of fee EVE |
 | `Timelock.getMinDelay()` | `172800 seconds` | 48-hour scheduling delay |
 | `Controller.version()` | `1.1.0` | 018 executed; ADMIN or KEEPER may withdraw from a single strategy |
 | Both keeper executors' `version()` | `2.1.0-mimic` | Mimic executor contracts |
-| `QueueKeeperExecutor.minBatchAge()` | `86400 seconds` | Automatic pricing eligibility starts 24 hours after batch creation, not after each request |
+| `QueueKeeperExecutor.minBatchAge()` | `86400 seconds` | A batch can be priced automatically once it is 24 hours old |
 | `StrategyKeeperExecutor.controllerReserveETH()` | `0.05 ETH` | Controller reserve target |
 | `StrategyKeeperExecutor.minWithdrawETH()` | `0.0001 ETH` | Strategy withdrawal threshold |
 | `StrategyKeeperExecutor.exitLiquidityTargetETH()` | `0` | Automatic AMM float top-up disabled |
 | `Whitelist.disabled()` | `false` | Invite checks remain active |
 
-The three-day queue processing window starts **after pricing**, independently of the
-keeper's minimum age since batch creation. A still-unprocessed request cannot be processed
-strictly more than three days after pricing; it must be cancelled to recover EVE.
-Already credited ETH remains claimable.
+The three-day queue processing window starts **after pricing** and is separate from the
+keeper's minimum batch age. Expiry and cancellation rules are in
+[The redemption queue](/how-everstrat-works/redemption-queue#the-escape-hatch).
 
 ## Exit liquidity at this block
 
@@ -67,9 +66,9 @@ Already credited ETH remains claimable.
 All ETH held by AMM was reserved for existing claims. Every new successful positive-size
 exit at this block would therefore queue, subject to the queued minimum and other checks.
 Deposits are forwarded to Controller, and `exitLiquidityTargetETH = 0` disables routine
-AMM float top-up. Immediate redemption is a conditional code path, not the current funded
-user path. Authorized liquidity transfers can change this state; recheck free balance before
-assuming an immediate exit is available. This snapshot does not establish historical exit counts.
+AMM float top-up. The contracts still settle an exit immediately when free balance covers it,
+and authorized liquidity transfers can raise free balance. Recheck it before assuming an
+immediate exit is available. This snapshot does not establish historical exit counts.
 
 ## Registered strategies
 
@@ -94,7 +93,7 @@ Registration does not guarantee that a strategy is healthy, funded, or executing
 | `DEFAULT_ADMIN_ROLE` | No holders |
 
 Both executors allow the Mimic caller `0x41153f0c36f8Fb5c38396573dDB487AC95a98256`.
-This is an executor caller allowlist, not a direct `KEEPER_ROLE` grant to that account.
+This is an executor caller allowlist. The account itself holds no `KEEPER_ROLE`.
 Allowlisting alone does not prove uninterrupted off-chain task execution.
 
 ## Pending migration

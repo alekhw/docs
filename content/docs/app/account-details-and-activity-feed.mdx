@@ -8,8 +8,8 @@ description: RPC-backed current balances and requests, indexed history, and clai
 The account surface shows wallet EVE, claimable ETH, queued requests, and confirmed activity.
 Portfolio holds current state, available actions, lifetime totals, and position history;
 the connected-wallet dialog holds wallet information and historical activity.
-Current balances and request actions are direct chain state, not inferred from lifetime
-mint/burn totals or the visible activity page.
+Current balances and request actions are read directly from chain state. Lifetime
+mint/burn totals and the visible activity page do not feed them.
 
 The app reads balances, batch metadata, and request closure eligibility at a shared RPC block.
 It loads indexed pending batch IDs independently of activity pagination and checks the

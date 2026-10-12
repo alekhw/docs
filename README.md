@@ -171,6 +171,7 @@ Default local URL:
 
 ```bash
 bun run docs:gen
+bun run test:content
 bun run lint
 bun run types:check
 bun run build

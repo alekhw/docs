@@ -5,7 +5,7 @@ description: Definitions for share pricing, net NAV, queue liabilities, fees, an
 
 | Term | Definition |
 | --- | --- |
-| **EVE** | Transferable ERC-20 protocol shares minted on entry and burned on redemption; not a governance-role token. |
+| **EVE** | Transferable ERC-20 protocol shares minted on entry and burned on redemption. Holding EVE grants no governance role. |
 | **Gross assets** | Strategy NAV plus ETH on StrategyManager and Controller, free AMM ETH, and supported ERC-20 balances valued in ETH. |
 | **NAV (net asset value)** | Gross assets minus in-window priced, unprocessed queued redemption liabilities. Reserved claim ETH is already excluded from free AMM ETH. |
 | **Live supply** | Total EVE supply minus escrowed EVE corresponding to the live priced redemption liability. Unpriced queued EVE is not excluded. |

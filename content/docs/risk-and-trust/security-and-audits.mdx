@@ -7,7 +7,7 @@ description: Evidence-based review coverage and the protections actually present
   The repositories inspected on October 11, 2026 did not contain a completed independent
   audit report identifying an auditor, reviewed commit, deployment coverage, and remediation
   status. Do not describe the protocol as independently audited on the strength of tests,
-  model-assisted reviews, or audit-fix PR titles.
+  internal reviews, or audit-fix PR titles.
 </Callout>
 
 ## Review coverage
@@ -43,7 +43,7 @@ pause every peer. A paused AMM blocks normal entry/exit, and other module pauses
 their relevant operations. Strategy `emergencyExit()` permits ADMIN or SECURITY and requires
 the strategy to be paused.
 They do not block AMM's claim or eligible cancellation paths.
-The timelock is a review window, not a guarantee that an exit will settle before a change.
+The timelock is a review window. It does not guarantee that an exit will settle before a change.
 
 ## Fail-closed valuation
 
@@ -66,7 +66,7 @@ Queued settlement outside tolerance returns EVE rather than crediting ETH.
 The queue bounds live priced batches to 25.
 
 There is **no deployed AMM 5% rolling-price checkpoint guard or checkpoint-reset action**.
-UniCL pool/TWAP checks are strategy-level controls, not an AMM-wide guarantee against NAV changes.
+UniCL pool/TWAP checks are strategy-level controls. They do not protect the AMM as a whole against NAV changes.
 
 ## Pull-based claims
 

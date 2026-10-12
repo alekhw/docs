@@ -24,7 +24,7 @@ underlying assets, lose value, or require swaps to satisfy ETH withdrawals.
 They share the UniCL strategy family and infrastructure. Not every deployed instance has
 identical bytecode, but shared logic, Uniswap dependence, feeds, and market exposures mean
 four pools do not provide four independent risk systems.
-Paired-token amounts are range-dependent, not a fixed 50/50 allocation.
+Paired-token amounts depend on the position's range; there is no fixed 50/50 allocation.
 
 ## Exit delays
 
@@ -32,16 +32,14 @@ If AMM has insufficient free ETH, an exit is queued. The Mimic queue and strateg
 price requests and make liquidity available for processing. Gas caps, outages, failed reads,
 pauses, strategy capacity, and liquidity conditions can delay this work.
 
-The snapshot's queue keeper minimum age was 24 hours since batch creation before automatic
-pricing, not since each request.
-After pricing, a separate three-day processing window applies.
+At the snapshot, the queue keeper waited until a batch was 24 hours old before automatic
+pricing. After pricing, a separate three-day processing window applies.
 Neither is a promise that ETH will arrive at the end of that period.
 
-An unpriced request can be cancelled. A priced, unprocessed request can be cancelled
-**strictly more than three days after pricing**. Cancellation returns EVE, not ETH;
-strictly after this deadline, that request cannot be processed at all. Recover EVE through
-cancellation; a later redemption requires a new request. Processed requests instead require
-a separate claim transaction and their credited ETH does not expire with the batch window.
+A priced request that is still unprocessed **strictly more than three days after pricing**
+can no longer be paid. Its only recovery is cancellation, which returns EVE and pays no ETH.
+Credited ETH from processed requests stays claimable. The exact rules are in
+[The redemption queue](/how-everstrat-works/redemption-queue#the-escape-hatch).
 
 Automatic AMM immediate-liquidity top-up was disabled at the snapshot.
 Do not assume an always-funded immediate-exit buffer.
@@ -71,7 +69,7 @@ cancellations remain available without fresh NAV, so this is not a universal shu
 
 Recovery may require governance. Force-removing a strategy or removing a supported ERC-20
 from accounting does not recover its capital; it removes that value from reported NAV.
-This is an accounting and governance risk, not merely an availability fix.
+That makes it an accounting and governance risk as well as an availability fix.
 
 ## Governance and upgrade risk
 

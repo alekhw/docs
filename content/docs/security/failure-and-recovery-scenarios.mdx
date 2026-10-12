@@ -7,10 +7,9 @@ description: What can fail in practice and which recovery path exists today in t
 
 <Accordions type="single">
   <Accordion title="Queue processing is delayed">
-    An unprocessed request can be cancelled strictly more than three days after pricing, returning
-    EVE rather than ETH. Unpriced requests can be cancelled without that wait.
-    Strictly after the three-day processing window, an unprocessed request cannot be settled;
-    cancellation is the recovery path, not more waiting for an ETH payment.
+    An unprocessed request can no longer be settled strictly more than three days after
+    pricing. Cancelling it returns EVE and pays no ETH; waiting longer does not help.
+    Unpriced requests can be cancelled without that wait.
     Processed requests instead require a claim. The app checks eligibility from RPC state.
   </Accordion>
   <Accordion title="Queued redemption moves outside tolerance">

@@ -64,10 +64,9 @@ test("expiry closes processing, not already credited claims", () => {
       path,
     );
   }
-  assert.match(
-    compact("contracts/keepers-and-automation.mdx"),
-    /from batch creation, not each request/,
-  );
+  const keepers = compact("contracts/keepers-and-automation.mdx");
+  assert.match(keepers, /measured from batch creation/);
+  assert.match(keepers, /\/how-everstrat-works\/redemption-queue/);
 });
 
 test("authority, fee basis, and wallet access retain their important boundaries", () => {

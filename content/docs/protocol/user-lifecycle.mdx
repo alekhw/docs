@@ -30,5 +30,5 @@ The subgraph maps user-visible lifecycle events into:
 ## Important Constraint
 
 The frontend checks current-batch state and all discovered indexed pending batch IDs through RPC.
-Pending discovery is independent of Activity pagination. The subgraph supplies history, not the
-authority for current balances or action eligibility.
+Pending discovery is independent of Activity pagination. The subgraph supplies history;
+current balances and action eligibility come from RPC.

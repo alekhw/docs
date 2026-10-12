@@ -15,11 +15,13 @@ This page explains the full lifecycle of a queued redemption. For the user-facin
 
 When you call `exit()`, the AMM first checks its **free balance** — the ETH it holds minus any ETH
 already reserved for pending claims (`freeBalance = address(AMM).balance − lockedForClaims`). If the
-free balance is enough to pay your redemption at the current base price, the code supports
-immediate settlement. At the [dated snapshot](/operations/current-deployments#exit-liquidity-at-this-block),
-free balance is **zero**: all AMM ETH is reserved for existing claims, and routine immediate-exit
-float top-up is disabled. New successful exits therefore enter **ExitQueue**, with EVE escrowed
-on AMM. Deposits go to Controller and do not replenish AMM's free balance.
+free balance is enough to pay your redemption at the current base price, the exit settles
+immediately. Otherwise your request enters **ExitQueue** and your EVE is escrowed on AMM.
+
+At the [dated snapshot](/operations/current-deployments#exit-liquidity-at-this-block),
+free balance was **zero**: all AMM ETH was reserved for existing claims, and the keeper's
+immediate-exit float top-up was disabled. Deposits go to Controller and do not add to AMM's
+free balance, so new exits queue.
 
 There is a minimum size for queued exits: your redemption must be worth at least **0.001 ETH** (the
 default `minBatchExitETH`). The admin can raise this up to **0.05 ETH** if needed to keep batch sizes
@@ -86,15 +88,15 @@ make the original unprocessed request payable. Cancellation returns EVE; any lat
 requires a new exit request and a new quote. At exactly three days, processing is still allowed
 and cancellation is still blocked.
 
-You can also cancel **at any time before the batch is priced** — there is no waiting period for
-unpriced batches.
+You can also cancel **at any time before the batch is priced**. Unpriced batches have no
+waiting period.
 
 | When | Can you cancel? |
 | --- | --- |
-| Before the batch is priced | Yes, any time — no waiting period |
-| After batch is priced, up to and including 3 days | No — still inside the processing window |
-| More than 3 days after pricing, still unprocessed | Yes — escape hatch available via `cancelRedemption` |
-| Request already processed | No — claim the credited ETH instead |
+| Before the batch is priced | Yes, at any time |
+| After batch is priced, up to and including 3 days | No, the request is still inside the processing window |
+| More than 3 days after pricing, still unprocessed | Yes, through the `cancelRedemption` escape hatch |
+| Request already processed | No. Claim the credited ETH instead |
 
 <Callout type="info">
   The 3-day window after pricing exists to give the keeper time to process all requests in the batch
@@ -112,7 +114,7 @@ unpriced batches.
 | Maximum live priced batches | **25** | Fixed in this implementation |
 
 At the [dated deployment snapshot](/operations/current-deployments), the Mimic queue keeper required
-**24 hours since batch creation before automatic pricing**, not 24 hours since each request.
+a batch to be **24 hours old before automatic pricing**, counted from batch creation.
 A request joining an older batch does not start a fresh 24-hour clock. This is
 an executor scheduling parameter, separate from ExitQueue's three-day window after pricing.
 Keeper availability, gas limits, and liquidity affect actual timing. See

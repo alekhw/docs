@@ -77,10 +77,11 @@ For the full role breakdown and governance model, see
     these into a total NAV that the AMM uses to price entries and exits.
   </Step>
   <Step>
-    **Exit.** At the [dated snapshot](/operations/current-deployments#exit-liquidity-at-this-block),
-    AMM free ETH is zero and new successful exits queue. EVE is escrowed; keepers must price,
-    fund, and process the request before you can claim ETH. Code also supports an immediate
-    base-price exit if enough unreserved AMM ETH becomes available.
+    **Exit.** You send EVE to the AMM. At the
+    [dated snapshot](/operations/current-deployments#exit-liquidity-at-this-block), new exits
+    queue: EVE is escrowed, keepers price and process the batch, and you then claim ETH.
+    [The redemption queue](/how-everstrat-works/redemption-queue) explains when an immediate
+    exit is possible.
   </Step>
 </Steps>
 

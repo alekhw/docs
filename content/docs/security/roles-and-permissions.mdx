@@ -22,7 +22,7 @@ self-administered, so zero default-admin holders does not remove governance auth
 
 Controller 1.1.0 accepts ADMIN or KEEPER for `withdrawFromStrategy(address,uint256)`.
 Strategy `emergencyExit()` accepts ADMIN or SECURITY and requires a paused strategy.
-Registry pause affects its own guarded functions, not all peers.
+Registry pause affects only the Registry's own guarded functions.
 
 ## Contract identity is separate from roles
 

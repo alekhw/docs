@@ -34,22 +34,18 @@ description: Answers to the most common questions about Everstrat — what it is
   <Accordion title="How do I exit and get my ETH back?">
     Select Burn, enter EVE, and approve the AMM allowance if requested. Then confirm the separate
     Burn transaction. At the [dated snapshot](/operations/current-deployments#exit-liquidity-at-this-block),
-    AMM free ETH is zero, so new successful exits queue. After pricing and successful processing,
-    submit Claim to withdraw credited ETH. Code supports immediate settlement only if sufficient
-    free AMM ETH becomes available. See [Exiting & redeeming](/using-everstrat/exiting-and-redeeming).
+    new exits queue. After the request is processed, submit Claim to withdraw the credited ETH.
+    See [Exiting & redeeming](/using-everstrat/exiting-and-redeeming).
   </Accordion>
   <Accordion title="Why did my exit get queued, and how long does it take?">
-    An exit queues when AMM free ETH is insufficient. At the dated snapshot, its entire ETH balance
-    is locked for existing claims and automatic immediate-exit float top-up is disabled.
-    Deposits go to Controller, so even idle Controller ETH does not mean AMM can pay immediately.
-    The keeper's 24-hour automatic-pricing minimum is measured from batch creation, not each request;
-    it is not a settlement guarantee. A keeper prices the batch at the AMM's base price and
-    must process eligible requests within three days. NAV behind that price can depend on feeds and
-    pool TWAPs. After processing, ETH is
-    credited to your claimable balance and you must call `claim()` to withdraw it (pull-over-push). If
-    a request is still unprocessed **strictly more than 3 days** after pricing, it can no longer be
-    processed. Invoke the escape hatch (`cancelRedemption`) to recover EVE; waiting longer will
-    not make that request payable. Any new exit needs a new request and quote.
+    An exit queues when the AMM has too little unreserved ETH to pay it. At the dated snapshot,
+    all AMM ETH was reserved for existing claims and deposits go to Controller, so every new exit queued.
+    A keeper prices the batch at the AMM's base price, at the earliest 24 hours after the batch
+    was created, and must process it within three days of pricing. Neither period is a settlement
+    guarantee. After processing, ETH is credited to your claimable balance and you call `claim()`
+    to withdraw it. If a request is still unprocessed **strictly more than 3 days** after pricing,
+    it can no longer be processed: cancel it to recover EVE. Credited ETH remains claimable.
+    Details are in [The redemption queue](/how-everstrat-works/redemption-queue).
   </Accordion>
   <Accordion title="Can I cancel a queued exit?">
     Yes, in two situations:
@@ -58,8 +54,8 @@ description: Answers to the most common questions about Everstrat — what it is
     - **After the batch is priced:** an unprocessed request can be cancelled only **strictly more than
       3 days** after pricing. At exactly three days, cancellation is still blocked.
 
-    Processed requests cannot be cancelled; claim their credited ETH instead. Already credited
-    ETH remains claimable after the batch processing window ends.
+    Processed requests cannot be cancelled; claim their credited ETH instead. It stays
+    claimable after the batch processing window ends.
 
     If the settled price has dropped more than your `priceTolerance` below the price at request time,
     the protocol automatically closes your request and returns your EVE — you do not need to take
@@ -91,7 +87,7 @@ description: Answers to the most common questions about Everstrat — what it is
   </Accordion>
   <Accordion title="Has Everstrat been audited?">
     No completed independent audit report was verified in the repositories reviewed on October 11.
-    Tests and model-assisted reviews are not equivalent to independent audit coverage.
+    Tests and internal reviews are not equivalent to independent audit coverage.
     See [Security & audits](/risk-and-trust/security-and-audits).
   </Accordion>
   <Accordion title="What network are the contracts on?">
@@ -111,9 +107,9 @@ description: Answers to the most common questions about Everstrat — what it is
     Already credited ETH can still be claimed, and eligible queued requests can still be cancelled.
   </Accordion>
   <Accordion title="My queued exit is still pending after several days">
-    A still-unprocessed request cannot be paid more than 3 days after pricing. Use the escape hatch
-    to cancel it and recover EVE. If already processed, claim the credited ETH instead.
-    If the batch has not been priced yet, you can cancel at any time.
+    A still-unprocessed request cannot be paid once more than 3 days have passed since pricing.
+    Cancel it to recover EVE; waiting longer will not settle it. If it was already processed,
+    claim the credited ETH instead. If the batch has not been priced yet, you can cancel at any time.
     See the question above on cancelling a queued exit.
   </Accordion>
   <Accordion title="The activity feed is lagging behind my transaction">

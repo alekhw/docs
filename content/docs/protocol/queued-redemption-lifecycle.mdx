@@ -29,13 +29,13 @@ During that window, priced, unprocessed requests contribute a liability and matc
 escrow-supply offset. Processing removes the offsets and reserves ETH for claims.
 
 Unpriced requests can be cancelled at any time. Priced, unprocessed requests can be
-cancelled **strictly after** three days, not at the exact three-day boundary.
-After that processing deadline, an unprocessed request can no longer be paid:
+cancelled only **strictly after** three days; at exactly three days they are still processable.
+After that deadline, an unprocessed request can no longer be paid:
 `pullRequest` reverts with `ExitQueueBatchExpired`. Cancel it to recover EVE; a later redemption
 requires a new request. Expired offsets lapse without a checkpoint reset.
 Processed requests cannot be cancelled and credited ETH remains claimable.
 
-The queue keeper's minimum age since batch creation, not since each request, is separate from this window.
+The queue keeper's minimum batch age is counted from batch creation and is separate from this window.
 There is no guaranteed settlement deadline. See [Keepers](/contracts/keepers-and-automation).
 
 ## Indexing rule

@@ -26,7 +26,7 @@ not principal protection or a guaranteed opportunity to exit before an upgrade.
 | CONVERTER_CALLER_MANAGER | Management of converter caller grants | Converter |
 
 Registered peer checks, such as AMM accepting processing only from Controller, are separate
-from Registry role grants. Oracle configuration requires ADMIN, not a separate oracle-manager role.
+from Registry role grants. Oracle configuration requires ADMIN; there is no separate oracle-manager role.
 
 See [Roles and permissions](/security/roles-and-permissions) and the
 [dated role/address snapshot](/operations/current-deployments#role-holders).
@@ -42,7 +42,7 @@ Immediate SECURITY paths do not wait for the ADMIN delay.
 
 The review window is **not an exit guarantee**. An exit can be paused, depend on NAV
 availability, or need a queue that takes longer than the timelock delay. Cancellation
-returns EVE, not ETH.
+returns EVE and pays no ETH.
 
 ## SECURITY limits and accounting effects
 
@@ -54,7 +54,7 @@ configuration-free emergency authority. `Whitelist.removeSigner()` is another co
 exception: SECURITY can revoke a signer while the Whitelist is enabled, but cannot add a
 signer or disable the Whitelist.
 
-Pausing is per contract, not a global Registry switch. Strategy emergency recovery requires
+Pausing is per contract; pausing the Registry does not pause other contracts. Strategy emergency recovery requires
 the strategy to be paused and permits ADMIN or SECURITY.
 
 Cancellation of an eligible queued request and withdrawal of already claimable ETH

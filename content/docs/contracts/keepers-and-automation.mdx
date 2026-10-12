@@ -18,7 +18,8 @@ Both executors hold Registry `KEEPER_ROLE`. A Mimic smart account must separatel
 allowed by each executor's caller allowlist to invoke `perform`. An empty caller allowlist
 leaves an executor inert. ADMIN manages the allowlist and operational settings.
 
-These are bounded automation workflows, not autonomous agents with unrestricted control.
+These are bounded automation workflows. They can act only through the executor functions
+described below.
 
 ## W1: queue pricing and processing
 
@@ -29,11 +30,12 @@ The executor and protocol re-derive settlement values from on-chain state.
 The shared live-priced-batch cap is **25**. Request processing is also bounded by
 configured user limits and available liquidity. At the
 [dated deployment snapshot](/operations/current-deployments), `minBatchAge()` was **24 hours**.
-That age is measured from batch creation, not each request, pricing, or the user's claim.
+That age is measured from batch creation. A request that joins an older batch does not
+restart it.
 
 Once priced, a batch has a separate three-day processing window. Processing creates
-claimable ETH in AMM; the user still submits the claim transaction. Strictly after the window,
-unprocessed requests cannot be settled and must be cancelled to recover EVE.
+claimable ETH in AMM; the user still submits the claim transaction. Requests left unprocessed
+after the window expire; see [The redemption queue](/how-everstrat-works/redemption-queue).
 
 ## W2: strategy operations
 

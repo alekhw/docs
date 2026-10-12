@@ -20,13 +20,13 @@ Processing, cancellation, and claims have their own timestamps and transaction l
 | Cancellation | EVE returned before pricing or after expiry |
 | Claim | Actual ETH payout, potentially combining multiple redemptions |
 
-Unknown processing results are unavailable, not an assumed successful burn.
+An unknown processing result is shown as unavailable and is never assumed to be a successful burn.
 A claim must not be assigned an invented per-request association.
 
 ## Current actions
 
 Current wallet/claimable balances and request eligibility are read from RPC.
-Claims and cancellations live in Portfolio's Available actions, not in historical event cards.
+Claims and cancellations live in Portfolio's Available actions. Historical event cards do not offer them.
 Discovery of pending requests is independent of Activity pagination.
 
 See [Account details and activity](/app/account-details-and-activity-feed).

@@ -9,9 +9,9 @@ Burns originate from `AMM.exit(requestedEth, maxTokensToBurn, priceTolerance)`.
 
 See the [exit-path diagram](/using-everstrat/exiting-and-redeeming#everstrat-exit-diagram) for the liquidity-dependent branches.
 
-At the [dated deployment snapshot](/operations/current-deployments#exit-liquidity-at-this-block),
-AMM free ETH is zero and routine float top-up is disabled, so new successful exits queue.
-The immediate branch below describes a code capability if that liquidity state changes.
+The immediate branch needs unreserved ETH in the AMM. At the
+[dated deployment snapshot](/operations/current-deployments#exit-liquidity-at-this-block),
+the AMM had none, so new exits take the queued branch.
 
 <Tabs items={["Immediate redemption", "Queued redemption"]}>
   <Tab>
@@ -31,7 +31,5 @@ redemptions. If the keeper-priced batch falls outside that tolerance, the reques
 of redeeming ETH.
 
 `maxTokensToBurn` caps the EVE input before either branch, including queued escrow.
-An unprocessed request strictly more than three days after pricing cannot be processed;
-the user must cancel it to recover EVE. Already credited ETH remains claimable.
 
 Read next: [Queued redemption lifecycle](/protocol/queued-redemption-lifecycle).
