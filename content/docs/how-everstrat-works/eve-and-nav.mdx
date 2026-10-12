@@ -24,8 +24,8 @@ correspondingly more or less ETH. There is no promised return. EVE is not pegged
 
 ## What counts as NAV
 
-Total NAV is the sum of every pool of ETH the protocol controls. Specifically, the StrategyManager's
-`totalNAVInETH()` adds up:
+Total NAV includes the protocol's recoverable assets, less live priced redemption liabilities.
+Specifically, the StrategyManager's `totalNAVInETH()` adds up:
 
 | Component | What it includes |
 | --- | --- |
@@ -35,9 +35,17 @@ Total NAV is the sum of every pool of ETH the protocol controls. Specifically, t
 | AMM free balance | ETH in the AMM contract that is not reserved for pending claims: `address(AMM).balance − lockedForClaims`. |
 | Supported-ERC20 balances on the StrategyManager | The ETH value of each admin-whitelisted ERC-20 held by the StrategyManager, priced via `Oracle.convert`. This term is zero day-to-day and only becomes non-zero in emergencies — for example, after `UniCLStrat.emergencyExit()` leaves a paired-token balance stranded on the StrategyManager. |
 
+From that asset total, it subtracts the ETH liability of priced, unprocessed requests whose batches
+are still inside the 3-day processing window (`liveRedemptionOffsets()`). Unpriced requests remain
+equity; their escrowed EVE is not deducted from NAV. The priced liability expires with the processing
+window, without requiring a reset transaction. AMM pricing also excludes in-window priced redemption
+shares from its live supply denominator.
+
 `lockedForClaims` tracks ETH already owed to users who have had their queued exit processed but have
 not yet called `claim()`. That ETH is excluded from NAV because it is no longer the protocol's to
 deploy.
+
+<DocsDiagram name="nav" />
 
 ## Fail-closed NAV
 
@@ -52,9 +60,11 @@ pricing all freeze until the problem is resolved.
   from the remaining holders. The protocol prefers a temporary freeze over mispricing.
 </Callout>
 
-A frozen strategy can be fixed by the admin (by repairing the strategy's state) or removed entirely
-via `StrategyManager.removeStrategy()`, which uses a try/catch so a reverting `navInETH()` does not
-block removal.
+A broken strategy can be repaired or removed through an authorized recovery path. Normal
+`removeStrategy()` requires a successful NAV read with no material residue; `forceRemoveStrategy()`
+is the emergency path when the NAV read reverts or over-reports. Non-zero supported-token balances
+also require valid Oracle prices; an invalid feed freezes NAV until repaired or the token is removed
+from the supported set.
 
 ## Why this matters to you
 

@@ -3,10 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "next build --turbopack",
+    "build": "bun run diagrams:gen && next build --turbopack",
     "dev": "next dev --turbopack",
     "start": "next start",
     "docs:gen": "fumadocs-mdx",
+    "diagrams:gen": "bun scripts/generate-diagrams.tsx",
     "types:check": "next typegen && tsc --noEmit",
     "postinstall": "fumadocs-mdx",
     "lint": "biome check .",
