@@ -1,41 +1,120 @@
 ---
 title: Current deployments
-description: Current live deployment snapshot from frontend and subgraph configuration.
+description: Ethereum mainnet addresses, live settings, and pending governance operations verified on October 11, 2026.
 ---
 
-## Chain
+## Verification boundary
 
-| Item | Value |
-| --- | --- |
-| Network | Mainnet |
-| Chain ID | `1` |
+This snapshot was checked on **October 11, 2026**, at Ethereum mainnet block
+**26,169,646** (13:56:11 UTC). It describes that block, not an automatically refreshed status.
+The app uses chain ID **1**.
 
-## Contract snapshot
+Entry remains invite-gated: `Whitelist.disabled()` returned `false`.
+A deployed address or a merged PR is not an announcement of unrestricted access.
+
+## Registered contracts
+
+These addresses were checked against `Registry.getContractsAndKeys()`.
+Upgradeable components are listed at their **proxy addresses**, which integrations should call.
 
 | Contract | Address |
 | --- | --- |
-| `REGISTRY` | `0x46AA1bd55c19be90d8767e0C22732A7DD31D993D` |
-| `EVE_TOKEN` | `0x8FE6A43672fCa70d41e112B8426387665fD061EC` |
-| `EXIT_QUEUE` | `0x70E284502e99e150Fde1C07B4E8171ffc365423c` |
-| `CONTROLLER` | `0x9097868dcbda5a630729015DE1ddeCd66d74052c` |
-| `ORACLE` | `0xF5B0C0ab00F92f6B8DC5F6314507FACC9c610c26` |
-| `STRATEGY_MANAGER` | `0x94916ab93C669E7c734f844dB019Ce9449a3b5C9` |
-| `AMM` | `0x42c618D9457BE7cb3b836F7FD3332E2800C48a8b` |
-| `CONVERTER` | `0xc8700441A8ca74aE5390F137bf3Dd659CaD570de` |
-| `WHITELIST` | `0x225B517a68A869020D99F51fFf0Ab43D47Ce3B48` |
-| `TIMELOCK` | `0xF0911198Ef0a4b4234546fa5F50d6d1D45091774` |
-| `QUEUE_KEEPER_EXECUTOR` | `0xb7D76E4334e9E23B6edFF77e0C05B07E938a090B` |
-| `STRATEGY_KEEPER_EXECUTOR` | `0xE94F714fbBF85c421b6FB80D3Ce0DFA20110EA29` |
+| Registry | `0x46AA1bd55c19be90d8767e0C22732A7DD31D993D` |
+| EVE | `0x8FE6A43672fCa70d41e112B8426387665fD061EC` |
+| AMM | `0x42c618D9457BE7cb3b836F7FD3332E2800C48a8b` |
+| Controller proxy | `0x9097868dcbda5a630729015DE1ddeCd66d74052c` |
+| StrategyManager proxy | `0x94916ab93C669E7c734f844dB019Ce9449a3b5C9` |
+| Oracle proxy | `0xF5B0C0ab00F92f6B8DC5F6314507FACC9c610c26` |
+| ExitQueue proxy | `0x70E284502e99e150Fde1C07B4E8171ffc365423c` |
+| Converter proxy | `0xc8700441A8ca74aE5390F137bf3Dd659CaD570de` |
+| Whitelist | `0x225B517a68A869020D99F51fFf0Ab43D47Ce3B48` |
+| Timelock | `0xF0911198Ef0a4b4234546fa5F50d6d1D45091774` |
+| QueueKeeperExecutor | `0xb7D76E4334e9E23B6edFF77e0C05B07E938a090B` |
+| StrategyKeeperExecutor | `0xE94F714fbBF85c421b6FB80D3Ce0DFA20110EA29` |
 
-## Current subgraph
+## Live settings
 
-`https://api.goldsky.com/api/public/project_cm7aaq2gvh5ak01wf890nferb/subgraphs/everything-strategy-mainnet/prod/gn`
+| Getter | Result at the snapshot block | Meaning |
+| --- | --- | --- |
+| `AMM.connectorWeight()` | `0.9 × 10^18` | Entry price is base price divided by 0.9 |
+| `AMM.minBatchExitETH()` | `0.001 ETH` | Minimum for a queued exit, not a universal mint minimum |
+| `StrategyManager.performanceFeeBps()` | `1500` | 15% of eligible realized strategy fees; not 15% of deposits |
+| `StrategyManager.daoTreasury()` | `0x1780C78eB50cD28dC349CEA8452eD1F7206D8fF9` | Recipient of fee EVE |
+| `Timelock.getMinDelay()` | `172800 seconds` | 48-hour scheduling delay |
+| `Controller.version()` | `1.0.0` | The proposed 1.1.0 upgrade was not executed |
+| Both keeper executors' `version()` | `2.1.0-mimic` | Mimic executor contracts |
+| `QueueKeeperExecutor.minBatchAge()` | `86400 seconds` | 24 hours before automatic batch pricing |
+| `StrategyKeeperExecutor.controllerReserveETH()` | `0.05 ETH` | Controller reserve target |
+| `StrategyKeeperExecutor.minWithdrawETH()` | `0.0001 ETH` | Strategy withdrawal threshold |
+| `StrategyKeeperExecutor.exitLiquidityTargetETH()` | `0` | Automatic AMM float top-up disabled |
+| `Whitelist.disabled()` | `false` | Invite checks remain active |
 
-## Source of truth
+The three-day queue processing window starts **after pricing**, independently of the
+keeper's 24-hour minimum batch age.
 
-These values are copied from `frontend-app/web3-app/src/config/index.ts`, which reads
-`frontend-app/web3-app/subgraph/config/deployments/mainnet.json` and is kept in sync with
-`frontend-app/web3-app/subgraph/src/config.ts` via `scripts/sync-config.mjs`. If this page ever
-disagrees with those files, the config files are correct and this page is stale.
+## Registered strategies
 
-For the user-facing view, see [Contract addresses](/reference/contract-addresses).
+`StrategyManager.strategies()` returned these four v1 strategy addresses.
+Registration does not guarantee that a strategy is healthy, funded, or executing at every moment.
+
+| Pool | Fee tier | Registered strategy |
+| --- | --- | --- |
+| USDC/WETH | 0.30% | `0x5E12FFD5e0F69d37B581D06b68ad6c53609cac38` |
+| USDC/WETH | 0.01% | `0x59C476c1817b23791d96F35b9f468E6d9A242252` |
+| WETH/USDT | 0.30% | `0x3Fb6B9174427CA4FF38728398F4F4CB526F66501` |
+| UNI/WETH | 0.30% | `0x956fE55DB50527E75c1fcA679adE509AD89cAFDd` |
+
+## Role holders
+
+| Registry role | Holders |
+| --- | --- |
+| `ADMIN_ROLE` | Timelock |
+| `SECURITY_ROLE` | `0x7c128C1CF39822B4133F8E067F4bF14999c49846` |
+| `KEEPER_ROLE` | QueueKeeperExecutor and StrategyKeeperExecutor |
+| `MINTER_ROLE` | AMM and StrategyManager |
+| `DEFAULT_ADMIN_ROLE` | No holders |
+
+Both executors allow the Mimic caller `0x41153f0c36f8Fb5c38396573dDB487AC95a98256`.
+This is an executor caller allowlist, not a direct `KEEPER_ROLE` grant to that account.
+Allowlisting alone does not prove uninterrupted off-chain task execution.
+
+## Pending migration
+
+| Governance record | Chain state at the snapshot | Effect if executed |
+| --- | --- | --- |
+| [018: Controller 1.1.0](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/018-controller-upgrade-v1.1.0) | **Ready**, not executed | Adds ADMIN access to the single-strategy withdrawal function |
+| [019: register v2 strategies](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/019-strategy-manager-register-unicl-v2-strategies) | **Unset**, not scheduled | Adds four v2 replacements; does not remove v1 |
+| [020: drain and remove v1](https://github.com/everstrat-xyz/governance/tree/047f8e30136d127851a59c41cadf9f38e391a379/020-strategy-manager-drain-remove-unicl-v1-strategies) | All four operations **Unset**, not scheduled | Withdraws from and removes the old strategies |
+
+Record 018 became executable on October 11 at 12:07:59 UTC.
+Its proposed implementation is `0xd4f4152a887253CFdD23d0289951176Ec13cd55D`;
+the proxy still used `0x6bf777b1173b49173cce5ec82505ebd7ce5cbefc` at the snapshot.
+
+The v2 strategy addresses recorded in governance were deployed but **not registered** at this block:
+
+| Pool | Proposed v2 address |
+| --- | --- |
+| USDC/WETH 0.30% | `0xfbcC73fA67F50D38FB318991C6CAbD5A6f64014A` |
+| USDC/WETH 0.01% | `0x63B68CC99991429CA8a808125e446990Ae7fe669` |
+| WETH/USDT 0.30% | `0xE80bfd65A55855ead8Cb5f7040031426CB718Cc5` |
+| UNI/WETH 0.30% | `0xFC888a499c4172e393A258FbC6cAd1475a7e4129` |
+
+Registration in 019 can precede the Controller upgrade. The drain transactions in 020
+need 018 executed for ADMIN withdrawal authorization, and use 019 as their timelock predecessor.
+The basket can temporarily contain both generations. Do not describe migration as complete
+until execution receipts and the strategy list confirm it.
+
+## Data and source references
+
+Current app configuration uses the
+[Goldsky mainnet subgraph](https://api.goldsky.com/api/public/project_cm7aaq2gvh5ak01wf890nferb/subgraphs/everything-strategy-mainnet/prod/gn).
+
+Addresses and deployment configuration are maintained in
+[everstrat-xyz/app](https://github.com/everstrat-xyz/app), at
+`src/config/index.ts` and `subgraph/config/deployments/mainnet.json`.
+Proposals and execution receipts live in
+[everstrat-xyz/governance](https://github.com/everstrat-xyz/governance).
+
+For current authorization and settings, read the contracts at a pinned block.
+For intended changes, read the proposal. Neither repository main nor this dated page
+automatically proves a transaction has executed.

@@ -5,9 +5,10 @@ description: The minimum event and entity set required to integrate with fronten
 
 ## Event Families That Matter
 
-- approval events on EVE
-- mint and redemption events on AMM
+- approvals and transfers on EVE
+- mint, redemption, and claim events on AMM
 - queue state events on ExitQueue
+- whitelist access events and timelock operation events
 
 ## Entity Families That Matter
 
@@ -15,6 +16,9 @@ description: The minimum event and entity set required to integrate with fronten
 - `UserActivity`
 - `ExitBatch`
 - `RedemptionRequest`
+
+Additional transfer, metric, access, and governance entities are listed in [Entities](/data/entities).
+Processing credit and actual ETH claim are separate events; do not count both as payouts.
 
 ## Integration Advice
 

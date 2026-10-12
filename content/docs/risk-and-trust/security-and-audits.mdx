@@ -1,98 +1,79 @@
 ---
 title: Security & audits
-description: The honest state of third-party review and the security model built into the protocol design.
+description: Evidence-based review coverage and the protections actually present in the deployed protocol.
 ---
 
-<Callout type="warn" title="Testing phase — treat as a test protocol">
-  Everstrat is deployed on **Ethereum mainnet** (chain id 1), but it is in a **testing phase** and
-  should be treated as a **test protocol**. Entry is invite-gated and the software is experimental.
-  Do not deposit more than you can afford to lose entirely.
+<Callout type="warn" title="No completed third-party audit report verified">
+  The repositories inspected on October 11, 2026 did not contain a completed independent
+  audit report identifying an auditor, reviewed commit, deployment coverage, and remediation
+  status. Do not describe the protocol as independently audited on the strength of tests,
+  model-assisted reviews, or audit-fix PR titles.
 </Callout>
 
-## Audit status
+## Review coverage
 
-<Callout type="warn" title="No audit">
-  No third-party audit report is documented in this repository. The smart-contracts README references an
-  internal design designation ("PL-003") for the timelock governance model, but no formal audit artifact
-  — no report, no auditor, no engagement — is present in the codebase. Everstrat is in a testing
-  phase. Treat the contracts as unaudited.
-</Callout>
+Public development history contains review-driven fixes and tests. Those are useful evidence
+of engineering work, but do not substitute for an independent audit report.
+This documentation audit did not establish whether an engagement exists outside the reviewed
+repositories. It does not certify the deployed protocol or the proposed v2 migration.
 
-If an audit is completed in future, it will be linked here with the report artifact and the auditor's
-name. Until then, the responsible position is: no external review has been documented.
+When a report is published, link its artifact, auditor, exact code revision, covered contracts,
+and remediation status. Coverage of v1 does not automatically cover a different v2 build.
 
-## Security model
+## Immutable core and configurable dependencies
 
-The protocol's security design relies on a layered set of mechanisms rather than a single point of
-protection. Each is described below.
+EVE, AMM, Registry, and individual UniCL strategy instances have fixed deployed bytecode.
+Controller, StrategyManager, ExitQueue, Oracle, and Converter are upgradeable.
+The timelock held ADMIN and had a 48-hour delay at the
+[October 11 snapshot](/operations/current-deployments).
 
-### Immutable core
+Fixed AMM code is not a guarantee that its inputs remain unchanged: Registry peers, NAV
+logic, oracle feeds, connector weight, and other settings can change through authorized paths.
+Performance-fee configuration and treasury EVE minting live in StrategyManager.
 
-EVE, AMM, UniCLStrat, and the Registry are static (non-upgradeable) contracts. Their code is fixed at
-deployment. This means:
+## Emergency authority
 
-- The bonding curve formulas for enter (premium price) and exit (base price) cannot be changed.
-- The AMM's fee structure (currently no protocol fee on enter or exit) cannot be changed.
-- The UniCLStrat's position management and per-strategy settlement logic (its side of the
-  performance fee — measuring accrued Uniswap V3 trading fees and reporting an ETH-equivalent
-  amount to the StrategyManager) cannot be changed. The fee **rate**, cap, and the EVE-mint
-  settlement that actually dilutes holders live on the upgradeable StrategyManager.
-- The Registry's address-resolution and role-check logic cannot be changed (the addresses and roles it
-  stores remain admin-configurable, behind the timelock).
+ADMIN or SECURITY can pause designated modules and use designated emergency paths.
+SECURITY also has the specific ability to remove supported ERC-20s from StrategyManager
+accounting. It cannot unpause or authorize upgrades.
 
-There is no admin key that can alter these contracts' code.
+Pauses block normal entry, exit, and relevant operational calls.
+They do not block AMM's claim or eligible cancellation paths.
+The timelock is a review window, not a guarantee that an exit will settle before a change.
 
-### Upgradeable management contracts behind a 48-hour timelock
+## Fail-closed valuation
 
-Controller, StrategyManager, ExitQueue, Oracle, and Converter are UUPS-upgradeable. All upgrades
-require ADMIN_ROLE authorization. ADMIN_ROLE is intended to be held by a 48-hour `TimelockController` —
-every upgrade or configuration change must wait 48 hours from announcement before it can execute.
+A registered strategy NAV revert propagates into total NAV.
+An invalid feed for a nonzero supported-token balance can also block valuation.
+Normal mints, burns, and batch pricing may then fail rather than trade at an unverifiable NAV.
 
-The timelock delay is your reaction window. See [Trust & governance](/risk-and-trust/trust-and-governance)
-for the full role breakdown.
+This does not mean all protocol functions stop. Claims and eligible cancellations do not
+require fresh NAV. A paused strategy can still report NAV if its view remains functional.
 
-### Emergency pause (SECURITY_ROLE)
+Ordinary strategy removal requires NAV at most 10 wei and a successful NAV read.
+ADMIN's force-removal path can remove a strategy despite a failed read or residual assets.
+It does not recover those assets, and their value is no longer included in the registered basket.
 
-A security multisig holds SECURITY_ROLE. It can pause AMM, Controller, ExitQueue, StrategyManager,
-UniCLStrat, and Registry immediately — no timelock, because emergency response must be fast. A paused
-protocol freezes deposits, withdrawals, and strategy operations.
+## Actual price and execution protections
 
-The security multisig cannot unpause, reconfigure, or upgrade anything. Unpausing requires ADMIN_ROLE,
-which goes through the 48-hour timelock.
+AMM checks the user's mint minimum, immediate-burn maximum, and queued price tolerance.
+Queued settlement outside tolerance returns EVE rather than crediting ETH.
+The queue bounds live priced batches to 25.
 
-The security multisig also holds the CANCELLER role on the timelock, giving it the ability to veto a
-queued admin action before it executes.
+There is **no deployed AMM 5% rolling-price checkpoint guard or checkpoint-reset action**.
+UniCL pool/TWAP checks are strategy-level controls, not an AMM-wide guarantee against NAV changes.
 
-### Fail-closed NAV
+## Pull-based claims
 
-If any registered strategy's `navInETH()` call reverts, the protocol's total NAV calculation reverts.
-Deposits, withdrawals, and price updates all freeze until the strategy is fixed or removed by
-governance. This is a safety-first design: the protocol refuses to operate at an unverifiable price, at
-the cost of temporary unavailability.
+Processing credits ETH to AMM's claimable balance, and reserves it in `lockedForClaims`.
+The user calls `claim()` separately. This avoids pushing ETH to every recipient during
+batch processing, but claim submission still depends on the user's wallet and gas.
 
-### Price-deviation guard
+## Automation boundary
 
-Every enter and exit checks the current EVE price against a recent checkpoint. If the price has moved
-more than the configured maximum (default 5%) since the last block-level checkpoint, the transaction
-reverts. This prevents manipulation via rapid price swings. The checkpoint moves at most once per block
-to prevent chaining multiple deviation steps.
+Mimic functions call allowlisted keeper executors. Execution values are re-derived on-chain;
+off-chain payloads do not supply authoritative NAV or settlement amounts.
+Availability still depends on tasks, funding, RPC, gas policies, feeds, and contract eligibility.
 
-Recovery from a deviation revert requires `ADMIN_ROLE` or `SECURITY_ROLE` to reset the checkpoint.
-
-### Pull-over-push claims
-
-When a queued exit batch is processed, ETH is credited to each user's claimable balance rather than
-pushed directly to their address. Users call `claim()` to withdraw. This avoids the reentrancy and
-griefing risks that come with pushing ETH to arbitrary addresses.
-
-### priceTolerance guard on queued exits
-
-When you submit a queued exit, you specify a `priceTolerance`. If the EVE price at settlement has
-fallen more than that tolerance below the price when you submitted, the request is closed and your EVE
-is returned. This protects you from being settled at a significantly worse price than you expected, but
-it also means your exit request may fail and need to be resubmitted.
-
----
-
-For what these mechanisms mean in practice as a user, see [Key risks](/risk-and-trust/key-risks) and
-[Trust & governance](/risk-and-trust/trust-and-governance).
+See [Keepers and automation](/contracts/keepers-and-automation),
+[Key risks](/risk-and-trust/key-risks), and [Trust & governance](/risk-and-trust/trust-and-governance).

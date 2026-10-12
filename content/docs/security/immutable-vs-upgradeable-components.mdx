@@ -7,6 +7,8 @@ description: Which contracts are intentionally static and which use UUPS proxies
 
 - `EVE`
 - `AMM`
+- `Registry`, `Whitelist`, and the keeper executors
+- each deployed UniCL strategy instance
 
 These contracts are treated as the “code is law” core.
 
@@ -16,8 +18,13 @@ These contracts are treated as the “code is law” core.
 - `ExitQueue`
 - `StrategyManager`
 - `Oracle`
+- `Converter`
 
 These contracts use UUPS and therefore depend on `ADMIN_ROLE` for upgrade authorization.
+
+Fixed bytecode does not mean fixed configuration. Registry peers, roles, feeds, routes,
+and parameters can still change. A new immutable strategy must be deployed and registered,
+not upgraded in place. See [Current deployments](/operations/current-deployments).
 
 ## Design Tradeoff
 

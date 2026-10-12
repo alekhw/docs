@@ -1,30 +1,37 @@
 ---
 title: Mint flow
-description: Protocol-level view of how ETH deposits become EVE through the AMM.
+description: Native ETH entry, invite authorization, premium pricing, and EVE minting.
 ---
 
-## Contract Path
+## Contract path
 
-The live frontend submits `AMM.enter(minTokensToMint)` with native ETH.
+AMM accepts native ETH as `msg.value`.
+`enter(minTokensToMint)` is the standard path for users authorized to enter.
+During the invite period, a new invited user submits
+`enterWithInvite(minTokensToMint, inviteId, deadline, signature)`.
 
 See the [deposit and mint sequence diagram](/using-everstrat/depositing-and-minting#everstrat-mint-diagram) for the normal deposit path.
 
 ## Sequence
 
-<Steps>
-  <Step>User provides ETH and signs the transaction.</Step>
-  <Step>AMM validates paused state and pricing constraints.</Step>
-  <Step>If the protocol is not yet bootstrapped, the bootstrap path runs.</Step>
-  <Step>EVE is minted to the user and ETH moves into protocol custody.</Step>
-</Steps>
+1. The app verifies chain, input, and invite state and asks the wallet to sign.
+2. AMM checks pauses, whitelist authorization, and the minimum output.
+3. On a bootstrapped deployment, AMM prices the deposit from net NAV and live supply,
+   excluding the just-arrived deposit from the pre-entry pricing basis.
+4. EVE is minted to the user and the deposited ETH is forwarded to Controller.
 
-## Pricing Notes
+The historical first-deposit bootstrap path has separate initial-supply and USD minimum rules.
+It is not the normal minimum for a later user's mint.
 
-- premium price is user-facing for mint UX
-- minimum output is protected by frontend slippage handling
-- oracle is not part of the normal enter execution path
+## Pricing dependencies
 
-## Data Notes
+Entry price is `NAV / (liveSupply × connectorWeight)`.
+The contract enforces the submitted `minTokensToMint`; frontend estimates alone are not protection.
 
-Mints appear in the subgraph as either `BOOTSTRAP_MINT` or `MINT`, and both update user aggregate
-deposit and minted-token totals.
+NAV can depend on token feeds and strategy pool TWAPs. Normal minting is therefore
+not oracle-independent, even though ETH/USD conversion is not directly required for every entry.
+
+## Indexed data
+
+Bootstrap mints and later mints have distinct event types and update indexed deposit/mint totals.
+A submitted transaction is not a confirmed mint until the receipt is known.

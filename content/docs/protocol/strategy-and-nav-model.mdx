@@ -1,32 +1,35 @@
 ---
 title: Strategy and NAV model
-description: How StrategyManager, Controller, and Oracle support ETH-first NAV and strategy operations.
+description: Net ETH accounting, live supply, weighted strategy allocation, and oracle dependencies.
 ---
 
-## NAV Model
+## Accounting
 
-The protocol calculates NAV in **ETH first**:
+```text
+gross assets = strategy NAVs + StrategyManager ETH + Controller ETH
+               + AMM free ETH + supported ERC-20 value held by StrategyManager
+net NAV = gross assets - in-window priced queued ETH liabilities
+live supply = total EVE supply - matching priced queued EVE
+base price = net NAV / live supply
+```
 
-- total strategy NAV in ETH
-- plus idle ETH on StrategyManager, Controller, and the AMM (excluding locked claims)
-- plus the ETH value of supported ERC-20 balances on StrategyManager
-- minus in-window priced redemption liabilities
-
-USD views are derived later through Oracle conversion.
+AMM free balance excludes ETH already locked for processed claims. Unpriced queued EVE remains
+equity. Priced outstanding requests are excluded during their processing window; those offsets
+lapse after expiry. See [EVE & NAV](/how-everstrat-works/eve-and-nav).
 
 See the [NAV and EVE pricing diagram](/how-everstrat-works/eve-and-nav#everstrat-nav-diagram).
 
-## StrategyManager Responsibilities
+## Strategy allocation
 
-- track registered strategies
-- distribute ETH based on safety levels
-- withdraw or queue withdrawals based on withdrawal priorities
-- rebalance unhealthy strategies
+Governance sets independent deposit and withdrawal weights, each in `0..100`. A zero weight
+excludes the strategy from that batch path. Routine operations come from the registered
+Controller, subject to strategy capacity and eligibility.
 
-## Why This Matters To Pricing
+## Valuation dependency
 
 AMM price functions consume protocol NAV in ETH. They do not directly request an ETH/USD quote
-for normal entry or exit; NAV computation can still depend on Oracle feeds for non-ETH assets.
+for normal entry or exit; asset valuation can require Oracle feeds and pool TWAP data.
+A required NAV read failure can block minting, redemption, and batch pricing.
 
 Read more in [StrategyManager](/contracts/strategy-manager) and
-[Trust assumptions](/security/trust-assumptions).
+[Strategies & yield](/how-everstrat-works/strategies-and-yield).

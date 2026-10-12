@@ -1,19 +1,38 @@
 ---
 title: Roles, permissions, and admin powers
-description: Governance-oriented view of who can upgrade, pause, configure, or process core flows.
+description: Timelocked governance, immediate emergency powers, and pending upgrades.
 ---
 
-## Admin Powers
+## Governance authority
 
-- authorize UUPS upgrades on management contracts
-- pause and unpause where supported
-- manage strategies on `StrategyManager`
-- grant `KEEPER_ROLE`
-- manage Oracle feed configuration through `ORACLE_MANAGER_ROLE`
+The mainnet Registry grants `ADMIN_ROLE` to the timelock at
+`0xF0911198Ef0a4b4234546fa5F50d6d1D45091774`. Its minimum delay is **172,800 seconds (48 hours)**
+at the [dated deployment snapshot](/operations/current-deployments).
 
-## Security Posture
+Governance can configure the connector weight, queued-exit minimum, feeds, supported assets,
+strategy weights, performance-fee rate, treasury, and keeper parameters. It can register or remove
+strategies, grant roles, unpause modules, and authorize UUPS upgrades.
 
-`DEFAULT_ADMIN_ROLE` is intended as a temporary setup role. The safer steady state is to rely on
-`ADMIN_ROLE` and narrower operational roles instead of leaving setup authority in place.
+A proposal in the DAO Safe is not yet a scheduled timelock operation. The delay starts when
+the scheduling transaction executes. A Ready operation still needs an execution transaction.
 
-For function-level detail, see [Roles and permissions](/security/roles-and-permissions).
+## Emergency authority
+
+`SECURITY_ROLE` permits pause and designated emergency recovery actions without the timelock.
+It does not authorize UUPS upgrades or unpause. One narrow configuration exception is
+`StrategyManager.removeSupportedERC20()`, which either ADMIN or SECURITY may call to exclude
+a supported token balance from NAV. This can restore accounting availability while reducing
+reported backing; it does not recover the excluded asset.
+
+A 48-hour review window does not guarantee a completed exit before execution. Queue timing,
+liquidity, and pauses can make an exit take longer.
+
+## Pending protocol migration
+
+At the snapshot, Controller 1.0.0 is still active. Proposal 018 is Ready and would allow
+`withdrawFromStrategy()` to be called by ADMIN as well as KEEPER. Proposals 019 and 020
+register UniCL v2 and drain/remove v1 respectively; they remain proposed and unscheduled.
+See [Current deployments](/operations/current-deployments) for operation states.
+
+Sources: [governance records](https://github.com/everstrat-xyz/governance)
+and [Roles and permissions](/security/roles-and-permissions).

@@ -1,33 +1,34 @@
 ---
 title: Interfaces and libraries
-description: Interfaces and support libraries that define contract boundaries in the repository.
+description: Contract boundaries for the registry, NAV, strategies, conversions, and queue.
 ---
 
-## Interfaces
+Interfaces are in `src/interfaces` in
+[everstrat-xyz/contracts](https://github.com/everstrat-xyz/contracts).
 
-- `IAMM`
-- `IController`
-- `IEVE`
-- `IExitQueue`
-- `IOracle`
-- `IStrategy`
-- `IStrategyManager`
+Important boundaries include `IAMM`, `IController`, `IEVE`, `IExitQueue`,
+`IOracle`, `IRegistry`, `IConverter`, `IStrategy`, and `IStrategyManager`.
+Registry lookups distinguish registered peer authorization from role membership.
 
-## Why They Matter
+## Strategy contract boundary
 
-Interfaces formalize:
+`IStrategy` defines:
 
-- controller-to-manager coordination
-- AMM-to-queue coordination
-- strategy requirements for registration
-- oracle lookup expectations
+- identity, version, genesis timestamp, and deposited/withdrawn totals
+- ETH NAV, health, pause state, and deposit/withdrawal capacity
+- `deposit`, `investIdleETH`, `withdraw`, `rebalance`, and `sync`
+- pending and settled performance-fee calculations
+- an ADMIN emergency exit
 
-## Strategy Contract Boundary
+It does **not** define a safety score, withdrawal-priority field, or a generic queued
+strategy withdrawal hook. StrategyManager's deposit and withdrawal weights are separate
+registration parameters in the range 0–100.
 
-`IStrategy` is especially important because it defines:
+## Shared libraries
 
-- metadata
-- safety level
-- withdrawal priority
-- ETH NAV reporting
-- deposit / withdraw / queue / rebalance hooks
+`Auth` defines Registry keys and role identifiers. `Math` provides pricing arithmetic.
+`ExitQueueLimits` defines the 25-live-priced-batch limit shared by queue and executor scans.
+
+The proposed v2 UniCL strategies use a linked `UniCLStratLib` for strategy calculations.
+A merged library or strategy change is not automatically live on existing immutable strategy
+instances. See [Pending migration](/operations/current-deployments#pending-migration).

@@ -24,7 +24,8 @@ This design means:
   configuration. Other contracts just query the Registry at call time.
 - **Roles** (ADMIN, KEEPER, SECURITY, MINTER, …) are all managed in one place, making permission
   audits straightforward.
-- **A paused Registry** freezes all mutations across the protocol in a single action.
+- **A paused Registry** blocks calls that use the shared pause gate. AMM claims and eligible
+  cancellations remain callable; pausing is not a blanket freeze of all mutations.
 
 <DocsDiagram name="architecture" />
 
@@ -35,12 +36,12 @@ This design means:
 | **Registry** | No (immutable) | Protocol address book and role authority. Every contract resolves peers and checks roles through it; its logic is fixed, while the addresses and roles it stores are admin-configurable. |
 | **AMM** | No (immutable) | User entry and exit point. Runs the bonding curve, mints/burns EVE, manages immediate vs. queued exits. |
 | **EVE** | No (immutable) | The ERC-20 token that represents your proportional share of the protocol's NAV. |
-| **Controller** | Yes (UUPS proxy) | Receives deposited ETH from the AMM. A keeper bot drives distribution to strategies, withdrawal from strategies, and redemption-queue operations. |
+| **Controller** | Yes (UUPS proxy) | Receives deposited ETH from the AMM. Authenticated keeper executors drive distribution to strategies, withdrawal from strategies, and redemption-queue operations. |
 | **StrategyManager** | Yes (UUPS proxy) | Registers strategies, routes funds in and out, and computes total NAV by aggregating each strategy's `navInETH()`. |
 | **ExitQueue** | Yes (UUPS proxy) | Manages batches of queued redemption requests when the AMM lacks free ETH to pay immediately. |
-| **Oracle** | Yes (UUPS proxy) | Wraps Chainlink ETH/USD and strategy-asset price feeds. Used for bootstrap validation, USD-denominated view prices, and strategy asset valuation — **not** in the enter/exit hot path. |
+| **Oracle** | Yes (UUPS proxy) | Wraps Chainlink ETH/USD and strategy-asset price feeds. Used for token valuation, bootstrap validation, and USD views. Entry/exit depend indirectly on it through NAV. |
 | **Converter** | Yes (UUPS proxy) | Shared DEX swap and WETH wrap/unwrap module used by strategies. Centralises routing so strategies don't each integrate a DEX directly. |
-| **UniCLStrat** | No (immutable) | The first strategy. Deploys pooled ETH into a Uniswap V3 concentrated-liquidity position and reports NAV back to the StrategyManager. |
+| **UniCLStrat** | No (immutable) | The registered strategy family. Deploys pooled ETH into a Uniswap V3 concentrated-liquidity position and reports NAV back to the StrategyManager. |
 
 ## Immutable vs. upgradeable
 
@@ -66,7 +67,7 @@ For the full role breakdown and governance model, see
     forwards your ETH to the Controller.
   </Step>
   <Step>
-    **Deployment.** A keeper calls the Controller, which routes ETH through the StrategyManager into
+    **Deployment.** A Mimic function calls an allowlisted keeper executor, which calls Controller, which routes ETH through the StrategyManager into
     registered strategies. Strategies deploy capital into yield sources (currently Uniswap V3
     concentrated liquidity via UniCLStrat).
   </Step>

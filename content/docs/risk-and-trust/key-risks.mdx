@@ -1,119 +1,89 @@
 ---
 title: Key risks
-description: A plain account of what can go wrong when you hold or transact EVE. None of these risks are downplayed.
+description: Capital, valuation, governance, liquidity, and automation risks for EVE holders.
 ---
 
-<Callout type="warn" title="Testing phase — treat as a test protocol">
-  Everstrat is deployed on **Ethereum mainnet** (chain id 1), but it is in a **testing phase** and
-  should be treated as a **test protocol**. Entry is invite-gated, the software is experimental and
-  unaudited, and deposits are real ETH at real risk. Do not deposit more than you can afford to
-  lose entirely.
+<Callout type="warn" title="Experimental mainnet deployment">
+  Entry is invite-gated. Deposits are real ETH at real risk. No principal protection or
+  guaranteed return exists; do not deposit more than you can afford to lose entirely.
 </Callout>
 
-Understanding these risks is part of using the protocol. Each one is described plainly below — what it
-is and what it means for you.
+## NAV and capital losses
 
-## NAV can fall
+EVE's redemption price follows net NAV per live share. Strategy losses, token price changes,
+execution costs, accounting errors, and vulnerabilities can reduce that value.
+Deposits growing aggregate NAV do not establish investment returns.
 
-<Callout type="warn">
-  EVE's value tracks the portfolio's net asset value (NAV). If the strategy portfolio loses value,
-  every EVE token is worth less ETH. There is no principal protection, no floor price, and no guarantee
-  of recovery.
-</Callout>
+## Concentrated-liquidity exposure
 
-Your ETH is deployed into on-chain strategies. Those strategies can produce losses. When they do, the
-NAV falls and so does the ETH you would receive on exit.
+The registered strategies at the [October 11 snapshot](/operations/current-deployments)
+use four Uniswap v3 pools. Concentrated LP positions can underperform holding their
+underlying assets, lose value, or require swaps to satisfy ETH withdrawals.
 
-## Impermanent loss
+They share the UniCL strategy family and infrastructure. Not every deployed instance has
+identical bytecode, but shared logic, Uniswap dependence, feeds, and market exposures mean
+four pools do not provide four independent risk systems.
+Paired-token amounts are range-dependent, not a fixed 50/50 allocation.
 
-<Callout type="warn">
-  The current active strategy (UniCLStrat) provides concentrated liquidity on Uniswap V3. In volatile
-  markets, concentrated LP positions can underperform simply holding the underlying assets — this is
-  impermanent loss.
-</Callout>
+## Exit delays
 
-Impermanent loss is not a failure of the protocol; it is an inherent property of providing liquidity
-across a price range. If the market moves sharply, you may exit with less ETH-equivalent value than if
-you had held outside the protocol.
+If AMM has insufficient free ETH, an exit is queued. The Mimic queue and strategy tasks must
+price requests and make liquidity available for processing. Gas caps, outages, failed reads,
+pauses, strategy capacity, and liquidity conditions can delay this work.
 
-## Single-contract concentration
+The snapshot's queue keeper minimum age was 24 hours before automatic pricing.
+After pricing, a separate three-day processing window applies.
+Neither is a promise that ETH will arrive at the end of that period.
 
-<Callout type="warn">
-  Today essentially all pooled capital flows into UniCLStrat. It is spread across four Uniswap V3
-  pools, one UniCLStrat instance per pool, but every instance runs the same contract code. A bug in
-  UniCLStrat could affect all protocol NAV deployed to strategies, and the pools share similar market
-  exposure, so the spread across pools offers only limited diversification.
-</Callout>
+An unpriced request can be cancelled. A priced, unprocessed request can be cancelled
+**strictly more than three days after pricing**. Cancellation returns EVE, not ETH;
+processed requests instead require a separate claim transaction.
 
-Strategies built on different code may be added in future, which would change this profile — but that
-change requires governance action and is not guaranteed.
+Automatic AMM immediate-liquidity top-up was disabled at the snapshot.
+Do not assume an always-funded immediate-exit buffer.
 
-## Exit queue delays
+## Settlement price and slippage
 
-<Callout type="warn">
-  If the AMM does not have enough free ETH to fulfil your exit immediately, your exit request is placed
-  in a queue. You may have to wait for the keeper bot to process it. If the keeper goes offline, your
-  ETH is not immediately accessible.
-</Callout>
+A queued exit is priced later than submission. A final batch price outside the user's
+`priceTolerance` causes EVE to be returned when the request is processed, rather than
+settling ETH. Wider tolerance accepts more downside; narrower tolerance can prevent an exit.
 
-The protocol provides an escape hatch: if a batch has been priced for more than 3 days without being
-processed, you can call `cancelRedemption` to recover your EVE tokens. You receive EVE back — not ETH.
-You would then need to attempt a new exit.
+Mint and immediate-burn bounds protect execution against the user's limits.
+The deployed AMM does **not** provide a 5% checkpoint guard or a principal-loss limit.
 
-The escape hatch is also available at any time before a batch has been priced (no time constraint
-applies then).
+## Oracle and pool dependence
 
-## Queued-exit slippage
+Normal ETH entry and exit read StrategyManager NAV. That NAV can depend on token price
+feeds and pool TWAPs even when no direct ETH/USD conversion is performed by AMM.
+Stale, invalid, or unavailable valuation inputs can therefore block normal trading and batch pricing.
 
-When your exit is queued, the price used for settlement is determined later — when the keeper prices
-the batch. If the EVE price at settlement has fallen more than your chosen `priceTolerance` below the
-price at request time, the request is closed and your EVE is returned. You do not exit that round and
-must try again.
+USD displays and the historical bootstrap minimum also have direct oracle dependencies.
+ETH-denominated accounting should not be described as oracle-free.
 
-Setting a wider `priceTolerance` makes settlement more likely but exposes you to more price movement.
-Setting it narrow protects you from settlement at a much worse price, but increases the chance of your
-request being closed.
+## Valuation failure and removal
 
-## Oracle dependence (limited)
+A failed registered strategy NAV read can block aggregate NAV. Claims and eligible
+cancellations remain available without fresh NAV, so this is not a universal shutdown.
 
-Normal deposits and withdrawals do not use the oracle. However, the oracle **is** used for:
+Recovery may require governance. Force-removing a strategy or removing a supported ERC-20
+from accounting does not recover its capital; it removes that value from reported NAV.
+This is an accounting and governance risk, not merely an availability fix.
 
-- The bootstrap USD minimum check ($1,000 minimum initial deposit)
-- USD-denominated price views in the frontend
-- Strategy asset valuation within UniCLStrat
+## Governance and upgrade risk
 
-If the Chainlink price feed becomes stale or malfunctions, these paths can be blocked. Deposits and
-redemptions that trigger these checks would be unavailable until the feed recovers.
+ADMIN controls registered peers, strategies, feeds, fees, and upgradeable management code.
+SECURITY has immediate designated emergency authority.
+A 48-hour timelock creates advance visibility but cannot guarantee that a queued or paused
+position can be redeemed before execution.
 
-## Fail-closed freeze
+Proposed v2 strategies are a different build. Registration and migration must be confirmed
+on-chain, and review coverage must identify the build it actually covers.
 
-<Callout type="warn">
-  If any registered strategy cannot report its NAV — because its `navInETH()` function reverts — the
-  entire protocol freezes. Deposits, withdrawals, and price updates all stop until the strategy is
-  fixed or removed by governance (which requires the 48-hour timelock).
-</Callout>
+## Data and review limitations
 
-This is an intentional safety feature: the protocol will not process entries or exits at a price it
-cannot verify. The downside is that a malfunctioning strategy causes temporary unavailability for all
-users, not just those in that strategy.
+Historical app data depends on indexer and snapshot availability. Missing history or prices
+must not be interpreted as zero assets or zero return. App charts are accounting estimates,
+not guaranteed payouts or proof of profit.
 
-## Price-deviation guard
-
-Each deposit and withdrawal checks the current EVE price against a recent checkpoint. If the price has
-moved more than the configured maximum (default 5%, maximum 20%) since the last checkpoint, the
-transaction reverts. This prevents exploitation of sudden price swings, but it also means transactions
-can fail during genuine market volatility. Recovery requires `ADMIN_ROLE` or `SECURITY_ROLE` to reset
-the checkpoint.
-
-## Testing-phase status
-
-Everstrat is deployed on Ethereum mainnet but is in a testing phase and should be treated as a test
-protocol. The deployment may be suspended, redeployed with different parameters, or taken offline at
-any time. Deposits are real ETH and no aspect of this protocol should be treated as a production,
-real-money system until explicitly announced otherwise.
-
----
-
-For how the protocol's roles and governance controls work, see
-[Trust & governance](/risk-and-trust/trust-and-governance).
-For the security model and audit status, see [Security & audits](/risk-and-trust/security-and-audits).
+No completed independent audit report was verified in this repository review.
+See [Security & audits](/risk-and-trust/security-and-audits).

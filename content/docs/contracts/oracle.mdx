@@ -1,21 +1,28 @@
 ---
 title: Oracle
-description: The upgradeable price feed registry used for ETH-to-USD conversion and staleness checks.
+description: The upgradeable Registry-authorized price-feed registry and valuation dependency.
 ---
 
 ## Purpose
 
-`Oracle` manages token price feed configuration and staleness validation.
+Oracle maintains token/USD feeds and optional token-pair feeds. Native ETH is represented by
+`address(0)`. Token support is established by `updateUsdFeedInfo()`; there is no separate
+add-token operation.
 
-## Important Role
+## Permissions
 
-`ORACLE_MANAGER_ROLE` can:
+Feed registration, updates, token removal, pair-feed configuration, and UUPS upgrades require
+**`ADMIN_ROLE` in Registry**. The protocol does not define an `ORACLE_MANAGER_ROLE`.
 
-- add token price feeds
-- update feed configuration
-- remove token configuration
+## Valuation and staleness
 
-## Protocol Scope
+Conversion uses a direct pair feed when available, an inverse pair feed when available, or
+the ratio of the two token/USD feeds. Non-positive or invalid feed answers and stale observations
+can revert a required valuation.
 
-Oracle is important, but it is not on the hottest user flow path. The system deliberately keeps
-normal mint and burn execution ETH-native.
+Oracle supports the bootstrap USD minimum, USD display values, and the ETH valuation of
+strategy paired tokens and supported ERC-20 balances held by StrategyManager. Since the AMM
+prices from that NAV, oracle failures can also block ordinary minting, exits, and batch pricing.
+
+Sources: [Oracle](https://github.com/everstrat-xyz/contracts/blob/157129b7c7f3db06275ecc6697ff0acfab3d9dbe/src/contracts/Oracle.sol)
+and [EVE & NAV](/how-everstrat-works/eve-and-nav).

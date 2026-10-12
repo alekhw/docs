@@ -18,7 +18,7 @@ description: Answers to the most common questions about Everstrat — what it is
   </Accordion>
   <Accordion title="What is EVE and what backs it?">
     EVE is a token that represents your share of the protocol's net asset value (NAV). When you deposit
-    ETH, the AMM mints EVE proportional to your share of the total NAV. When you exit, you burn EVE and
+    ETH, the AMM mints EVE at the premium entry price. When you exit, you burn EVE and
     receive ETH back at the current NAV per EVE (the base price). The NAV is made up of ETH held across
     the AMM, Controller, StrategyManager, and any deployed yield strategies. See
     [EVE and NAV](/how-everstrat-works/eve-and-nav) for the full formula.
@@ -37,17 +37,20 @@ description: Answers to the most common questions about Everstrat — what it is
   <Accordion title="Why did my exit get queued, and how long does it take?">
     Your exit is queued when the AMM does not have enough free ETH to settle it immediately — for
     example, because most of the NAV is deployed in a yield strategy. Once queued, a keeper prices the
-    batch (at the AMM's base price, not an oracle price) and processes it. After processing, ETH is
+    batch at the AMM's base price and processes it. NAV behind that price can depend on feeds and
+    pool TWAPs. After processing, ETH is
     credited to your claimable balance and you must call `claim()` to withdraw it (pull-over-push). If
-    the keeper has not processed the batch within **3 days** of pricing, you can invoke the escape hatch
+    a request is still unprocessed **strictly more than 3 days** after pricing, you can invoke the escape hatch
     (`cancelRedemption`) to cancel the request and recover your EVE.
   </Accordion>
   <Accordion title="Can I cancel a queued exit?">
     Yes, in two situations:
 
     - **Before the batch is priced:** you can cancel at any time with no restrictions.
-    - **After the batch is priced:** you can cancel only after **3 days have passed** since the batch
-      was priced (the escape hatch). Inside that window, the cancel call will revert.
+    - **After the batch is priced:** an unprocessed request can be cancelled only **strictly more than
+      3 days** after pricing. At exactly three days, cancellation is still blocked.
+
+    Processed requests cannot be cancelled; claim their credited ETH instead.
 
     If the settled price has dropped more than your `priceTolerance` below the price at request time,
     the protocol automatically closes your request and returns your EVE — you do not need to take
@@ -61,7 +64,8 @@ description: Answers to the most common questions about Everstrat — what it is
 
     - **Entry premium** — you deposit at the premium price (higher than base price). The difference goes
       to existing EVE holders, not the protocol. See [Fees & costs](/using-everstrat/fees-and-costs).
-    - **Performance fee** — a configurable bps rate (max **20%**) on the **accrued Uniswap V3
+    - **Performance fee** — **15%** at the [October 11 snapshot](/operations/current-deployments),
+      configurable up to **20%**, on eligible **realized Uniswap V3
       trading fees** earned by the strategy. It is settled by **minting EVE to the DAO treasury**,
       which dilutes existing EVE holders proportionally — no ETH moves out of the protocol. See
       [Fees & costs](/using-everstrat/fees-and-costs).
@@ -76,8 +80,9 @@ description: Answers to the most common questions about Everstrat — what it is
     and only deposit what you can afford to lose entirely. See [Key risks](/risk-and-trust/key-risks) for a full breakdown.
   </Accordion>
   <Accordion title="Has Everstrat been audited?">
-    No audit is documented in this repository. The protocol is in a testing phase and should
-    be treated as unaudited. Do not treat deployment as a signal of production readiness.
+    No completed independent audit report was verified in the repositories reviewed on October 11.
+    Tests and model-assisted reviews are not equivalent to independent audit coverage.
+    See [Security & audits](/risk-and-trust/security-and-audits).
   </Accordion>
   <Accordion title="What network are the contracts on?">
     The production contracts are on **Ethereum mainnet** (chain id 1); a Base Sepolia testnet
@@ -89,12 +94,11 @@ description: Answers to the most common questions about Everstrat — what it is
     support any other network in the app. If you see a network mismatch prompt, approve the switch. If transactions
     still do not initiate, refresh the page and reconnect your wallet.
   </Accordion>
-  <Accordion title="The AMM shows a paused or excessive-deviation error">
-    The AMM can be paused by the ADMIN_ROLE or SECURITY_ROLE in an emergency, or transactions can revert
-    with `AMMExcessiveDeviation` if the EVE (base) price has moved more than the allowed deviation
-    (default 5%) from its checkpoint. If you see this error, wait for the team to reset the price
-    checkpoint (an ADMIN_ROLE or SECURITY_ROLE action) before retrying. You cannot work around this
-    yourself.
+  <Accordion title="The AMM is paused or cannot calculate a price">
+    ADMIN or SECURITY can pause normal trading. A failed strategy NAV read or invalid valuation
+    feed can also block pricing. Check the transaction's actual revert reason and official updates.
+    The deployed AMM has no 5% checkpoint guard or checkpoint-reset function.
+    Already credited ETH can still be claimed, and eligible queued requests can still be cancelled.
   </Accordion>
   <Accordion title="My queued exit is still pending after several days">
     If more than 3 days have passed since your batch was priced, you can use the escape hatch to cancel

@@ -6,7 +6,8 @@ description: Build and deploy workflow for the bundled GoldSky/The Graph workspa
 ## Build workflow
 
 ```bash
-cd frontend-app/web3-app/subgraph
+# From the everstrat-xyz/app repository root:
+cd subgraph
 npm install
 npm run codegen
 npm run build
@@ -29,9 +30,9 @@ The live `prod` tag serves the current endpoint; see
 
 When redeploying contracts:
 
-1. Update `frontend-app/web3-app/subgraph/config/deployments/mainnet.json` with the new addresses
+1. Update `everstrat-xyz/app/subgraph/config/deployments/mainnet.json` with the new addresses
    and `startBlock`.
 2. Run `npm run config:sync` (or any of `codegen`/`build` which invoke it) to regenerate
    `src/config.ts`.
-3. Update `frontend-app/web3-app/src/config/index.ts` `CONFIG.CONTRACTS` to match — the two files
+3. Update `everstrat-xyz/app/src/config/index.ts` `CONFIG.CONTRACTS` to match — the two files
    are expected to agree exactly.

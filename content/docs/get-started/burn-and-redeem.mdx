@@ -6,7 +6,7 @@ description: How to burn EVE and redeem ETH on Ethereum mainnet, including immed
 <Steps>
   <Step>
     **Switch the toggle to Burn.** The Mint/Burn toggle is at the top of the form. Select **Burn**
-    (shown in orange) to enter exit mode.
+    to enter exit mode. The input is labelled **You will burn**.
   </Step>
   <Step>
     **Enter the amount of EVE to burn.** Type an amount or use the percentage slider to choose a
@@ -14,7 +14,7 @@ description: How to burn EVE and redeem ETH on Ethereum mainnet, including immed
   </Step>
   <Step>
     **Review the estimated ETH you'll receive.** The app shows the estimated ETH based on the current
-    exit (base) price, which equals the portfolio NAV divided by EVE supply.
+    exit (base) price: net NAV divided by live EVE supply, excluding live priced queue escrow.
   </Step>
   <Step>
     **Set your slippage (`priceTolerance`).** This only matters if your exit gets queued: it sets how
@@ -50,9 +50,11 @@ immediate or queued.
 
     A **"Pending: [amount] EVE"** card will appear in the app while your request is waiting.
 
-    **Escape hatch:** If your batch hasn't been paid out within **3 days of being priced** (the clock
-    starts when the keeper prices the batch, not when you submit), you can cancel it and get your EVE
-    back. The **Cancel Pending Burn** action in the app will become available at that point.
+    Review queued requests and available actions on **Portfolio**.
+
+    **Escape hatch:** An unprocessed request can be cancelled **strictly more than 3 days after
+    pricing**, returning EVE. Unpriced requests can be cancelled without that wait.
+    Already processed requests cannot be cancelled, even if you have not claimed their ETH.
   </Tab>
 </Tabs>
 

@@ -1,20 +1,29 @@
 ---
 title: Overview
-description: Contract map for the immutable core and the upgradeable management layer.
+description: Immutable entry contracts, upgradeable management, and authenticated keeper executors.
 ---
 
-## Current Contract Set
+## Contract map
 
-| Contract | Type | Upgradeability | Primary role |
-| --- | --- | --- | --- |
-| `EVE` | token | immutable | ERC-20 supply surface for the protocol |
-| `AMM` | core | immutable | ETH entry and exit surface |
-| `Controller` | management | UUPS proxy | keeper coordinator and queue operator |
-| `ExitQueue` | management | UUPS proxy | queued redemption batches and request state |
-| `StrategyManager` | management | UUPS proxy | strategy registry, NAV, distribution, withdrawals |
-| `Oracle` | management | UUPS proxy | price feed registry and staleness controls |
+| Component | Deployment model | Primary responsibility |
+| --- | --- | --- |
+| Registry | Static, configurable | Registered peer addresses, roles, global pause |
+| EVE | Immutable | ERC-20 protocol shares |
+| AMM | Immutable, configurable | Mint, redeem, escrow, and claims |
+| Whitelist | Static, configurable | Invite entry authorization |
+| Controller | UUPS proxy | Strategy and queue coordination |
+| ExitQueue | UUPS proxy | Batch/request metadata and redemption offsets |
+| StrategyManager | UUPS proxy | Strategy registry, allocation weights, NAV, performance fees |
+| Oracle | UUPS proxy | Token feed registration and valuation |
+| Converter | UUPS proxy | Supported conversion routes and adapters |
+| Converter adapters | Separate contracts | Execute approved conversion routes |
+| UniCL strategies | Separate immutable instances | Manage Uniswap v3 liquidity positions |
+| QueueKeeperExecutor | Static, configurable | Authenticated queue operations |
+| StrategyKeeperExecutor | Static, configurable | Authenticated strategy operations |
+| Timelock | Separate governance contract | Delayed ADMIN execution |
 
-## Reading Strategy
+Immutable code does not mean immutable configuration or immutable dependencies.
+Existing UniCL strategies are replaced through registration and removal, not proxy upgrades.
 
 <Cards>
   <Card title="EVE" href="/contracts/eve" />
@@ -23,11 +32,6 @@ description: Contract map for the immutable core and the upgradeable management 
   <Card title="ExitQueue" href="/contracts/exit-queue" />
   <Card title="StrategyManager" href="/contracts/strategy-manager" />
   <Card title="Oracle" href="/contracts/oracle" />
+  <Card title="Keepers and automation" href="/contracts/keepers-and-automation" />
+  <Card title="Current deployment snapshot" href="/operations/current-deployments" />
 </Cards>
-
-## Design Split
-
-The repository uses a deliberate split:
-
-- immutable contracts for the direct user entry/exit surface
-- upgradeable contracts for operational control, queue state, oracle config, and strategy management

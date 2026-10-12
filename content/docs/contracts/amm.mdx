@@ -1,40 +1,56 @@
 ---
 title: AMM
-description: The immutable bonding-curve contract that accepts ETH and handles entry and exit requests.
+description: Immutable ETH entry, immediate redemption, queued requests, and pull-based claims.
 ---
 
 ## Responsibilities
 
-- accept ETH deposits and mint EVE
-- process immediate redemption when liquidity is sufficient
-- queue redemptions when liquidity is insufficient
-- expose ETH-first price views
+AMM accepts native ETH, mints EVE, and handles redemptions. Its bytecode is immutable,
+but its registered peers, connector weight, minimum queued exit, and pause state are configurable.
 
-## Key Roles
-
-| Role | Meaning |
-| --- | --- |
-| `ADMIN_ROLE` | configure connector weight, pause, unpause |
-| `CONTROLLER_ROLE` | allow Controller-mediated redemption processing |
-
-## Key Functions
+## Entry points
 
 ```solidity
-function enter(uint256 _deposit, uint256 _minTokensToMint) external payable
+function enter(uint256 _minTokensToMint) external payable
+function enterWithInvite(uint256 _minTokensToMint, bytes32 _inviteId, uint256 _deadline, bytes calldata _signature) external payable
 function exit(uint256 _requestedETH, uint256 _maxTokensToBurn, uint256 _priceTolerance) external returns (uint256)
-function processRedemption(uint256 _batchId, address _user) external payable
 function cancelRedemption(uint256 _batchId) external
+function claim() external
+function processRedemption(uint256 _batchId, address _user) external payable
 ```
 
-## Critical Behavior
+The ETH deposit is `msg.value`, not a separate `enter` argument.
+During the active invite period, a new user needs valid invite authorization.
 
-<Tabs items={["Oracle usage", "Queue usage"]}>
-  <Tab>
-    Oracle is not used in the normal enter/exit hot path. It is used for bootstrap minimum deposit
-    checks and USD-facing view functions.
-  </Tab>
-  <Tab>
-    When ETH liquidity is insufficient, AMM hands off request state to `ExitQueue` and emits the
-    user-facing queue event.
-  </Tab>
-</Tabs>
+## Pricing and dependencies
+
+Base price uses net NAV divided by **live supply**. Live supply excludes the EVE
+escrow corresponding to priced, unprocessed, unexpired redemption liabilities.
+Entry price divides base price by connector weight.
+
+ETH pricing does not require a direct ETH/USD conversion on every trade. However, it reads
+StrategyManager NAV, which can depend on token feeds and pool TWAPs. Failed NAV valuation
+can therefore block normal entry and exit. See [Pricing](/how-everstrat-works/pricing-and-bonding-curve).
+
+The deployed AMM has no 5% NAV checkpoint guard or checkpoint-reset function.
+User bounds are `minTokensToMint`, `maxTokensToBurn`, and queued `priceTolerance`.
+
+## Queued exits and claims
+
+If free AMM ETH is sufficient, EVE is burned and ETH paid in the exit transaction.
+Otherwise EVE is **escrowed in AMM**, while ExitQueue records request metadata.
+The registered Controller calls `processRedemption` to burn escrow and credit claimable ETH.
+The user then calls `claim()`; processed redemptions do not send ETH automatically.
+
+`lockedForClaims` is excluded from AMM free balance and cannot fund another exit.
+An unpriced request can be cancelled; a priced, unprocessed request can be cancelled
+only strictly more than three days after pricing. Processed requests must be claimed.
+
+## Authorization and pausing
+
+- ADMIN configures parameters and unpauses.
+- ADMIN or SECURITY can pause.
+- `processRedemption` authenticates the registered Controller address, not a `CONTROLLER_ROLE`.
+- Entry, exit, and processing are pause-gated. Cancellation and claims remain callable while paused.
+
+See [Current deployments](/operations/current-deployments) for the dated mainnet snapshot.

@@ -12,7 +12,8 @@ description: What Everstrat is, what EVE is, and the three steps to get started 
 
 You deposit ETH and receive **EVE** — a token representing your share of a managed on-chain strategy
 portfolio. A keeper deploys the pooled ETH into yield strategies, and EVE's value tracks the
-portfolio's net asset value (NAV). You can exit any time by burning EVE for ETH.
+portfolio's net asset value (NAV). Exits redeem EVE for ETH, subject to pause state, valuation
+availability, liquidity, and queue rules.
 
 <Cards>
   <Card title="Connect your wallet" href="/get-started/connect-wallet-and-supported-network" />
@@ -34,6 +35,7 @@ portfolio's net asset value (NAV). You can exit any time by burning EVE for ETH.
   </Step>
   <Step>
     **Burn EVE to redeem ETH.** When you're ready to exit, burn your EVE. Depending on available
-    liquidity, you'll receive ETH immediately or after a short queued process.
+    liquidity, the exit settles immediately or enters a queue. Queued settlement is not guaranteed
+    to be quick and requires a separate claim.
   </Step>
 </Steps>

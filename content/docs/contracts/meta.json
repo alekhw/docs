@@ -9,6 +9,7 @@
     "exit-queue",
     "strategy-manager",
     "oracle",
+    "keepers-and-automation",
     "interfaces-and-libraries"
   ]
 }

@@ -16,7 +16,8 @@ fractional share of the protocol's total **net asset value (NAV)**, measured in 
 Your share of the protocol is simple:
 
 ```text
-your share = your EVE balance / total EVE supply
+live supply = total EVE supply - in-window priced queued EVE
+your active share = your EVE balance / live supply
 ```
 
 As the protocol's strategies earn (or lose) value, NAV rises or falls, and each EVE token is worth
@@ -24,8 +25,8 @@ correspondingly more or less ETH. There is no promised return. EVE is not pegged
 
 ## What counts as NAV
 
-Total NAV includes the protocol's recoverable assets, less live priced redemption liabilities.
-Specifically, the StrategyManager's `totalNAVInETH()` adds up:
+StrategyManager's `totalNAVInETH()` starts with the following gross assets, then deducts
+the live priced queued liability described below:
 
 | Component | What it includes |
 | --- | --- |
@@ -33,7 +34,7 @@ Specifically, the StrategyManager's `totalNAVInETH()` adds up:
 | StrategyManager balance | Any ETH sitting on the StrategyManager contract itself, waiting to be deployed. |
 | Controller balance | Any ETH held by the Controller — received from the AMM but not yet forwarded to strategies. |
 | AMM free balance | ETH in the AMM contract that is not reserved for pending claims: `address(AMM).balance − lockedForClaims`. |
-| Supported-ERC20 balances on the StrategyManager | The ETH value of each admin-whitelisted ERC-20 held by the StrategyManager, priced via `Oracle.convert`. This term is zero day-to-day and only becomes non-zero in emergencies — for example, after `UniCLStrat.emergencyExit()` leaves a paired-token balance stranded on the StrategyManager. |
+| Supported-ERC20 balances on the StrategyManager | Supported tokens held by the manager, valued through `Oracle.convert`; for example, paired-token inventory received through emergency recovery. A zero balance contributes no value. |
 
 From that asset total, it subtracts the ETH liability of priced, unprocessed requests whose batches
 are still inside the 3-day processing window (`liveRedemptionOffsets()`). Unpriced requests remain
@@ -45,12 +46,21 @@ shares from its live supply denominator.
 not yet called `claim()`. That ETH is excluded from NAV because it is no longer the protocol's to
 deploy.
 
+The full formula is:
+
+```text
+NAV = strategy NAVs + StrategyManager ETH + Controller ETH + AMM free ETH
+      + supported ERC-20 value held by StrategyManager
+      - in-window priced redemption liabilities
+base price = NAV / live supply
+```
+
 <DocsDiagram name="nav" />
 
 ## Fail-closed NAV
 
 The NAV calculation is **fail-closed**: if any strategy's `navInETH()` call reverts — for example
-because the strategy is paused, broken, or in an inconsistent state — then `totalNAVInETH()` reverts
+because a required oracle or pool observation is unavailable, or the strategy is broken — then `totalNAVInETH()` reverts
 too. When NAV cannot be computed, the AMM cannot price anything, so `enter()`, `exit()`, and batch
 pricing all freeze until the problem is resolved.
 
@@ -60,20 +70,21 @@ pricing all freeze until the problem is resolved.
   from the remaining holders. The protocol prefers a temporary freeze over mispricing.
 </Callout>
 
-A broken strategy can be repaired or removed through an authorized recovery path. Normal
-`removeStrategy()` requires a successful NAV read with no material residue; `forceRemoveStrategy()`
-is the emergency path when the NAV read reverts or over-reports. Non-zero supported-token balances
-also require valid Oracle prices; an invalid feed freezes NAV until repaired or the token is removed
-from the supported set.
+A paused UniCL strategy can still report NAV. Pausing alone does not imply a failed NAV read.
+Non-zero supported ERC-20 balances on StrategyManager also require valid oracle prices.
+
+Governance can recover funds or use `StrategyManager.forceRemoveStrategy()` to deregister a
+strategy whose NAV reverts. Normal `removeStrategy()` requires its reported NAV to be at most
+10 wei and propagates a failed NAV read. Forced removal drops any remaining strategy assets out
+of protocol NAV; it does not automatically recover them.
 
 ## Why this matters to you
 
-- **NAV going up** means the strategies earned more in fees or asset appreciation than they lost. Each
-  EVE you hold is worth more ETH.
-- **NAV going down** means the strategies lost value (for example, due to impermanent loss or adverse
-  market movements). Each EVE is worth less ETH.
-- **A frozen protocol** means something is wrong with a strategy and the admin needs to intervene. You
-  cannot enter or exit until the issue is resolved or the bad strategy is removed.
+- **NAV changes** can come from deposits, exits, fees, asset prices, donations, or recovery actions.
+  NAV alone is not a return measure. Compare the base price per EVE, and account for fee dilution
+  and queued liabilities.
+- **Unavailable NAV** can block normal entry and exit until valuation recovers or governance acts.
+  Claims of already credited ETH and eligible queued cancellations do not require fresh NAV.
 
 For a full treatment of what can go wrong, see [Key risks](/risk-and-trust/key-risks).
 

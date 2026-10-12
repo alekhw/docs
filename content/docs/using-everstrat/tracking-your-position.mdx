@@ -1,72 +1,59 @@
 ---
 title: Tracking your position
-description: What you can see in the Everstrat app today — your balances, the bonding curve view, the activity feed, and an honest note about Dashboard prototype status.
+description: Portfolio, protocol Metrics, live account actions, and indexed activity history.
 ---
 
-<Callout type="warn" title="Testing phase — treat as a test protocol">
-  Everstrat is deployed on **Ethereum mainnet** (chain id 1), but it is in a **testing phase** and
-  should be treated as a **test protocol**. Entry is invite-gated, the software is experimental and
-  unaudited, and deposits are real ETH at real risk. Do not deposit more than you can afford to
-  lose entirely.
-</Callout>
+## Portfolio
 
-The Everstrat app gives you several ways to monitor your position and the protocol's state. Here is
-what is available today and what each view shows.
+The app's **Portfolio** page (`/portfolio`) shows the connected wallet's position history,
+current account state, available claim/cancel actions, and lifetime deposit/redemption totals.
+The old `/dashboard` route redirects to Portfolio.
 
-## What you can see
+The position chart values EVE using the protocol's on-chain **redemption price**. It offers
+Value and Return views in ETH or USD. It combines indexed wallet events with stored historical
+redemption prices and direct current price reads.
 
-<Cards>
-  <Card title="EVE balance & NAV share" />
-  <Card title="Curve page" />
-  <Card title="Dashboard page" />
-  <Card title="Activity feed" />
-</Cards>
+Important calculation details:
 
-## What is reliably live
+- EVE escrowed for an unprocessed exit remains part of the wallet's position.
+- Processing an exit removes that EVE and records the redeemed ETH; claiming transfers ETH
+  already credited by processing.
+- External EVE transfers, including exchange trades or gifts, are valued at the redemption
+  price at the time. The protocol does not know their actual trade cost.
+- At the snapshot's connector weight of 0.9, entry uses a higher premium price, so a new mint
+  starts with redemption value below its deposit cost.
+- Missing historical prices or stale/failed current reads can produce an unavailable state.
+  Partial data is not presented as a zero return.
 
-The following data is sourced directly from on-chain state and the subgraph indexer:
+Portfolio returns are estimates under these valuation rules. They are not a complete wallet
+cost-basis or tax calculation.
 
-- **Your EVE balance** — read from the EVE token contract on Ethereum mainnet.
-- **Your share of NAV** — derived from the current on-chain NAV and EVE supply.
-- **Mint and burn actions** — the deposit and exit flows write to the chain; the app reflects
-  confirmed transactions.
-- **Activity feed** — your mint, burn, and redemption history from the subgraph. Each event
-  corresponds to a real transaction.
-- **Bonding curve (Curve page)** — prices are calculated from live on-chain NAV and supply.
+## Metrics
 
-## Dashboard — prototype status
+The **Metrics** page (`/metrics`) shows protocol NAV, supply, holder/activity aggregates,
+liquidity, strategy allocation, stored performance history, and EVE market history.
+The old `/stats` route redirects to Metrics.
 
-<Callout type="info" title="Prototype">
-  **The Dashboard is currently a prototype.** Several of its metrics display placeholder values rather
-  than live data. Do not rely on Dashboard figures for decisions about when to enter or exit.
+| Data | Source | Meaning |
+| --- | --- | --- |
+| Current NAV, protocol prices, liquidity, supply | Ethereum contract reads | Current protocol state |
+| Deposits, redemptions, users, requests | GoldSky subgraph | Indexed contract events |
+| Historical returns and strategy series | Stored block-pinned snapshots | Sampled protocol history |
+| EVE/WETH market chart | GeckoTerminal market data | External market price |
 
-  Features still being wired up include certain real-time protocol-level metrics shown on the
-  Dashboard overview. Your wallet balances, transaction history in the activity feed, and the Curve
-  page are live and accurate.
+The market chart can differ from the AMM redemption and mint prices. It does not determine
+protocol accounting. Snapshot returns measure the recorded period and are not annualized
+or guaranteed future yield.
 
-  This page will be updated as Dashboard metrics are connected to real data sources.
-</Callout>
+## Account state and activity
 
-## Reading the Curve page
+Portfolio uses direct RPC snapshots for balances, claimable ETH, queued requests,
+and cancellation eligibility. Claim and Cancel are separate available actions.
+The connected-wallet dialog shows wallet information and confirmed Activity history.
 
-The Curve page shows you the current shape of the bonding curve:
+Activity history is indexed by GoldSky and may lag a confirmed receipt. Submitted transactions
+have a separate local status while confirmations are pending. Use the explorer link to verify
+a transaction when the indexer is behind.
 
-- **Base price** (`NAV / supply`) — the price at which you can exit right now.
-- **Premium price** (`NAV / (supply × connectorWeight)`) — the price at which a new deposit would be
-  priced right now.
-- How those prices move as you simulate different deposit or exit sizes.
-
-Use it to understand the cost of entering at the current pool size and to see how much of a premium
-you are paying relative to the exit (base) price.
-
-## Reading the activity feed
-
-The activity feed is powered by the Everstrat subgraph, which indexes events emitted by the AMM and
-ExitQueue contracts on Ethereum mainnet. Each entry shows:
-
-- **Event type** — mint, burn, exit request, batch priced, batch processed, or claim.
-- **Amount** — ETH deposited or EVE minted/burned.
-- **Timestamp and transaction hash** — so you can verify any event on the block explorer.
-
-If a queued exit request is in flight, the feed shows its current status (submitted → priced →
-processed → claimed).
+Sources: [application](https://github.com/everstrat-xyz/app/tree/860fec9affaf1ea5c4d0cf2ca96639ec2889068d/src/features),
+[Account details](/app/account-details-and-activity-feed), and [Fees & costs](/using-everstrat/fees-and-costs).

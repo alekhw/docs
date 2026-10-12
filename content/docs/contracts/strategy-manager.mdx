@@ -1,25 +1,49 @@
 ---
 title: StrategyManager
-description: The upgradeable contract that manages strategy registration, NAV, distribution, withdrawals, and rebalancing.
+description: Strategy registration, weighted allocation, net NAV, and performance-fee settlement.
 ---
 
 See the [strategy deployment diagram](/how-everstrat-works/strategies-and-yield#everstrat-strategies-diagram) for the keeper-to-strategy flow.
 
 ## Responsibilities
 
-- register and remove strategies
-- compute total NAV in ETH
-- distribute ETH based on safety levels
-- withdraw or queue withdrawals based on withdrawal priority
-- rebalance unhealthy strategies
+StrategyManager registers strategies, computes ETH-denominated NAV, routes capital through the
+Controller, and settles performance fees by minting EVE to the DAO treasury.
 
-## Important Constraints
+## Allocation and withdrawal weights
 
-- safety levels must be within `1..100`
-- withdrawal priorities must be within `1..100`
-- range-based operations use `[startIndex, endIndex)`
+Governance sets separate `depositWeight` and `withdrawalWeight` values for each registered strategy.
+Each is an integer in **0..100**. Zero excludes a strategy from the corresponding batch allocation.
+The values are relative weights; they need not sum to 100 and are not safety scores or priorities.
 
-## Why It Matters
+Deposit allocation also considers capacity, health, pause state, and deposit cooldown.
+Withdrawal capacity can prevent an allocation from being fully satisfied. Range-based operations
+use `[startIndex, endIndex)`.
 
-StrategyManager is the bridge between pooled protocol capital and the external strategy set. Its
-ETH-first NAV is the pricing input the AMM cares about.
+Only the Controller address registered under `Auth.CONTROLLER` can call routine deposit,
+withdrawal, rebalance, sync, and harvest entry points. Governance controls registration and weights.
+
+## NAV and live supply
+
+`totalNAVInETH()` includes strategy NAVs, StrategyManager ETH, Controller ETH, AMM free ETH, and
+the oracle value of supported ERC-20 balances held by StrategyManager. It deducts in-window
+priced redemption liabilities. A required valuation failure propagates.
+
+The AMM and performance-fee mint calculation use total EVE supply minus the matching priced
+escrow. See [EVE & NAV](/how-everstrat-works/eve-and-nav) for the full accounting model.
+
+## Removal and recovery
+
+`removeStrategy()` requires reported NAV to be at most **10 wei** and propagates a reverting
+NAV read. `forceRemoveStrategy()` can deregister a strategy despite a failed NAV read or
+remaining assets. It records the reported NAV or read failure in an event. Deregistration
+removes the strategy from accounting; it does not recover funds by itself.
+
+## Performance fees
+
+The [dated mainnet snapshot](/operations/current-deployments) has a **15%** rate, capped in code
+at **20%**. Strategies report accrued LP trading fees in ETH terms. StrategyManager mints EVE
+to `daoTreasury` using `feeETH × liveSupply / (NAV - feeETH)`.
+See [Fees & costs](/using-everstrat/fees-and-costs).
+
+Source: [StrategyManager](https://github.com/everstrat-xyz/contracts/blob/157129b7c7f3db06275ecc6697ff0acfab3d9dbe/src/contracts/StrategyManager.sol).

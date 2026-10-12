@@ -7,16 +7,17 @@ description: Shared vocabulary used across the product, protocol, app, and data 
 
 | Term | Meaning |
 | --- | --- |
-| `EVE` | The protocol ERC-20 token, named “Everything Strategy” on-chain. |
+| `EVE` | Protocol ERC-20 shares; the deployed mainnet token reports the name “Everstrat”. |
 | `AMM` | The immutable contract that accepts ETH deposits and handles redemption attempts. |
-| `NAV` | Net asset value of the protocol, calculated in ETH first and converted to USD only when needed. |
+| `NAV` | Gross ETH-valued assets minus live priced queued liabilities; token valuation can depend on feeds. |
+| `Live supply` | Total EVE supply minus the escrow corresponding to live priced queued liabilities. |
 | `Connector weight` | AMM parameter used in premium-price calculations. |
 | `Immediate redemption` | Burn settles directly in the AMM because sufficient ETH is available. |
-| `Queued redemption` | Burn request is pushed into `ExitQueue` for later pricing and processing. |
+| `Queued redemption` | EVE escrow in AMM, request metadata in ExitQueue, later processing, then a separate claim. |
 | `Batch pricing` | Keeper action that records the final EVE price for the current exit batch. |
 | `priceTolerance` | User slippage bound used to decide whether a queued request can settle. |
-| `Escape hatch` | Request closure path after `MAX_BATCH_PROCESSING_TIME` has passed. |
-| `KEEPER_ROLE` | Operational role on Controller used for strategy and queue workflows. |
+| `Escape hatch` | Cancellation of an unprocessed request strictly more than three days after pricing. |
+| `KEEPER_ROLE` | Registry role held by the queue and strategy executors for Controller operations. |
 
 ## Related References
 

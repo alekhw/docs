@@ -19,11 +19,12 @@ explains what that price is, how it is calculated, and what to watch out for.
 
 Everstrat uses a bonding curve. There are two prices:
 
-- **Base price** — the "fair value" of one EVE, calculated as `NAV / EVE supply`. This is the price
-  you receive when you *exit*.
+- **Base price** — the redemption value of one EVE, calculated as `NAV / live supply`. This is the price
+  you receive when you *exit*. Live supply is total supply minus in-window priced
+  queued EVE, with the corresponding liability already deducted from NAV.
 - **Premium price** — the price you pay when you *enter*, calculated as
-  `NAV / (EVE supply × connectorWeight)`. Because the connector weight is less than 1, the premium
-  price is always higher than the base price.
+  `NAV / (live supply × connectorWeight)`. At the snapshot's weight of 0.9, the premium
+  price is higher than the base price. Governance can set the weight to 1, making the prices equal.
 
 The gap between the two prices is not a protocol fee. It accrues to existing EVE holders, slightly
 increasing the value of every EVE already in circulation. This is by design — the bonding curve rewards
@@ -31,7 +32,8 @@ early participants and provides a buffer that protects the pool against rapid in
 
 ### Worked example
 
-The following numbers are **illustrative**. They show the math; they are not live values.
+The following numbers are **illustrative** and assume no priced queued offsets.
+They show the math; they are not live values.
 
 | Parameter | Value |
 | --- | --- |
