@@ -1,5 +1,5 @@
 ---
-title: Repository structure
+title: Repository map
 description: Current standalone repositories and the legacy hackerhouse source history.
 ---
 
@@ -24,10 +24,28 @@ It is private and requires repository access, so it is not a public contributor 
 `frontend-app/web3-app`, `frontend-app/landing`, and `frontend-app/everstrat-docs`
 are historical paths. They do not match the current standalone checkout layout.
 
-The docs route retains its old `monorepo-structure` slug for link compatibility.
-
 ## Evidence hierarchy
 
 Use deployed code and pinned chain reads for live behavior, contracts source and tests
 for implementation, app source for UI behavior, and governance payloads for proposed changes.
 Keep proposals separate from execution receipts; repository main can be ahead of deployed code.
+
+## Reading order
+
+1. Use contracts and tests for implementation details.
+2. Compare deployed versions, Registry state, and pinned chain reads before calling a change live.
+3. Use governance records to distinguish proposed, scheduled, ready, and executed operations.
+4. Use keepers for off-chain execution and gas-policy behavior.
+5. Use app features and `subgraph/` for UI, indexed data, and accounting behavior.
+6. Use website copy for introduction and docs for the detailed public explanation.
+
+## Drift rules
+
+- Registry peers and strategy registration can change without changing an app's core addresses.
+- A Controller source upgrade can be merged while its proxy still runs the earlier version.
+- A deployed strategy is not part of NAV until registered.
+- A signed Safe proposal is not a timelock execution.
+- Indexer history is not the authority for current wallet balances or request eligibility.
+
+See [System and responsibilities](/contributing/system-and-responsibilities) for runtime
+relationships and ownership boundaries.

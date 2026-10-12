@@ -1,52 +1,50 @@
 ---
 title: Your first deposit
-description: How to deposit ETH and mint EVE on Ethereum mainnet, step by step.
+description: Review an ETH deposit, acknowledge risks, and mint EVE on Ethereum mainnet.
 ---
+
+Complete [Before you start](/get-started/overview) and
+[Connect your wallet](/get-started/connect-wallet-and-supported-network) first.
 
 <Steps>
   <Step>
     **Select Mint mode.** If the form is in Burn mode, use the **Mint** text button beneath
-    the main action. There is no Mint/Burn toggle at the top of the form.
+    the main action.
   </Step>
   <Step>
-    **Enter an ETH amount.** Type a value into the amount field, or use the percentage slider
-    (**0 / 25 / 50 / 75 / 100%**) to fill based on your wallet balance. The balance pill shows your
-    current ETH balance for reference.
+    **Enter an ETH amount.** Type an amount or use the balance slider. Leave ETH in your wallet
+    for gas and future transactions.
   </Step>
   <Step>
-    **Review the estimated EVE you'll receive.** The app shows how much EVE you'll get based on the
-    current portfolio NAV and the entry (premium) price. You won't see the exact final amount until
-    the transaction is mined, which is why slippage matters.
+    **Review the estimated EVE and max slippage.** The quote uses the current entry price.
+    Leave slippage on **Auto** or enter a manual percentage. Your minimum acceptable EVE output
+    protects the transaction if the quote changes before confirmation.
   </Step>
   <Step>
-    **Set your slippage.** This controls `minTokensToMint` — the fewest EVE you'll accept. If the
-    price moves against you before the transaction confirms, it reverts instead of giving you less EVE
-    than expected. You can leave it on **Auto** or enter a manual percentage.
-  </Step>
-  <Step>
-    **Click Mint and read “Before you mint.”** On the first mint for this wallet/network,
+    **Click Mint and read “Before you mint.”** On your first mint for this wallet and network,
     tick both checkboxes: accept the Risk Disclosure and total-loss risk, and confirm you are
-    not a citizen or resident of the United States or otherwise restricted as stated in the dialog.
-    Continue only if both statements are true. Select **I accept — continue to mint**, then
-    review and confirm the transaction in your wallet.
-    The app will display a transaction status dialog showing progress.
+    not a citizen or resident of the United States and not located in, or a citizen or resident of,
+    another jurisdiction where access is restricted or prohibited by law or sanctions.
+    Continue only if both statements are true. Select
+    **I accept — continue to mint** to proceed, or **Cancel** to stop. This acknowledgment is
+    remembered in your browser for that wallet and network; it may appear again in another
+    browser or after stored data is cleared.
   </Step>
   <Step>
-    **Wait for confirmation.** Once the transaction is confirmed, your EVE balance updates and the
-    deposit is complete. View your position on **Portfolio** and transaction activity in the
-    wallet account dialog opened from the header's connected-wallet button.
+    **Confirm the mint transaction in your wallet.** Check the network, destination, ETH amount,
+    and gas estimate. The app shows the transaction's progress.
+  </Step>
+  <Step>
+    **Wait for confirmation.** A confirmed mint updates your EVE balance. Review the result
+    on **Portfolio** and activity in the wallet account dialog, opened from the header's
+    connected-wallet button. A quote or wallet prompt alone is not a completed deposit.
   </Step>
 </Steps>
 
-<Callout type="info" title="More about depositing">
-  There's more to know about depositing: the first-ever deposit into the protocol (bootstrap) has a
-  minimum size requirement, and entry uses the premium price (above base price when connector weight is below 1). See
-  [Depositing and minting](/using-everstrat/depositing-and-minting) for a worked example and full
-  explanation.
-</Callout>
+If the action is blocked or fails, do not repeatedly approve prompts without reviewing the error.
+See [Depositing & minting](/using-everstrat/depositing-and-minting) for pricing expectations,
+transaction conditions, and the one-time bootstrap rule.
 
-<Callout type="warn" title="AMM paused">
-  If you see **"AMM is currently paused"**, minting and burning are temporarily unavailable — check
-  back later. Claiming ETH you are already owed and the escape-hatch cancel keep working while paused,
-  so a pause never locks up funds that have been credited to you.
-</Callout>
+Next: [Your first exit](/get-started/burn-and-redeem). Keep the
+[Risk Disclosure](/legal/risk-disclosure) and [Fees & costs](/using-everstrat/fees-and-costs)
+in mind before submitting another transaction.

@@ -1,10 +1,5 @@
 {
   "title": "Introduction",
   "icon": "BookOpen",
-  "pages": [
-    "what-is-everstrat",
-    "how-the-system-is-organized",
-    "monorepo-map",
-    "core-concepts-glossary"
-  ]
+  "pages": ["what-is-everstrat", "core-concepts-glossary"]
 }

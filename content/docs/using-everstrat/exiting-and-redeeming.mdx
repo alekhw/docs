@@ -1,143 +1,87 @@
 ---
 title: Exiting & redeeming
-description: How to burn EVE and receive ETH back — covering immediate exits, the queued batch process, slippage protection, and the escape hatch.
+description: Approval, exit submission, pending requests, Claim, and common redemption problems.
 ---
 
-<Callout type="warn" title="Testing phase — treat as a test protocol">
-  Everstrat is deployed on **Ethereum mainnet** (chain id 1), but it is in a **testing phase** and
-  should be treated as a **test protocol**. Entry is invite-gated, the software is experimental and
-  unaudited, and deposits are real ETH at real risk. Do not deposit more than you can afford to
-  lose entirely.
+<Callout type="warn" title="Real ETH at risk">
+  Everstrat is an experimental, unaudited protocol in a testing phase on Ethereum mainnet.
+  Redemption depends on pause state, valuation, liquidity, and request conditions.
+  There is no guaranteed settlement deadline.
 </Callout>
 
-When you exit Everstrat you burn EVE tokens and receive ETH at the current **base price**
-(`NAV / live EVE supply`, excluding in-window priced queued EVE). There are two exit paths depending on how much free ETH the AMM is holding at
-that moment.
-
-At the [dated snapshot](/operations/current-deployments#exit-liquidity-at-this-block), AMM free ETH
-is zero and routine float top-up is disabled. New successful exits therefore queue. Immediate
-redemption below is a conditional code path if that funding state changes, not a funded alternative
-at this block.
+For a short walkthrough, see [Your first exit](/get-started/burn-and-redeem).
+This page explains the transactions and states you may see afterward.
 
 <DocsDiagram name="exit" />
 
-## Two exit paths
+## Review and submit
 
-<Tabs items={["Immediate exit", "Queued exit"]}>
-  <Tab>
-    If the AMM's free ETH balance is large enough to cover your redemption, you receive ETH in the
-    **same transaction**. No waiting. No extra steps.
+1. Select **Burn**, enter an EVE amount, and review the estimated ETH and max slippage.
+2. If the app shows **Approve EVE**, verify the AMM spender and allowance, confirm the approval
+   transaction, and wait for its receipt. Approval does not submit an exit.
+3. Review the quote again, then select **Burn** and confirm the separate exit transaction.
 
-    Immediate exits have **no minimum size**.
+The maximum EVE input caps both immediate burning and queued escrow; price tolerance
+additionally checks queued settlement against the request-time price. Read
+[Pricing & the bonding curve](/how-everstrat-works/pricing-and-bonding-curve#transaction-protections)
+for the exact protection on each path. Keep ETH in your wallet for gas.
 
-    Slippage protection on this path is `maxTokensToBurn` — a hard cap on how much EVE can be burned
-    for the ETH you requested. If the price moves against you beyond that cap, the transaction reverts.
-    (`priceTolerance` plays no role in an immediate exit.)
-  </Tab>
-  <Tab>
-    If the AMM does not have enough free liquidity, your exit request joins a **batch queue**. Your EVE
-    is escrowed and you wait for the keeper to settle the batch. See the lifecycle below.
+## Current queued flow and conditional immediate exits
 
-    Queued exits must be worth at least **0.001 ETH** by default (`DEFAULT_MIN_BATCH_EXIT_ETH`). This
-    minimum can be raised by governance up to a maximum of **0.05 ETH**
-    (`MIN_BATCH_EXIT_ETH_UPPER_BOUND`).
-  </Tab>
-</Tabs>
+At the [dated snapshot](/operations/current-deployments#exit-liquidity-at-this-block), AMM free ETH
+is zero and routine float top-up is disabled. New successful exits therefore queue; deposits
+forwarded to Controller do not replenish AMM free ETH.
 
-## Queued exit lifecycle
+Code supports immediate burning and ETH payment in one transaction only if sufficient free
+AMM ETH becomes available. That branch needs no separate Claim, but is not funded at the snapshot.
 
-<Steps>
-  <Step>
-    **Submit your exit request.** You call the exit function with the ETH amount you want back
-    (`requestedETH`), a cap on the EVE you are willing to burn (`maxTokensToBurn`), and a
-    `priceTolerance`. Your EVE tokens are escrowed — they leave your wallet and are held by the
-    protocol until the batch is settled.
-  </Step>
-  <Step>
-    **Keeper prices the batch.** A keeper bot monitors the queue. When conditions are met, it prices
-    the batch at `AMM.eveBasePriceInETH()`, locking in one price for all requests in that batch.
-    Each request is later checked against its own request-time price and chosen tolerance.
-  </Step>
-  <Step>
-    **Keeper processes the batch.** The keeper sends ETH to cover the batch and marks each request as
-    fulfilled.
-  </Step>
-  <Step>
-    **ETH is credited to your claimable balance.** After processing, the ETH you are owed is recorded
-    in `claimableBalances[yourAddress]`. It is not sent to you automatically (pull-over-push pattern).
-  </Step>
-  <Step>
-    **Call Claim to withdraw your ETH.** You call the `claim()` function to pull your ETH out of the
-    protocol and into your wallet.
-  </Step>
-</Steps>
+On the queued path, EVE is escrowed on the AMM and the request waits in ExitQueue.
+Keepers must price and process it. Submission, processing, and withdrawal are separate events:
 
-## Slippage protection (`priceTolerance`)
+| State | What it means for you |
+| --- | --- |
+| Queued and unprocessed | EVE is held by the AMM; ETH has not been paid. Review the request on Portfolio. |
+| Processed successfully | EVE is burned and ETH is credited, but still held for your Claim. |
+| Claimed | A separate Claim transaction transfers credited ETH to your wallet. |
+| Closed for slippage | EVE is returned instead of ETH; review a fresh quote before trying again. |
+| Cancelled | Escrowed EVE is returned; this is not an ETH redemption. |
 
-Price can fall between the moment you submit your exit request and the moment the keeper prices the
-batch. `priceTolerance` sets your floor: if the final batch price has dropped by more than your
-tolerance relative to the price at the time of your request, your request is **closed for slippage** —
-your EVE is returned to you and you receive no ETH. You can resubmit at any time.
+## Claim credited ETH
 
-`maxTokensToBurn` caps EVE input on both paths, including queued escrow at submission.
-`priceTolerance` additionally protects queued settlement.
+When ETH is available to claim, select **Claim** on **Portfolio**, confirm in your wallet,
+and wait for confirmation. A successful Claim withdraws the available credited balance, which
+can include more than one processed request. It is not necessarily a one-request payout.
 
-## Escape hatch — cancelling a redemption
+Processed requests cannot be cancelled. Their credited ETH remains claimable after the
+queue processing window ends. AMM pause alone does not block Claim or eligible cancellation.
 
-There are two situations where you can cancel a pending exit and get your escrowed EVE back:
+## Pending requests and cancellation
 
-<Accordions type="single">
-  <Accordion title="Before the batch is priced">
-    Any time before the keeper has priced a batch, you can call `cancelRedemption(batchId)` to cancel
-    your request and retrieve your EVE. There is no time constraint for this — you can cancel an
-    unpriced batch immediately after submitting.
-  </Accordion>
-  <Accordion title="More than 3 days after pricing, still unprocessed">
-    Once a keeper has priced a batch (`batch.pricedAt` is set), a **3-day clock**
-    (`MAX_BATCH_PROCESSING_TIME`) starts. When **more than** 3 days have passed and your request is
-    still unprocessed, you can call `cancelRedemption(batchId)` to reclaim your escrowed EVE.
-    At exactly 3 days, cancellation remains blocked. Once processed, the request cannot be
-    cancelled; withdraw its credited ETH with `claim()`.
+An existing pending request in the current batch can block another exit submission.
+Review the request on Portfolio instead of repeatedly clicking Burn.
 
-    Strictly after this processing deadline, an unprocessed request cannot be settled at all.
-    Waiting longer cannot make it payable; cancel to recover EVE and submit a new request if desired.
+Cancellation is available before batch pricing, or after the processing window expires
+for a request that is still unprocessed. During the priced processing window, cancellation
+is blocked. Strictly more than three days after pricing, an unprocessed request cannot
+be settled at all: cancel it to recover EVE. Waiting longer will not make that request
+payable. A later redemption requires a new request and quote. Already credited ETH remains
+claimable. Cancellation returns EVE, not ETH.
 
-    Note: the 3-day clock starts from when the batch is **priced**, not from when you submitted your
-    exit request.
-  </Accordion>
-</Accordions>
+For the exact minimum size, batch timing, tolerance checks, and cancellation boundary,
+see [The redemption queue, in depth](/how-everstrat-works/redemption-queue).
+The queue keeper's scheduling policy is described in
+[Keepers and automation](/contracts/keepers-and-automation).
 
-<Callout type="info">
-  For full technical details on how the exit queue is implemented, see
-  [The redemption queue, in depth](/how-everstrat-works/redemption-queue).
-</Callout>
+## Common blockers
 
-## Step-by-step exit
+- **Minimum queued amount:** use the live warning and ETH quote, not a fixed remembered EVE
+  threshold. The minimum is ETH-denominated, so its EVE equivalent changes with price.
+- **AMM paused or NAV unavailable:** normal exit submission may be blocked. Check current
+  state; do not assume a previously displayed quote is still usable.
+- **Keeper delay or insufficient liquidity:** there is no guaranteed completion time.
+  Check request state and eligible actions rather than assuming a pending exit has failed.
+- **Approval pending:** wait for confirmation before submitting Burn. If the amount changes,
+  the app may require a different allowance.
 
-<Steps>
-  <Step>
-    **Open the app and connect your wallet** on Ethereum mainnet.
-  </Step>
-  <Step>
-    **Enter the EVE amount** you want to burn. The app shows your estimated ETH at the current base
-    price.
-  </Step>
-  <Step>
-    **Set your price tolerance.** This bounds how much the price can fall before your queued request
-    is automatically cancelled and your EVE returned.
-  </Step>
-  <Step>
-    **Approve EVE if requested.** Verify the AMM spender and allowance and wait for the approval
-    receipt. Approval does not submit your exit.
-  </Step>
-  <Step>
-    **Confirm Burn separately.** Review the quote after approval and submit the exit transaction.
-    At the dated snapshot it queues; immediate payment requires sufficient free AMM ETH.
-  </Step>
-  <Step>
-    **If queued, wait for the keeper to settle, then Claim.** Check the app for the status of your
-    batch. Once it is processed, call Claim to withdraw your ETH.
-  </Step>
-</Steps>
-
-For a guided walkthrough of your first exit, see [Your first exit](/get-started/burn-and-redeem).
+See [Fees & costs](/using-everstrat/fees-and-costs) and
+[Tracking your position](/using-everstrat/tracking-your-position) for costs and account history.

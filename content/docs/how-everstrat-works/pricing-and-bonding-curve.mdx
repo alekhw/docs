@@ -54,6 +54,13 @@ calmness and Converter swap quote checks are separate protections.
 
 Source: [AMM at the reviewed contracts commit](https://github.com/everstrat-xyz/contracts/blob/157129b7c7f3db06275ecc6697ff0acfab3d9dbe/src/contracts/AMM.sol).
 
+## Bootstrap rules
+
+The first deposit into a fresh deployment must be worth at least **$1,000**
+(`MIN_INITIAL_DEPOSIT_USD`). The protocol permanently mints **1 EVE** to the dead address
+`0x000000000000000000000000000000000000dEaD`; the first depositor receives the remainder.
+This initializes supply once per deployment. It is not a minimum applied to every later deposit.
+
 <Accordions type="single">
   <Accordion title="Formula detail & worked example">
 

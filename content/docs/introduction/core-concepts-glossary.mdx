@@ -1,26 +1,19 @@
 ---
-title: Core concepts glossary
-description: Shared vocabulary used across the product, protocol, app, and data model.
+title: Core concepts
+description: ETH, EVE, NAV, keepers, deposits, and redemptions in plain language.
 ---
 
-## Terms
+These six terms are enough to follow the first-use guides. For implementation vocabulary,
+use the complete [Reference glossary](/reference/glossary).
 
 | Term | Meaning |
 | --- | --- |
-| `EVE` | Protocol ERC-20 shares; the deployed mainnet token reports the name “Everstrat”. |
-| `AMM` | The immutable contract that accepts ETH deposits and handles redemption attempts. |
-| `NAV` | Gross ETH-valued assets minus live priced queued liabilities; token valuation can depend on feeds. |
-| `Live supply` | Total EVE supply minus the escrow corresponding to live priced queued liabilities. |
-| `Connector weight` | AMM parameter used in premium-price calculations. |
-| `Immediate redemption` | Burn settles directly in the AMM because sufficient ETH is available. |
-| `Queued redemption` | EVE escrow in AMM, request metadata in ExitQueue, later processing, then a separate claim. |
-| `Batch pricing` | Keeper action that records the final EVE price for the current exit batch. |
-| `priceTolerance` | User slippage bound used to decide whether a queued request can settle. |
-| `Escape hatch` | Cancellation of an unprocessed request strictly more than three days after pricing. |
-| `KEEPER_ROLE` | Registry role held by the queue and strategy executors for Controller operations. |
+| **ETH** | Ethereum's native asset. You deposit ETH, redeem for ETH, and keep some in your wallet to pay transaction gas. |
+| **EVE** | The protocol's share token. Its value can rise or fall with the managed portfolio. |
+| **NAV** | Net asset value: the portfolio's ETH-valued assets after the protocol's accounting deductions. It is used to value EVE. |
+| **Keeper** | Automation that submits authorized strategy and queue operations when conditions permit. It does not guarantee execution or settlement timing. |
+| **Deposit** | Sending ETH to the protocol to mint EVE at the entry price. |
+| **Redemption** | Exchanging EVE for ETH. The dated deployment snapshot queues new successful exits; after processing, you submit Claim separately. Immediate payment requires enough free AMM ETH. |
 
-## Related References
-
-- [Reference glossary](/reference/glossary)
-- [Queued redemption lifecycle](/protocol/queued-redemption-lifecycle)
-- [Entities](/data/entities)
+Next: [Before you start](/get-started/overview). Detailed NAV, pricing, and queue rules live in
+[How Everstrat Works](/how-everstrat-works/architecture).

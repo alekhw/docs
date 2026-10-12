@@ -1,72 +1,61 @@
 ---
 title: Your first exit
-description: How to burn EVE and redeem ETH on Ethereum mainnet, including immediate and queued exits.
+description: Approve EVE if needed, submit a redemption, and Claim ETH after a queued exit is processed.
 ---
+
+Use Ethereum mainnet and keep ETH in your wallet for gas. Review
+[Before you start](/get-started/overview) and [Fees & costs](/using-everstrat/fees-and-costs).
 
 <Steps>
   <Step>
-    **Select Burn mode.** Use the **Burn** text button beneath the main action to enter
-    exit mode. The input is labelled **You will burn**.
+    **Select Burn mode.** Use the **Burn** text button beneath the main action.
+    The input is labelled **You will burn**.
   </Step>
   <Step>
-    **Enter the amount of EVE to burn.** Type an amount or use the percentage slider to choose a
-    portion of your EVE balance. The balance pill shows your current EVE balance.
+    **Enter an EVE amount.** Type an amount or use the slider to choose part of your balance.
   </Step>
   <Step>
-    **Review the estimated ETH you'll receive.** The app shows the estimated ETH based on the current
-    exit (base) price: net NAV divided by live EVE supply, excluding live priced queue escrow.
+    **Review the ETH estimate and max slippage.** Leave slippage on **Auto** or choose a manual
+    percentage. Read any minimum-size or pending-request warning before continuing.
   </Step>
   <Step>
-    **Set your slippage (`priceTolerance`).** This only matters if your exit gets queued: it sets how
-    much the EVE price can fall between when you submit the request and when the batch settles. If the
-    price drops beyond your tolerance, the request is cancelled and your EVE is returned. Immediate
-    exits don't use it — there, the EVE amount you entered acts as a hard cap on how much is burned
-    (`maxTokensToBurn`), which also caps queued escrow. The transaction reverts if the price
-    moves beyond that input cap. Leave it on
-    **Auto** or enter a manual value.
+    **Approve EVE if requested.** If your allowance is insufficient, the button reads
+    **Approve EVE**. Verify the AMM spender and allowance, then confirm this approval transaction
+    in your wallet and wait for confirmation. Approval lets the AMM transfer EVE; it does not
+    submit your exit or send ETH back. The app skips this step if allowance is already sufficient.
   </Step>
   <Step>
-    **Approve EVE if requested.** Check the AMM spender and allowance, confirm **Approve EVE**
-    in your wallet, and wait for confirmation. Approval does not submit an exit.
-  </Step>
-  <Step>
-    **Click Burn and confirm the separate exit transaction.** Review the quote again after
-    approval. The app displays transaction progress.
+    **Click Burn and confirm the exit transaction.** After approval, check the updated quote
+    and confirm **Burn** separately in your wallet. Wait for the transaction result.
   </Step>
 </Steps>
 
 ## What happens next
 
 At the [dated snapshot](/operations/current-deployments#exit-liquidity-at-this-block), AMM free ETH
-is zero and routine float top-up is disabled, so new successful exits queue. The immediate
-branch below is available only if enough unreserved AMM ETH becomes available.
+is zero and routine float top-up is disabled, so new successful exits queue.
 
-<Tabs items={["Immediate exit", "Queued exit"]}>
+<Tabs items={["Queued exit (current snapshot)", "Immediate exit (conditional)"]}>
   <Tab>
-    If the AMM holds enough free ETH to cover your redemption, you receive ETH in the same
-    transaction. The exit is complete as soon as the transaction confirms — no further action needed.
+    AMM holds your EVE while the request waits in the exit queue. Submission does not mean
+    ETH has been paid.
+
+    1. Review your request on **Portfolio** while keepers price, fund, and process it.
+    2. After successful processing, ETH is credited to your claimable balance.
+    3. Select **Claim** and confirm the separate transaction in your wallet to withdraw that ETH.
+
+    Settlement is not guaranteed. If closed for slippage, the request returns EVE instead of ETH.
+    Strictly more than three days after pricing, an unprocessed request cannot be paid; cancel
+    it to recover EVE. Processed requests must be claimed, and already credited ETH remains claimable.
+    See [Exiting & redeeming](/using-everstrat/exiting-and-redeeming) for conditions.
   </Tab>
   <Tab>
-    If the AMM doesn't hold enough free ETH, your request joins a batch in the exit queue. Here's
-    what happens next:
-
-    1. A keeper prices and processes the batch.
-    2. Once processed, ETH is credited to your account — but not sent automatically (pull-over-push).
-    3. Come back to the app and click **Claim** to withdraw your ETH.
-
-    A **"Pending: [amount] EVE"** card will appear in the app while your request is waiting.
-
-    Review queued requests and available actions on **Portfolio**.
-
-    **Escape hatch:** An unprocessed request can be cancelled **strictly more than 3 days after
-    pricing**, returning EVE. Unpriced requests can be cancelled without that wait.
-    Already processed requests cannot be cancelled, even if you have not claimed their ETH.
-    After the three-day processing window, an unprocessed request cannot be settled at all;
-    cancel it to recover EVE. Already credited ETH remains claimable.
+    Code supports this branch only if enough unreserved AMM ETH becomes available. It is not
+    funded at the dated snapshot. If available and the exit succeeds, EVE is burned and ETH
+    is transferred to your wallet in the same transaction. No separate Claim is needed.
   </Tab>
 </Tabs>
 
-<Callout type="info" title="Full mechanics">
-  For the full mechanics of queued exits, price tolerance, batch timing, and cancellation rules, see
-  [Exiting and redeeming](/using-everstrat/exiting-and-redeeming).
-</Callout>
+The detailed [exit guide](/using-everstrat/exiting-and-redeeming) covers minimum amounts,
+pending-request limits, pauses, and transaction states. Exact pricing and queue rules live in
+[How Everstrat Works](/how-everstrat-works/redemption-queue).

@@ -1,9 +1,9 @@
 {
-  "title": "Engineering",
+  "title": "Contributing",
   "icon": "Blocks",
   "pages": [
-    "monorepo-structure",
-    "workspace-responsibilities",
+    "repository-map",
+    "system-and-responsibilities",
     "cross-workspace-sync-rules",
     "how-docs-should-be-maintained"
   ]
