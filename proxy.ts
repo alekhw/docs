@@ -2,23 +2,37 @@ import { isMarkdownPreferred, rewritePath } from "fumadocs-core/negotiation";
 import { type NextRequest, NextResponse } from "next/server";
 import { siteConfig } from "./lib/config";
 
+// The root route already includes the slash before the optional page path.
+const docsPath =
+  siteConfig.routes.docs === "/"
+    ? "/{*path}"
+    : `${siteConfig.routes.docs}{/*path}`;
+
 const { rewrite: rewriteDocs } = rewritePath(
-  `${siteConfig.routes.docs}{/*path}`,
+  docsPath,
   `${siteConfig.routes.docsContent}{/*path}/content.md`,
 );
 const { rewrite: rewriteSuffix } = rewritePath(
-  `${siteConfig.routes.docs}{/*path}.mdx`,
+  `${docsPath}.mdx`,
   `${siteConfig.routes.docsContent}{/*path}/content.md`,
 );
 
 export default function proxy(request: NextRequest) {
-  const result = rewriteSuffix(request.nextUrl.pathname);
+  let pathname = request.nextUrl.pathname;
+  const legacyPrefix = `${siteConfig.routes.legacyDocs}/`;
+  if (pathname === siteConfig.routes.legacyDocs) {
+    pathname = siteConfig.routes.docs;
+  } else if (pathname.startsWith(legacyPrefix)) {
+    pathname = `${siteConfig.routes.docs}${pathname.slice(legacyPrefix.length)}`;
+  }
+
+  const result = rewriteSuffix(pathname);
   if (result) {
     return NextResponse.rewrite(new URL(result, request.nextUrl));
   }
 
   if (isMarkdownPreferred(request)) {
-    const result = rewriteDocs(request.nextUrl.pathname);
+    const result = rewriteDocs(pathname);
 
     if (result) {
       return NextResponse.rewrite(new URL(result, request.nextUrl));

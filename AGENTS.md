@@ -150,6 +150,7 @@ bun run test:content
 bun run lint
 bun run types:check
 bun run build
+bun run test:markdown
 ```
 
 Important:
@@ -157,6 +158,7 @@ Important:
 - `bun run lint` checks Biome without changing files; `bun run lint:fix` applies safe fixes
 - `bun run docs:gen` refreshes generated `.source` files when docs collections change
 - `bun run types:check` regenerates Next route types before TypeScript checking
+- `bun run test:markdown` checks real HTTP responses on a temporary production server; build first
 
 At minimum, agents touching this workspace should run `bun run lint` unless blocked.
 

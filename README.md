@@ -175,6 +175,7 @@ bun run test:content
 bun run lint
 bun run types:check
 bun run build
+bun run test:markdown
 ```
 
 Notes:
@@ -184,6 +185,8 @@ Notes:
 - `bun run check` combines lint and Next route/TypeScript checks
 - `bun run docs:gen` refreshes generated Fumadocs source files under `.source`
 - `bun run types:check` regenerates Next route types before running TypeScript
+- `bun run test:markdown` requires a production build, starts a temporary local server, and checks
+  Markdown suffix/Accept requests, legacy `/docs/*` paths, HTML responses, and discovery endpoints
 
 ## Writing Documentation
 
