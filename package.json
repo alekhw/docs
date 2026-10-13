@@ -8,6 +8,8 @@
     "start": "next start",
     "docs:gen": "fumadocs-mdx",
     "diagrams:gen": "bun scripts/generate-diagrams.tsx",
+    "test:content": "node --test scripts/docs-protocol-content.test.mjs",
+    "test:markdown": "node --test scripts/docs-markdown-http.test.mjs",
     "types:check": "next typegen && tsc --noEmit",
     "postinstall": "fumadocs-mdx",
     "lint": "biome check .",

@@ -11,8 +11,13 @@ description: How to burn EVE and receive ETH back — covering immediate exits, 
 </Callout>
 
 When you exit Everstrat you burn EVE tokens and receive ETH at the current **base price**
-(`NAV / EVE supply`). There are two exit paths depending on how much free ETH the AMM is holding at
+(`NAV / live EVE supply`, excluding in-window priced queued EVE). There are two exit paths depending on how much free ETH the AMM is holding at
 that moment.
+
+At the [dated snapshot](/operations/current-deployments#exit-liquidity-at-this-block), AMM free ETH
+is zero and routine float top-up is disabled. New successful exits therefore queue. Immediate
+redemption below is a conditional code path if that funding state changes, not a funded alternative
+at this block.
 
 <DocsDiagram name="exit" />
 
@@ -50,9 +55,8 @@ that moment.
   </Step>
   <Step>
     **Keeper prices the batch.** A keeper bot monitors the queue. When conditions are met, it prices
-    the batch, locking in a final base price for all requests in that batch. That price is validated
-    against the AMM's last settled base price, so a batch cannot be priced far from the protocol's
-    checkpointed price.
+    the batch at `AMM.eveBasePriceInETH()`, locking in one price for all requests in that batch.
+    Each request is later checked against its own request-time price and chosen tolerance.
   </Step>
   <Step>
     **Keeper processes the batch.** The keeper sends ETH to cover the batch and marks each request as
@@ -75,8 +79,8 @@ batch. `priceTolerance` sets your floor: if the final batch price has dropped by
 tolerance relative to the price at the time of your request, your request is **closed for slippage** —
 your EVE is returned to you and you receive no ETH. You can resubmit at any time.
 
-`priceTolerance` applies only to queued exits; immediate exits are protected by `maxTokensToBurn`
-instead (see above).
+`maxTokensToBurn` caps EVE input on both paths, including queued escrow at submission.
+`priceTolerance` additionally protects queued settlement.
 
 ## Escape hatch — cancelling a redemption
 
@@ -88,11 +92,15 @@ There are two situations where you can cancel a pending exit and get your escrow
     your request and retrieve your EVE. There is no time constraint for this — you can cancel an
     unpriced batch immediately after submitting.
   </Accordion>
-  <Accordion title="After 3 days from pricing without payout">
+  <Accordion title="More than 3 days after pricing, still unprocessed">
     Once a keeper has priced a batch (`batch.pricedAt` is set), a **3-day clock**
-    (`MAX_BATCH_PROCESSING_TIME`) starts. If 3 days pass after pricing and you have still not received
-    your ETH, you can call `cancelRedemption(batchId)` to reclaim your escrowed EVE. Before that 3-day
-    window expires the call reverts.
+    (`MAX_BATCH_PROCESSING_TIME`) starts. When **more than** 3 days have passed and your request is
+    still unprocessed, you can call `cancelRedemption(batchId)` to reclaim your escrowed EVE.
+    At exactly 3 days, cancellation remains blocked. Once processed, the request cannot be
+    cancelled; withdraw its credited ETH with `claim()`.
+
+    Strictly after this processing deadline, an unprocessed request cannot be settled at all.
+    Waiting longer cannot make it payable; cancel to recover EVE and submit a new request if desired.
 
     Note: the 3-day clock starts from when the batch is **priced**, not from when you submitted your
     exit request.
@@ -119,8 +127,12 @@ There are two situations where you can cancel a pending exit and get your escrow
     is automatically cancelled and your EVE returned.
   </Step>
   <Step>
-    **Confirm the transaction.** If the AMM has enough free ETH, you receive ETH immediately.
-    Otherwise, your request enters the queue.
+    **Approve EVE if requested.** Verify the AMM spender and allowance and wait for the approval
+    receipt. Approval does not submit your exit.
+  </Step>
+  <Step>
+    **Confirm Burn separately.** Review the quote after approval and submit the exit transaction.
+    At the dated snapshot it queues; immediate payment requires sufficient free AMM ETH.
   </Step>
   <Step>
     **If queued, wait for the keeper to settle, then Claim.** Check the app for the status of your

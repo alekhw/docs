@@ -1,22 +1,35 @@
 ---
 title: Entities
-description: The current GraphQL entity model used by the frontend and query examples.
+description: Current GraphQL entities for protocol history, transfers, queue state, and governance.
 ---
 
-## Current Entity Set
+The schema lives in `everstrat-xyz/app/subgraph/schema.graphql`.
 
 | Entity | Purpose |
 | --- | --- |
-| `User` | aggregate wallet-level statistics |
-| `UserActivity` | append-only activity feed |
-| `ExitBatch` | batch-level queue state |
-| `RedemptionRequest` | per-user queued burn lifecycle snapshot |
+| `User` | Wallet-level lifetime aggregates |
+| `UserActivity` | Immutable chronological protocol events, including claims |
+| `TokenHolder` | Indexed EVE holder balance |
+| `TokenTransfer` | Immutable EVE transfers used for position history |
+| `ExitBatch` | Batch pricing and request counts |
+| `RedemptionRequest` | A request's lifecycle snapshot and settlement/refund outcome |
+| `CurrentRedemptionRequest` | Pointer to the current request record |
+| `EscrowDeposit` | Helper recording escrow transfer amount before request creation |
+| `ProtocolStats` | Cumulative protocol/user-flow aggregates |
+| `DailyProtocolMetric` | Per-day activity and flow metrics |
+| `DailyActiveUser` | Per-day user deduplication |
+| `WhitelistAccess` | Latest indexed wallet access state |
+| `WhitelistAccessEvent` | Immutable access grant/removal history |
+| `TimelockOperation` | Scheduled, executed, or cancelled operation and timestamps |
+| `TimelockCall` | Indexed calls within an operation |
+| `TimelockState` | Last indexed minimum delay |
 
-## Why It Works For The App
+## Event versus current state
 
-The app needs both:
+History and request snapshots coexist because one records chronology and the other records
+lifecycle outcomes. Actual wallet balance, claimable ETH, and cancellation eligibility are
+read through RPC before an action.
 
-- append-only chronological events
-- latest request snapshot state
-
-That is why `UserActivity` and `RedemptionRequest` coexist instead of collapsing into one record type.
+Indexed `SCHEDULED` does not itself distinguish Waiting from Ready at the current block.
+Read timelock state and current chain time to establish execution eligibility.
+The current schema is described here; deployment freshness must be checked separately.

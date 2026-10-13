@@ -5,8 +5,8 @@ description: How to burn EVE and redeem ETH on Ethereum mainnet, including immed
 
 <Steps>
   <Step>
-    **Switch the toggle to Burn.** The Mint/Burn toggle is at the top of the form. Select **Burn**
-    (shown in orange) to enter exit mode.
+    **Select Burn mode.** Use the **Burn** text button beneath the main action to enter
+    exit mode. The input is labelled **You will burn**.
   </Step>
   <Step>
     **Enter the amount of EVE to burn.** Type an amount or use the percentage slider to choose a
@@ -14,26 +14,32 @@ description: How to burn EVE and redeem ETH on Ethereum mainnet, including immed
   </Step>
   <Step>
     **Review the estimated ETH you'll receive.** The app shows the estimated ETH based on the current
-    exit (base) price, which equals the portfolio NAV divided by EVE supply.
+    exit (base) price: net NAV divided by live EVE supply, excluding live priced queue escrow.
   </Step>
   <Step>
     **Set your slippage (`priceTolerance`).** This only matters if your exit gets queued: it sets how
     much the EVE price can fall between when you submit the request and when the batch settles. If the
     price drops beyond your tolerance, the request is cancelled and your EVE is returned. Immediate
     exits don't use it — there, the EVE amount you entered acts as a hard cap on how much is burned
-    (`maxTokensToBurn`), and the transaction reverts if the price moves beyond it. Leave it on
+    (`maxTokensToBurn`), which also caps queued escrow. The transaction reverts if the price
+    moves beyond that input cap. Leave it on
     **Auto** or enter a manual value.
   </Step>
   <Step>
-    **Click Burn and approve in your wallet.** Confirm the transaction. The app displays a transaction
-    status dialog while the transaction is processed.
+    **Approve EVE if requested.** Check the AMM spender and allowance, confirm **Approve EVE**
+    in your wallet, and wait for confirmation. Approval does not submit an exit.
+  </Step>
+  <Step>
+    **Click Burn and confirm the separate exit transaction.** Review the quote again after
+    approval. The app displays transaction progress.
   </Step>
 </Steps>
 
 ## What happens next
 
-Depending on how much free ETH the AMM holds at the moment you burn, your exit will be either
-immediate or queued.
+At the [dated snapshot](/operations/current-deployments#exit-liquidity-at-this-block), AMM free ETH
+is zero and routine float top-up is disabled, so new successful exits queue. The immediate
+branch below is available only if enough unreserved AMM ETH becomes available.
 
 <Tabs items={["Immediate exit", "Queued exit"]}>
   <Tab>
@@ -50,9 +56,13 @@ immediate or queued.
 
     A **"Pending: [amount] EVE"** card will appear in the app while your request is waiting.
 
-    **Escape hatch:** If your batch hasn't been paid out within **3 days of being priced** (the clock
-    starts when the keeper prices the batch, not when you submit), you can cancel it and get your EVE
-    back. The **Cancel Pending Burn** action in the app will become available at that point.
+    Review queued requests and available actions on **Portfolio**.
+
+    **Escape hatch:** An unprocessed request can be cancelled **strictly more than 3 days after
+    pricing**, returning EVE. Unpriced requests can be cancelled without that wait.
+    Already processed requests cannot be cancelled, even if you have not claimed their ETH.
+    After the three-day processing window, an unprocessed request cannot be settled at all;
+    cancel it to recover EVE. Already credited ETH remains claimable.
   </Tab>
 </Tabs>
 

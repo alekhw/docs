@@ -11,6 +11,13 @@ description: Approval, burn submission, queued-request blocking, and cancellatio
 - block duplicate current-batch queued burns
 - expose cancellation when protocol rules allow it
 
+The amount label is **You will burn**. Minimum queued-exit feedback belongs only to Burn
+mode and must not appear after switching to Mint. The minimum is conditional on a queued
+exit; it is not a general mint minimum.
+
+Portfolio shows current request actions and claimable ETH independently of historical
+activity. A processed queued exit requires a separate claim.
+
 ## Current Write Shapes
 
 ```solidity

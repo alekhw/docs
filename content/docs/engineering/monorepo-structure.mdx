@@ -1,25 +1,33 @@
 ---
-title: Monorepo structure
-description: Engineering-facing summary of the source monorepo and the standalone documentation repository.
+title: Repository structure
+description: Current standalone repositories and the legacy hackerhouse source history.
 ---
 
-## Main Workspaces
+## Current repositories
 
-The application and landing page currently remain in
-[`Guide-DAO-Organization/hackerhouse`](https://github.com/Guide-DAO-Organization/hackerhouse):
+| Repository | Source responsibilities |
+| --- | --- |
+| [contracts](https://github.com/everstrat-xyz/contracts) | Protocol contracts, interfaces, libraries, tests, deployment scripts, and Mermaid diagrams |
+| [keepers](https://github.com/everstrat-xyz/keepers) | Mimic W1/W2 functions and automation runbooks |
+| [governance](https://github.com/everstrat-xyz/governance) | Safe/timelock proposal payloads, operation IDs, and execution records |
+| [app](https://github.com/everstrat-xyz/app) | Web3 app, Portfolio/Metrics, and `subgraph/` |
+| [website](https://github.com/everstrat-xyz/website) | Landing page |
+| [docs](https://github.com/everstrat-xyz/docs) | This documentation site |
 
-- `frontend-app/landing`
-- `frontend-app/web3-app`
-- `frontend-app/web3-app/subgraph`
-- `smart-contracts`, a submodule pointing to [`everstrat-xyz/contracts`](https://github.com/everstrat-xyz/contracts)
+The app, website, and docs build from their own repository roots.
+Some repositories require organization access even though their deployed sites are public.
 
-The documentation application has moved from `frontend-app/everstrat-docs` into
-[`everstrat-xyz/docs`](https://github.com/everstrat-xyz/docs). Its `app`, `content/docs`,
-`components`, and `lib` directories now live at the repository root.
+## Legacy history
 
-Protocol implementation and supporting Mermaid diagrams live in `everstrat-xyz/contracts`.
+`Guide-DAO-Organization/hackerhouse` contains the source history preceding extraction.
+It is private and requires repository access, so it is not a public contributor entry point. Old references to
+`frontend-app/web3-app`, `frontend-app/landing`, and `frontend-app/everstrat-docs`
+are historical paths. They do not match the current standalone checkout layout.
 
-## Why This Matters
+The docs route retains its old `monorepo-structure` slug for link compatibility.
 
-The docs site builds independently, but its content must stay aligned with the application,
-subgraph, and protocol sources in the other repositories and workspaces.
+## Evidence hierarchy
+
+Use deployed code and pinned chain reads for live behavior, contracts source and tests
+for implementation, app source for UI behavior, and governance payloads for proposed changes.
+Keep proposals separate from execution receipts; repository main can be ahead of deployed code.

@@ -1,30 +1,44 @@
 ---
 title: ExitQueue
-description: The upgradeable queue contract for redemption batches, slippage checks, and escape-hatch closure.
+description: Upgradeable request metadata, batch pricing, liability offsets, and cancellation eligibility.
 ---
 
-## Purpose
+ExitQueue tracks redemption requests; **AMM holds their EVE escrow and claimable ETH**.
 
-`ExitQueue` tracks queued burn requests when immediate redemption is not possible.
+## Lifecycle
 
-## Core Data
+1. AMM escrows EVE and records a request in the current unpriced batch.
+2. Controller prices the batch and opens a new batch.
+3. Controller funds processing through AMM, which applies the request tolerance,
+   burns escrow, and credits claimable ETH.
+4. The user claims ETH from AMM separately.
 
-- current batch id
-- request snapshot per user
-- priced batch metadata
-- processing eligibility
+The registered Controller may price batches. The registered AMM may create, process,
+or close requests. These are registered-address checks; there are no separate AMM or Controller roles.
 
-## Core Rules
+## Accounting
 
-<Steps>
-  <Step>AMM pushes requests into the current batch.</Step>
-  <Step>Controller prices the batch with a final EVE price.</Step>
-  <Step>AMM pulls requests and applies tolerance logic.</Step>
-  <Step>Users can close requests only when closure rules allow it.</Step>
-</Steps>
+`liveRedemptionOffsets()` returns the ETH liability and matching EVE escrow of
+priced, unprocessed requests that are still within their processing window.
+StrategyManager subtracts the liability from gross assets; AMM and performance-fee math
+exclude matching escrow from live supply.
 
-## Timing Constant
+Unpriced requests remain equity. Processed requests instead reserve ETH in AMM
+`lockedForClaims`. Expired, unprocessed requests stop contributing live offsets.
 
-`MAX_BATCH_PROCESSING_TIME = 3 days`
+## Limits and cancellation
 
-That constant matters because it gates the escape hatch after pricing.
+- Maximum **25 live priced batches**.
+- `MAX_BATCH_PROCESSING_TIME = 3 days`, measured from pricing.
+- An unpriced request can be cancelled.
+- A priced, unprocessed request can be cancelled **strictly after** three days.
+  At exactly three days, it is still in the processing window.
+- Strictly after three days, an unprocessed request cannot be processed (`ExitQueueBatchExpired`).
+  Cancellation returns EVE; it does not pay ETH. Already credited ETH remains claimable.
+- A processed request cannot be cancelled; its ETH remains claimable.
+
+Cancellation through AMM can close eligible requests while the queue is paused.
+Pausing normal processing does not erase the user's claim or eligible cancellation.
+
+The keeper's configurable minimum batch age is a separate delay **before pricing**.
+See [Keepers and automation](/contracts/keepers-and-automation).

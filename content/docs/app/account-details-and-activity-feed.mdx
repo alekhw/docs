@@ -1,27 +1,37 @@
 ---
 title: Account details and activity feed
-description: The wallet-specific account dialog, GoldSky-backed profile data, and lifecycle mapping in the activity feed.
+description: RPC-backed current balances and requests, indexed history, and claim-versus-credit semantics.
 ---
 
-## What The Dialog Shows
+## Current state is separate from history
 
-- formatted address and explorer link
-- chain and connector metadata
-- aggregate totals
-- recent protocol activity
-- queued burn cancellation where available
+The account surface shows wallet EVE, claimable ETH, queued requests, and confirmed activity.
+Portfolio holds current state, available actions, lifetime totals, and position history;
+the connected-wallet dialog holds wallet information and historical activity.
+Current balances and request actions are read directly from chain state. Lifetime
+mint/burn totals and the visible activity page do not feed them.
 
-## Data Sources
+The app reads balances, batch metadata, and request closure eligibility at a shared RPC block.
+It loads indexed pending batch IDs independently of activity pagination and checks the
+current batch even when indexing lags. Failed or unknown reads remain distinct from zero.
 
-| Source | Used for |
+## Data sources
+
+| Source | Use |
 | --- | --- |
-| wagmi / RainbowKit | wallet and chain metadata |
-| GoldSky subgraph | profile aggregates and activity history |
-| direct contract write path | cancel queued burn |
+| Wallet connector / wagmi | Wallet identity and supported-chain state |
+| Ethereum RPC | EVE balance, claimable ETH, batch/request state, cancellation eligibility |
+| Goldsky subgraph | Confirmed event history, transfer context, and lifetime aggregates |
+| Contract write flow | Claim and eligible queued cancellation |
 
-## Activity States
+Current request actions are separate from the historical Activity list.
+A past "Burn requested" event remains a submission event after later processing or cancellation;
+it does not establish a request's current actionable state.
 
-The mapper supports:
+## Activity types
+
+The mapper handles approvals/revocations, bootstrap mints, mints, immediate burns,
+queued burns, processed redemptions, cancellations, and claims:
 
 - `APPROVE`
 - `BOOTSTRAP_MINT`
@@ -30,5 +40,16 @@ The mapper supports:
 - `BURN_QUEUED`
 - `BURN_PROCESSED`
 - `CANCEL_REDEMPTION`
+- `CLAIM`
 
-Rendered outcomes include filled, queued, failed, and canceled burn states.
+Processing can credit ETH or return EVE for slippage. Cancellations can be ordinary
+or after expiry. Unknown outcomes display unavailable results rather than fabricated success.
+
+## ETH credited versus ETH claimed
+
+**ETH credited** means a queued request was settled into AMM's claimable balance.
+**ETH claimed** means ETH was actually paid to the wallet. One claim can aggregate multiple
+redemptions, so it must not be assigned an invented one-to-one request association.
+
+Lifetime totals and confirmed activity can lag the chain. Pending transaction status,
+RPC state, and an explorer receipt should be checked separately.

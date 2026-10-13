@@ -1,17 +1,22 @@
 ---
 title: Indexed contracts and events
-description: Which contracts are indexed today and why those particular events exist in the data model.
+description: EVE transfers, AMM payouts, queue snapshots, whitelist history, and timelock events.
 ---
 
-## Indexed Event Surfaces
-
-| Contract | Why it is indexed |
+| Contract | Indexed purpose |
 | --- | --- |
-| `EVE` | approvals before burn |
-| `AMM` | mint, immediate redemption, queued redemption, processed/canceled lifecycle events |
-| `ExitQueue` | batch and request state snapshots |
+| EVE | AMM approvals and token transfers, holder balances, position movement history |
+| AMM | Bootstrap/mint, immediate and queued redemption, processing/cancellation, claims |
+| ExitQueue | Batch pricing and request lifecycle snapshots |
+| Whitelist | Invite/admin grants and wallet removal history |
+| Timelock | Scheduled calls, execution/cancellation, and minimum-delay updates |
 
-## Event Logic
+`RequestPushed` captures metadata needed after request storage is deleted.
+AMM events identify credited versus paid-out ETH.
+`Claimed` can aggregate multiple redemptions and has no per-request association.
 
-`RequestPushed` and `RequestPulled` capture queue state, while AMM emits the user-facing business
-events the frontend wants to show.
+Indexed history can lag. Read current balances, request eligibility, registered peers,
+and timelock operation state through RPC when making a live-state assertion.
+
+The schema and handlers live in `everstrat-xyz/app/subgraph`.
+See [Entities](/data/entities).

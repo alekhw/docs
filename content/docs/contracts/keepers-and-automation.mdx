@@ -1,0 +1,72 @@
+---
+title: Keepers and automation
+description: Mimic W1/W2 functions, authenticated executor contracts, and operational limits.
+---
+
+## Current automation architecture
+
+The current keeper repository contains two Mimic functions written in AssemblyScript.
+The earlier Chainlink CRE and Gelato implementations are retired. The former W4
+freeze-watch workflow was removed; it is not a live monitoring service in this repository.
+
+| Workflow | Off-chain function | On-chain target |
+| --- | --- | --- |
+| W1 | `mimic-functions/queue-keeper` | QueueKeeperExecutor |
+| W2 | `mimic-functions/strategy-keeper` | StrategyKeeperExecutor |
+
+Both executors hold Registry `KEEPER_ROLE`. A Mimic smart account must separately be
+allowed by each executor's caller allowlist to invoke `perform`. An empty caller allowlist
+leaves an executor inert. ADMIN manages the allowlist and operational settings.
+
+These are bounded automation workflows. They can act only through the executor functions
+described below.
+
+## W1: queue pricing and processing
+
+W1 reads batch state and determines eligible queue work. Its payload identifies a batch
+and request-index range; it does not supply an authoritative ETH amount, price, or NAV.
+The executor and protocol re-derive settlement values from on-chain state.
+
+The shared live-priced-batch cap is **25**. Request processing is also bounded by
+configured user limits and available liquidity. At the
+[dated deployment snapshot](/operations/current-deployments), `minBatchAge()` was **24 hours**.
+That age is measured from batch creation. A request that joins an older batch does not
+restart it.
+
+Once priced, a batch has a separate three-day processing window. Processing creates
+claimable ETH in AMM; the user still submits the claim transaction. Requests left unprocessed
+after the window expire; see [The redemption queue](/how-everstrat-works/redemption-queue).
+
+## W2: strategy operations
+
+W2 relays StrategyKeeperExecutor's authoritative `checker()` execution payload.
+The executor selects work in this order:
+
+1. Rebalance.
+2. Withdraw to meet a priced redemption shortfall.
+3. Provide immediate-exit liquidity to AMM when that feature is configured.
+4. Deposit excess Controller ETH.
+5. Harvest eligible performance fees.
+6. Synchronize strategy accounting.
+
+The latest keeper source also suppresses repeated no-op rebalance attempts and applies
+per-action gas fee caps. These off-chain filters may defer work even when a contract view
+reports that work is possible.
+
+At the snapshot, the Controller reserve target was **0.05 ETH**, the minimum withdrawal
+threshold was **0.0001 ETH**, and `exitLiquidityTargetETH()` was **0**. Automatic AMM float
+top-up was therefore disabled; do not promise a permanently funded immediate-exit buffer.
+
+## Availability and operational checks
+
+Execution depends on Mimic task availability and funding, the caller allowlist, RPC access,
+gas policy, pause flags, strategy capacity, feeds, and queue eligibility. A deployed executor
+or a healthy checker response does not prove uninterrupted task operation.
+
+When a registered contract address changes, refresh the Mimic function inputs as specified
+in the cutover runbook. W1 carries configured protocol addresses, while W2 resolves the
+protocol through its executor's Registry.
+
+Sources: [keeper repository](https://github.com/everstrat-xyz/keepers/tree/ec1ab3f79e9cb93e17dc12b663d99e50252ca1f8),
+[cutover runbook](https://github.com/everstrat-xyz/keepers/blob/ec1ab3f79e9cb93e17dc12b663d99e50252ca1f8/docs/MIMIC_CUTOVER.md),
+and [executor contracts](https://github.com/everstrat-xyz/contracts/tree/157129b7c7f3db06275ecc6697ff0acfab3d9dbe/src/contracts/automation).

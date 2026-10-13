@@ -1,23 +1,24 @@
 ---
 title: EVE
-description: The immutable ERC-20 token contract for Everstrat.
+description: Immutable ERC-20 shares used for entry, redemption, and performance-fee dilution.
 ---
 
-## Purpose
+## Deployed properties
 
-`EVE` is the protocol token. It is an immutable ERC-20 with role-based mint and burn privileges.
-
-## Key Properties
-
-| Item | Value |
+| Item | Ethereum mainnet value |
 | --- | --- |
-| Name | `Everything Strategy` |
+| Name | `Everstrat` |
 | Symbol | `EVE` |
 | Decimals | `18` |
-| Upgradeability | none |
-| Role of interest | `MINTER_ROLE` |
+| Upgradeability | None |
+| Mint/burn permission | Registry `MINTER_ROLE` |
 
-## Key Functions
+The name above was read from the deployed token at the
+[dated deployment snapshot](/operations/current-deployments).
+The constructor in contracts main still contains the older name `Everything Strategy`;
+source naming should not override the deployed token's `name()`.
+
+## Privileged supply functions
 
 ```solidity
 function mint(address to, uint256 amount) external
@@ -25,8 +26,15 @@ function burn(uint256 amount) external
 function burnFrom(address account, uint256 amount) external
 ```
 
-## Integration Notes
+All three require MINTER. At the snapshot, both **AMM and StrategyManager** hold that role.
+AMM mints on entry and burns on redemption. StrategyManager mints treasury EVE when
+harvesting eligible performance fees.
 
-- AMM receives `MINTER_ROLE`.
-- Approval events from EVE are indexed because the frontend burn flow depends on `approve(...)`.
-- The subgraph filters approval activity to approvals where `spender == AMM`.
+EVE is a transferable protocol share. Holding it grants no governance role. Its ETH redemption
+price depends on net NAV and live supply, and can decrease.
+
+## App and indexer integration
+
+The burn flow may require approval to AMM. The subgraph records EVE approvals with
+`spender == AMM`, alongside protocol mint/burn and claim events.
+Queued EVE stays in AMM escrow until processed or cancelled.

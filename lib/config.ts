@@ -4,7 +4,7 @@ export const siteConfig = {
   brandName: "Everstrat",
   projectName: "Everstrat",
   description:
-    "Product, protocol, app, data, security, and operations documentation for the Everstrat monorepo.",
+    "Product, protocol, app, data, security, and operations documentation for the Everstrat protocol.",
   locale: "en",
   openGraphLocale: "en_US",
   category: "technology",
@@ -16,7 +16,7 @@ export const siteConfig = {
     "crypto documentation",
     "protocol documentation",
     "smart contracts",
-    "Arbitrum Sepolia",
+    "Ethereum mainnet",
     "GoldSky subgraph",
     "web3 app",
   ],

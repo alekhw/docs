@@ -1,18 +1,43 @@
 ---
 title: Contract addresses
-description: Deployed Everstrat contract addresses on Base Sepolia and Ethereum mainnet.
+description: Ethereum mainnet contract identification and the historical Base Sepolia deployment.
 ---
 
-<Callout type="warn" title="Mainnet is deployed but not open for general entry">
-  **Base Sepolia** (chain id 84532) is a testnet. Its EVE has no monetary value.
-
-  Contracts also exist on **Ethereum mainnet** (chain id 1). That deployment is behind the invite
-  whitelist (`Whitelist.disabled()` is still `false`), so entry requires an invite and setup is
-  still in progress. Do not send funds to the mainnet addresses unless invited. Finding them
-  on-chain is not a launch announcement.
+<Callout type="warn" title="Invite-gated mainnet deployment">
+  Ethereum mainnet uses real ETH. Entry remained invite-gated at the
+  [dated snapshot](/operations/current-deployments). Verify the network and full address. A deployed contract is not an unrestricted
+  launch announcement; do not send ETH directly to a contract address.
 </Callout>
 
-## Base Sepolia (chain id 84532)
+## Ethereum mainnet (chain ID 1)
+
+The canonical [current deployment snapshot](/operations/current-deployments) lists the
+registered core contracts, keeper executors, live settings, and registered strategies.
+The official EVE token is
+[`0x8FE6A43672fCa70d41e112B8426387665fD061EC`](https://etherscan.io/address/0x8FE6A43672fCa70d41e112B8426387665fD061EC).
+
+The dated snapshot records the registered strategy basket and migration operation states.
+Controller 1.1.0 is active after 018. 019/020 are scheduled; the v2 migration has not completed.
+Recheck the snapshot and `StrategyManager.strategies()` as those operations execute.
+Do not use the old "no mainnet strategies" or bootstrap-supply description to assess the deployment.
+
+## Verification
+
+Read Registry's registered keys and StrategyManager's strategy list at a pinned block,
+then compare the intended network, explorer code, and transaction target.
+Controller, StrategyManager, Oracle, ExitQueue, and Converter are listed at their proxy
+addresses. Changing implementation does not change the address integrations call.
+
+App configuration lives in `everstrat-xyz/app`, particularly
+`src/config/index.ts` and `subgraph/config/deployments/mainnet.json`.
+Configuration describes intended integration targets; current on-chain registration
+and execution receipts establish deployed state.
+
+## Historical Base Sepolia (chain ID 84532)
+
+These addresses are retained from the earlier testnet documentation.
+They were **not revalidated in this October 11 audit**, are not the current app network,
+and must not be used for mainnet interaction. Testnet EVE has no monetary value.
 
 | Contract | Address |
 | --- | --- |
@@ -32,47 +57,3 @@ description: Deployed Everstrat contract addresses on Base Sepolia and Ethereum 
 | StrategyKeeperExecutor | `0x97d1bD09b199A56015e55665B24D1932b6585223` |
 
 Look these up on [BaseScan (Sepolia)](https://sepolia.basescan.org/).
-
-## Ethereum mainnet (chain id 1)
-
-Deployed and bootstrap-funded (~1045 EVE supply, NAV held by the Controller), but **invite-gated**:
-the Whitelist invite period is still active, so entry requires an invite. Listed so that anyone who
-finds these contracts on-chain can identify them, not as an invitation to interact with them.
-
-| Contract | Address |
-| --- | --- |
-| Registry | `0x46AA1bd55c19be90d8767e0C22732A7DD31D993D` |
-| Admin timelock (48h) | `0xF0911198Ef0a4b4234546fa5F50d6d1D45091774` |
-| EVE token | `0x8FE6A43672fCa70d41e112B8426387665fD061EC` |
-| AMM | `0x42c618D9457BE7cb3b836F7FD3332E2800C48a8b` |
-| Controller | `0x9097868dcbda5a630729015DE1ddeCd66d74052c` |
-| StrategyManager | `0x94916ab93C669E7c734f844dB019Ce9449a3b5C9` |
-| Oracle | `0xF5B0C0ab00F92f6B8DC5F6314507FACC9c610c26` |
-| ExitQueue | `0x70E284502e99e150Fde1C07B4E8171ffc365423c` |
-| Converter | `0xc8700441A8ca74aE5390F137bf3Dd659CaD570de` |
-| Whitelist | `0x225B517a68A869020D99F51fFf0Ab43D47Ce3B48` |
-| QueueKeeperExecutor | `0xb7D76E4334e9E23B6edFF77e0C05B07E938a090B` |
-| StrategyKeeperExecutor | `0xE94F714fbBF85c421b6FB80D3Ce0DFA20110EA29` |
-
-No strategy is deployed on mainnet yet (`StrategyManager.strategies()` returns an empty list), so
-there is no `UniCLStrat` or converter adapter in the list above. Look these up on
-[Etherscan](https://etherscan.io/).
-
-## Verifying an address
-
-Every address on this page was checked to have contract code on the chain it is listed under. You
-can repeat that check yourself with `eth_getCode`, or by opening the address in the explorer linked
-under each table.
-
-The upgradeable contracts — Controller, StrategyManager, Oracle, ExitQueue, Converter — are listed
-at their **proxy** addresses, which are the addresses to call. The Registry, EVE, and both keeper
-executors are static contracts deployed at the addresses shown.
-
-## Source of truth
-
-These addresses come from the deployment itself and are verified on-chain.
-
-The app config is now in sync with this page: `frontend-app/web3-app/src/config/index.ts` and the
-subgraph config it feeds (`subgraph/config/deployments/mainnet.json`) point at the same mainnet
-deployment. The earlier warning about them pointing at an Ethereum Sepolia deployment no longer
-applies.

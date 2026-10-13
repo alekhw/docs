@@ -19,8 +19,9 @@ explicitly accept two statements:
 1. They understand Everstrat is an experimental protocol in a testing phase,
    have read the [Risk Disclosure](/legal/risk-disclosure), and accept the risk
    of losing their entire deposit.
-2. They confirm they are not a US person and not a citizen or resident of any
-   other restricted jurisdiction.
+2. They confirm they are not a citizen or resident of the United States and are not
+   located in, or a citizen or resident of, another jurisdiction where protocol access
+   is restricted or prohibited by law or sanctions.
 
 Both checkboxes must be checked before **I accept — continue to mint** enables.
 The acknowledgment is stored in `localStorage` per wallet address and chain
@@ -30,8 +31,12 @@ gated, and switching wallets or networks requires acknowledging again.
 
 ## Transaction Shape
 
+When the connected wallet requires a Whitelist voucher, the app simulates and submits:
+
 ```solidity
-AMM.enter(effectiveMinTokensToMint)
+AMM.enterWithInvite(effectiveMinTokensToMint, inviteId, deadline, signature)
 ```
 
-with transaction `value = depositEth`.
+The voucher is attached automatically. For a wallet that no longer requires a voucher,
+it uses `AMM.enter(effectiveMinTokensToMint)`. Both calls send `value = depositEth`.
+Invite access and the browser's risk acknowledgment are distinct from on-chain authorization.

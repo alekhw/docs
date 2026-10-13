@@ -5,8 +5,8 @@ This repository contains the public documentation site for Everstrat.
 The application lives at the root of [`everstrat-xyz/docs`](https://github.com/everstrat-xyz/docs).
 It was extracted from `frontend-app/everstrat-docs` in
 [`Guide-DAO-Organization/hackerhouse`](https://github.com/Guide-DAO-Organization/hackerhouse)
-with its Git history. The application and landing page still live in that source monorepo
-until their separate migrations are completed.
+with its Git history. The application and landing page now live in standalone
+`everstrat-xyz/app` and `everstrat-xyz/website` repositories.
 
 It is built with Fumadocs on top of Next.js App Router and is intended to document the real state of the project across protocol contracts, the web3 client, operational flows, and supporting architecture artifacts.
 
@@ -171,9 +171,11 @@ Default local URL:
 
 ```bash
 bun run docs:gen
+bun run test:content
 bun run lint
 bun run types:check
 bun run build
+bun run test:markdown
 ```
 
 Notes:
@@ -183,6 +185,8 @@ Notes:
 - `bun run check` combines lint and Next route/TypeScript checks
 - `bun run docs:gen` refreshes generated Fumadocs source files under `.source`
 - `bun run types:check` regenerates Next route types before running TypeScript
+- `bun run test:markdown` requires a production build, starts a temporary local server, and checks
+  Markdown suffix/Accept requests, legacy `/docs/*` paths, HTML responses, and discovery endpoints
 
 ## Writing Documentation
 
@@ -223,7 +227,7 @@ a local keyboard-accessible horizontal scroller; print output scales to the page
 When documenting the project:
 
 - prefer concrete, current behavior over aspirational descriptions
-- keep terminology aligned with `smart-contracts` (git submodule → `everstrat-xyz/contracts`), `web3-app`, and the Mermaid architecture diagrams in `smart-contracts/mermaid`
+- keep terminology aligned with `everstrat-xyz/contracts`, `everstrat-xyz/app`, and the Mermaid architecture diagrams in the contracts repository's `mermaid/` directory
 - update docs when protocol flows, permissions, deployment assumptions, or frontend behavior change
 - document user-facing and operator-facing constraints, not just ideal happy paths
 
@@ -232,8 +236,10 @@ When documenting the project:
 This workspace should stay aligned with:
 
 - [`everstrat-xyz/contracts`](https://github.com/everstrat-xyz/contracts): protocol code and Mermaid diagrams
-- [`frontend-app/web3-app`](https://github.com/Guide-DAO-Organization/hackerhouse/tree/main/frontend-app/web3-app): application and subgraph
-- [`frontend-app/landing`](https://github.com/Guide-DAO-Organization/hackerhouse/tree/main/frontend-app/landing): landing page
+- [`everstrat-xyz/app`](https://github.com/everstrat-xyz/app): application and subgraph
+- [`everstrat-xyz/website`](https://github.com/everstrat-xyz/website): landing page
+- [`everstrat-xyz/keepers`](https://github.com/everstrat-xyz/keepers): Mimic automation
+- [`everstrat-xyz/governance`](https://github.com/everstrat-xyz/governance): proposals and execution records
 
 In practice, if those workspaces change, docs often need changes too.
 

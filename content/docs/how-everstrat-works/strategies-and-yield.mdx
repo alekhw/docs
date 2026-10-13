@@ -12,9 +12,9 @@ description: How the keeper deploys pooled ETH into strategies, how UniCLStrat e
 ## How funds reach strategies
 
 You do not choose which strategies receive your ETH. When you deposit, the AMM forwards your ETH to
-the **Controller**. A **keeper** bot then calls the Controller to route ETH through the
+the **Controller**. Mimic automation calls an authenticated keeper executor, which uses Controller to route ETH through the
 **StrategyManager**, which distributes it to registered strategies proportionally according to each
-strategy's configured safety level.
+strategy's governance-set deposit weight, subject to capacity and deposit eligibility.
 
 This means:
 
@@ -28,7 +28,7 @@ This means:
 
 UniCLStrat is the strategy contract Everstrat runs today. Each deployed instance earns yield by
 providing **concentrated liquidity** on one Uniswap V3 pool that pairs WETH with another token.
-Four instances are registered on mainnet, one per pool — see [Live strategies](#live-strategies).
+The registered instance list can change through governance. See [Live strategies](#live-strategies).
 
 <Cards>
   <Card title="Wrap ETH to WETH">
@@ -36,7 +36,7 @@ Four instances are registered on mainnet, one per pool — see [Live strategies]
   </Card>
   <Card title="Swap part of the ETH into the paired token">
     A concentrated position needs both of the pool's tokens, in a ratio set by the current price and
-    the range. The strategy swaps part of its WETH — roughly half while the price sits mid-range — into
+    the range. The strategy swaps part of its WETH into
     the paired token (USDC, USDT, or UNI) via the Converter. That part of the strategy's value then
     moves with the paired token rather than with ETH.
   </Card>
@@ -60,22 +60,35 @@ Four instances are registered on mainnet, one per pool — see [Live strategies]
 
 ## Live strategies
 
-As of September 2026, four UniCLStrat instances are registered with the mainnet StrategyManager:
+The canonical [dated deployment snapshot](/operations/current-deployments#registered-strategies)
+lists registered strategy addresses and pending replacements. The pool set recorded there is:
 
-| Uniswap V3 pool | Fee tier | Strategy | Pool address |
-| --- | --- | --- | --- |
-| USDC / WETH | 0.30% | `0x5E12FFD5e0F69d37B581D06b68ad6c53609cac38` | `0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8` |
-| USDC / WETH | 0.01% | `0x59C476c1817b23791d96F35b9f468E6d9A242252` | `0xE0554a476A092703abdB3Ef35c80e0D76d32939F` |
-| WETH / USDT | 0.30% | `0x3Fb6B9174427CA4FF38728398F4F4CB526F66501` | `0x4e68Ccd3E89f51C3074ca5072bbAC773960dFa36` |
-| UNI / WETH | 0.30% | `0x956fE55DB50527E75c1fcA679adE509AD89cAFDd` | `0x1d42064Fc4Beb5F8aAF85F4617AE8b3b5B8Bd801` |
+| Uniswap V3 pool | Fee tier | Pool address |
+| --- | --- | --- |
+| USDC / WETH | 0.30% | `0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8` |
+| USDC / WETH | 0.01% | `0xE0554a476A092703abdB3Ef35c80e0D76d32939F` |
+| WETH / USDT | 0.30% | `0x4e68Ccd3E89f51C3074ca5072bbAC773960dFa36` |
+| UNI / WETH | 0.30% | `0x1d42064Fc4Beb5F8aAF85F4617AE8b3b5B8Bd801` |
 
 The strategy list can change through governance; `StrategyManager.strategies()` is the source of
-truth. The app's dashboard shows each strategy's pool, capital, and results, and links to the pool
+truth. The app's Metrics page shows each strategy's pool and capital, and links to the pool
 on Uniswap.
 
-Because each position holds both tokens, roughly half of the capital deployed to strategies is held
-in the paired tokens — mostly USD stablecoins — rather than in ETH. The exact split moves with price
-and rebalances.
+Each position can hold both tokens. The split depends on the pool price, tick ranges, idle inventory,
+and rebalances; it is not a fixed 50/50 allocation. Paired assets include USDC, USDT, and UNI.
+
+### UniCL v2 migration status
+
+Contracts [PR #53](https://github.com/everstrat-xyz/contracts/pull/53) merged UniCL v2 on 1 October.
+It adds ratio-aware inventory swaps, incremental liquidity, route-aware withdrawal sizing,
+and a full unwind for near-full withdrawals. Shared logic lives in `UniCLStratLib`.
+
+The dated snapshot confirms Controller 1.1.0 is active after 018, enabling the timelock's
+single-strategy withdrawal. 019 registers the deployed v2 replacements; 020 drains and removes
+v1. Both are scheduled, but neither has executed at that snapshot. Check
+[Current deployments](/operations/current-deployments#pending-migration) and on-chain registration
+for migration progress. Merged source, deployed bytecode, and scheduled operations do not
+by themselves establish the active basket.
 
 ## The calm-period check
 
@@ -83,9 +96,8 @@ UniCLStrat only deposits or rebalances when the pool is **calm**. Calmness is de
 both the pool's current spot tick and a short TWAP (at least 60 seconds) against a longer TWAP. If
 either deviates beyond a configured tolerance, the strategy refuses to act.
 
-This protects against flash-loan attacks and short-term price manipulation: an attacker who pushes the
-pool price in a single block cannot trick the strategy into depositing or rebalancing at a manipulated
-tick, because the TWAP has not moved.
+This limits operations during short-term spot/TWAP divergence. It does not guarantee immunity
+to manipulation, incorrect feed data, or adverse execution.
 
 ## Other guardrails
 
@@ -93,10 +105,12 @@ tick, because the TWAP has not moved.
   NAV past the cap revert.
 - **Swap safety.** Internal swaps are capped at 2% slippage (`MAX_SWAP_SLIPPAGE_BPS = 200`) and
   checked against a Chainlink quote with a 2% maximum deviation (`MAX_QUOTE_DEVIATION_BPS = 200`).
-- **Pause and emergency exit.** Pausing the strategy withdraws its pool liquidity and revokes its
-  Converter allowances. `emergencyExit()` requires the strategy to be paused first, then drains all
-  funds back to the StrategyManager. It is callable by either `ADMIN_ROLE` or `SECURITY_ROLE`
-  (`onlyEitherAuthRole`), consistent with the other emergency capital-recovery paths.
+- **Pause and emergency exit.** Pausing blocks normal strategy operations and attempts a
+  best-effort pool unwind and paired-token allowance revoke. Failures can leave liquidity or
+  tokens unrecovered. `emergencyExit()` requires pause and transfers assets already held by the
+  strategy to StrategyManager; paired-token recovery is best-effort and it does not itself
+  remove remaining pool liquidity. ADMIN or SECURITY may invoke it. Pause is not proof that
+  all capital was recovered.
 
 ## Performance fee
 
@@ -107,7 +121,7 @@ dilutes existing EVE holders proportionally.
 
 | Parameter | Value |
 | --- | --- |
-| Fee rate | Configurable bps rate set on the StrategyManager (`performanceFeeBps`) |
+| Fee rate | **15%** (`performanceFeeBps = 1500`) at the dated deployment snapshot; configurable by governance |
 | Maximum rate | **20%** (`MAX_PERFORMANCE_FEE_BPS = 2000` basis points, enforced on the StrategyManager) |
 | Fee basis | A fraction of accrued LP trading fees from the strategy's Uniswap V3 position (the bps rate is applied to the ETH-equivalent value of uncharged `tokensOwed` growth) |
 | Recipient | DAO treasury |
@@ -125,17 +139,17 @@ which:
 The StrategyManager then mints EVE to the DAO treasury using bonding-curve dilution:
 
 ```text
-evesToMint = (feeETH × EVE_supply) / (totalNAV − feeETH)
+evesToMint = (feeETH × live_supply) / (totalNAV − feeETH)
 ```
 
-This is the same dilution formula the AMM uses for premium-priced deposits. The treasury ends up
+`live_supply` excludes in-window priced queued EVE. The treasury ends up
 owning a larger slice of the protocol; existing EVE holders' share of NAV shrinks proportionally.
 No ETH is transferred out of the protocol and no Converter/WETH unwrap is involved.
 
-**Example.** Suppose `totalNAV = 100 ETH`, `EVE_supply = 1,000 EVE`, and the strategy has accrued
-`10 ETH` of LP trading fees. With a 10% fee rate, `feeETH = 1 ETH`. EVE minted to the treasury =
-`(1 × 1,000) / (100 − 1) ≈ 10.1 EVE`. The treasury now holds ~10.1 EVE; every existing holder's
-share of NAV is diluted by roughly 1%.
+**Example.** Suppose `totalNAV = 100 ETH`, `live_supply = 1,000 EVE`, and eligible
+uncharged LP fees are worth `10 ETH`. At a 15% fee rate, `feeETH = 1.5 ETH`.
+Treasury EVE minted is `(1.5 × 1,000) / (100 − 1.5) ≈ 15.23 EVE`.
+Existing holders' share of NAV is diluted by 1.5%, assuming no other changes.
 
 ## Trade-offs and risks
 
@@ -146,12 +160,11 @@ UniCLStrat carries risks that any concentrated-liquidity strategy carries:
   the underperforming token. The LP position value can fall below the equivalent value of simply
   holding WETH.
 
-  **Not a pure ETH position.** Roughly half of deployed capital is held in the paired tokens, mostly
-  USD stablecoins. Measured in ETH, strategy NAV therefore falls when ETH rises against the dollar and
-  rises when ETH falls, independently of the fees earned.
+  **Mixed-asset exposure.** Capital includes paired tokens and can move differently from ETH.
+  Stablecoin exposure changes ETH-denominated NAV when ETH/USD moves, independently of trading fees.
 
   **Single-contract concentration.** Capital is spread across four pools, but all of them run the
-  same UniCLStrat code. A bug in UniCLStrat could affect all protocol NAV deployed to strategies.
+  same strategy family, with deployment-specific builds. A shared bug could affect multiple pools.
 
   For a full treatment of these and other risks, see [Key risks](/risk-and-trust/key-risks).
 </Callout>

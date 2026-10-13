@@ -1,48 +1,47 @@
 ---
 title: Queued redemption lifecycle
-description: The exact lifecycle for burns that cannot settle immediately in the AMM.
+description: EVE escrow, batch pricing, processing, pull claims, and cancellation boundaries.
 ---
 
 See the [queued exit lifecycle diagram](/how-everstrat-works/redemption-queue#everstrat-queue-diagram).
 
-## Lifecycle Overview
+## Lifecycle
 
-<Steps>
-  <Step>AMM pushes the request into `ExitQueue`.</Step>
-  <Step>The current batch later gets priced by Controller using the AMM base EVE price.</Step>
-  <Step>Queued requests are processed one by one or in ranges.</Step>
-  <Step>Each request either redeems within tolerance or closes due to slippage.</Step>
-  <Step>If the processing window expires, the user may cancel via the escape hatch.</Step>
-</Steps>
+1. AMM escrows EVE and records request metadata in ExitQueue.
+2. Controller prices the current batch using AMM's base price.
+3. Controller processes requests individually or in ranges.
+4. A request within tolerance burns escrow and credits claimable ETH in AMM.
+   An out-of-tolerance request returns EVE instead.
+5. The user submits `AMM.claim()` to withdraw credited ETH.
 
-## User Action vs Keeper Action
+Creating a request, crediting ETH, and claiming ETH are separate states and events.
 
-<Tabs items={["User", "Keeper"]}>
-  <Tab>
-    User can create the queued request through `exit(...)` and later call `cancelRedemption(batchId)`
-    when closure rules allow it.
-  </Tab>
-  <Tab>
-    Keeper prices the batch through Controller and processes requests through AMM / ExitQueue
-    coordination.
-  </Tab>
-</Tabs>
+## User versus keeper actions
 
-## Processing Window
+Users call `exit(...)`, claim already credited ETH, or cancel eligible requests through
+`cancelRedemption(batchId)`. Mimic keeper executors coordinate batch pricing, liquidity,
+and processing through Controller.
 
-`ExitQueue.MAX_BATCH_PROCESSING_TIME` is **3 days**.
+## Timing and accounting
 
-Within that window after pricing:
+`MAX_BATCH_PROCESSING_TIME` is **three days from pricing**.
+During that window, priced, unprocessed requests contribute a liability and matching
+escrow-supply offset. Processing removes the offsets and reserves ETH for claims.
 
-- requests must be processed
-- normal closure is blocked
+Unpriced requests can be cancelled at any time. Priced, unprocessed requests can be
+cancelled only **strictly after** three days; at exactly three days they are still processable.
+After that deadline, an unprocessed request can no longer be paid:
+`pullRequest` reverts with `ExitQueueBatchExpired`. Cancel it to recover EVE; a later redemption
+requires a new request. Expired offsets lapse without a checkpoint reset.
+Processed requests cannot be cancelled and credited ETH remains claimable.
 
-After that window:
+The queue keeper's minimum batch age is counted from batch creation and is separate from this window.
+There is no guaranteed settlement deadline. See [Keepers](/contracts/keepers-and-automation).
 
-- users can close via escape hatch
-- the cancellation outcome is distinguishable in events and subgraph fields
+## Indexing rule
 
-<Callout type="warn" title="Snapshot rule">
-  `ExitQueue.closeRequest()` emits `RequestClosed` after deleting storage. That is why the subgraph
-  must snapshot request fields when the request is first pushed, not at close time.
-</Callout>
+`ExitQueue.closeRequest()` deletes request storage before emitting closure.
+The indexer must preserve request-time fields from the creation event. Claims can combine
+several redemptions and do not carry a per-request association.
+
+See [Activity mapping](/data/activity-feed-mapping) for event semantics.

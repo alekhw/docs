@@ -28,8 +28,9 @@ the portfolio's **net asset value (NAV)**. When you want to exit, you burn EVE a
   </Step>
   <Step>
     **Burn EVE to exit.** When you're ready to leave, you burn your EVE and receive ETH at the current
-    base price. Depending on available liquidity, this happens immediately or through a short queued
-    process.
+    base price. At the [dated snapshot](/operations/current-deployments#exit-liquidity-at-this-block),
+    new successful exits queue; after processing, claim credited ETH separately. The code's
+    immediate branch requires enough unreserved AMM ETH, which was zero at that block.
   </Step>
 </Steps>
 

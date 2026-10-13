@@ -1,21 +1,30 @@
 ---
 title: Transaction modal and status UX
-description: Shared status handling for network switching, confirmation, pending state, success, and errors.
+description: Shared receipt-based outcomes, duplicate protection, and resumable confirmation.
 ---
 
-## Shared Flow
+Approve, Mint, Burn, Cancel, and Claim use the shared tracked transaction flow.
 
-All protocol writes go through a shared transaction UX provider.
+## Sequence
 
-## States
+1. Verify the initiating account and chain, switching network if required.
+2. Simulate the intended write.
+3. Ask the wallet to confirm and submit.
+4. Wait for the receipt and decode its actual outcome and amounts.
+5. Refresh RPC financial state and wait separately for indexer history.
 
-<Steps>
-  <Step>switch network if required</Step>
-  <Step>request wallet confirmation</Step>
-  <Step>wait for on-chain confirmation</Step>
-  <Step>show success or error state</Step>
-</Steps>
+Immediate burns, queued submissions, slippage refunds, cancellations, and claims must not
+share an invented success outcome.
 
-## Why It Matters
+## Reloads and replacements
 
-This is where the app keeps mint, approval, burn, and cancel interactions behaviorally consistent.
+Submitted transaction hashes, account, chain/deployment, and intended action are journaled
+in browser storage. Reloading resumes confirmation; it does **not** resend the transaction.
+Unknown or timed-out confirmation remains retryable rather than being called successful.
+
+Replacement and cancellation transactions need their own receipt outcome.
+The app checks persisted pending transactions and locks duplicate submissions in the current
+instance. Fresh simulation and contract checks remain authoritative for races across tabs.
+
+Browser storage availability can limit confirmation recovery across reloads.
+An indexed-history delay is separate from an on-chain failure.

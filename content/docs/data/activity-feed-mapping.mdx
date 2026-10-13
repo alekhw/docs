@@ -1,23 +1,32 @@
 ---
 title: Activity feed mapping
-description: How raw events become the account dialog's user-facing activity cards.
+description: Confirmed event chronology, settlement outcomes, and independent current request actions.
 ---
 
-## Mapping Strategy
+## Event-first history
 
-The feed is event-first, not snapshot-first.
+Activity records confirmed events. A queued burn submission remains a "Burn requested"
+event after completion; it is not rewritten into current request state.
+Processing, cancellation, and claims have their own timestamps and transaction links.
 
-## Why
+| Event | User-facing meaning |
+| --- | --- |
+| Approval | Allowance granted or revoked |
+| Bootstrap/mint | EVE minted for ETH |
+| Immediate burn | EVE burned and ETH paid in the transaction |
+| Queued burn | EVE escrowed; settlement still pending |
+| Processed redemption within tolerance | EVE burned; ETH credited to claimable balance |
+| Processed redemption outside tolerance | EVE returned; no ETH settlement |
+| Cancellation | EVE returned before pricing or after expiry |
+| Claim | Actual ETH payout, potentially combining multiple redemptions |
 
-- queued burn rows need to be resolved against later terminal events
-- request snapshots alone are not enough to tell the full history
-- delayed indexing should not erase protocol chronology
+An unknown processing result is shown as unavailable and is never assumed to be a successful burn.
+A claim must not be assigned an invented per-request association.
 
-## Final UI States
+## Current actions
 
-- `Approve / Confirmed`
-- `Mint / Filled`
-- `Burn / Queued`
-- `Burn / Filled`
-- `Burn / Failed`
-- `Burn / Canceled`
+Current wallet/claimable balances and request eligibility are read from RPC.
+Claims and cancellations live in Portfolio's Available actions. Historical event cards do not offer them.
+Discovery of pending requests is independent of Activity pagination.
+
+See [Account details and activity](/app/account-details-and-activity-feed).

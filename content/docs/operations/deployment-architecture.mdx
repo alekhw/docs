@@ -1,16 +1,19 @@
 ---
 title: Deployment architecture
-description: The current phased deployment model for immutable contracts, proxies, and setup steps.
+description: Static code, UUPS proxies, configurable dependencies, and automation activation.
 ---
 
 ## Phases
 
-<Steps>
-  <Step>Deploy prerequisites: `EVE` and `ExitQueue`.</Step>
-  <Step>Deploy core management contracts and AMM.</Step>
-  <Step>Grant roles, wire dependencies, revoke setup privileges, and add strategies.</Step>
-</Steps>
+1. Deploy Registry and bind static contracts and initialized management proxies to it.
+2. Register peers and configure token feeds, conversion routes, treasury, and fee parameters.
+3. Configure the timelock and role holders; remove temporary deployment authority.
+4. Deploy and register strategy instances.
+5. Deploy keeper executors, grant KEEPER, configure Mimic tasks, and allowlist their caller.
+6. Verify addresses, versions, settings, and operation receipts before updating integration config.
 
-## Core Principle
+Static contracts are deployed directly. Controller, StrategyManager, Oracle, ExitQueue,
+and Converter use UUPS proxies. Static instances can still have ADMIN-configurable settings.
 
-Immutable contracts are deployed directly. Upgradeable contracts are deployed behind UUPS proxies.
+A strategy deployment, registration, and old-strategy removal are distinct operations.
+A ready timelock upgrade is not an executed one.

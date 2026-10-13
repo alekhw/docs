@@ -7,7 +7,7 @@ See the [subgraph and RPC data-flow diagram](/developers/subgraph-and-data-acces
 
 ## What the subgraph exists to do
 
-- index successful user actions initiated from the web3 app
+- index protocol events whether submitted through the app or another client
 - track keeper-driven queue state transitions that happen after the user transaction
 - serve account profile data and activity history to the frontend
 
@@ -16,6 +16,11 @@ See the [subgraph and RPC data-flow diagram](/developers/subgraph-and-data-acces
 - `AMM`
 - `ExitQueue`
 - `EVE`
+- `Whitelist`
+- `Timelock`
+
+The current schema also indexes token transfers, holder counts, protocol/daily flows,
+whitelist access, and timelock operations. See [Entities](/data/entities).
 
 ## Current deployment target
 
@@ -24,6 +29,6 @@ GoldSky deployment at:
 
 `https://api.goldsky.com/api/public/project_cm7aaq2gvh5ak01wf890nferb/subgraphs/everything-strategy-mainnet/prod/gn`
 
-Source of truth: `frontend-app/web3-app/src/config/index.ts` (`CONFIG.SUBGRAPH_URL`) and
-`frontend-app/web3-app/subgraph/config/deployments/mainnet.json`. For the full deployment
+Source of truth: `everstrat-xyz/app/src/config/index.ts` (`CONFIG.SUBGRAPH_URL`) and
+`everstrat-xyz/app/subgraph/config/deployments/mainnet.json`. For the full deployment
 details see [Subgraph deployments](/operations/subgraph-deployments).

@@ -395,7 +395,7 @@ export const diagrams = {
     description:
       "A queued request is priced by the keeper, processed into claimable ETH, and claimed by the user, with EVE returned on slippage or eligible cancellation.",
     caption:
-      "EVE stays on AMM until processing or cancellation. The keeper prices and processes the batch; the user claims ETH. Cancellation is available before pricing, or after the 3-day processing window if the request remains unprocessed. The clock starts at pricedAt.",
+      "EVE stays on AMM until processing or cancellation. The keeper must process within 3 days of pricedAt; the user then claims ETH. Strictly after 3 days, an unprocessed request cannot settle and must be cancelled to recover EVE. Unpriced requests can be cancelled at any time; already credited ETH remains claimable.",
     width: 816,
     height: 520,
     nodes: [
@@ -481,7 +481,7 @@ export const diagrams = {
           [372, 128],
           [444, 128],
         ],
-        label: { text: "SETTLE", x: 408, y: 104 },
+        label: { text: "≤ 3D", x: 408, y: 104 },
       },
       {
         id: "claim",
@@ -510,7 +510,7 @@ export const diagrams = {
           [244, 360],
         ],
         dashed: true,
-        label: { text: "3D TIMEOUT", x: 296, y: 304 },
+        label: { text: "> 3D EXPIRED", x: 296, y: 304 },
       },
       {
         id: "slippage",

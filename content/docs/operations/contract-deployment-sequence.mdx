@@ -1,19 +1,37 @@
 ---
 title: Contract deployment sequence
-description: Deployment order implied by the scripts and Mermaid deployment architecture.
+description: Registry-first construction, configuration, role finalization, and separate governance changes.
 ---
 
-## Sequence
+## Fresh deployment
 
-1. Deploy `EVE`.
-2. Deploy `ExitQueue` implementation and proxy.
-3. Deploy `Controller` implementation and proxy.
-4. Deploy `Oracle` implementation and proxy, then configure feeds.
-5. Deploy `StrategyManager` implementation and proxy.
-6. Deploy `AMM`.
-7. Grant operational roles and revoke temporary setup powers where intended.
+`script/ProtocolDeployBase.sol` in `everstrat-xyz/contracts` constructs:
 
-## Why Order Matters
+1. Registry.
+2. EVE and the ExitQueue implementation/proxy.
+3. Controller, Oracle, StrategyManager, and Converter implementations/proxies.
+4. Whitelist.
+5. AMM.
 
-Later contracts depend on earlier addresses, especially Controller, StrategyManager, Oracle, AMM,
-and ExitQueue role wiring.
+Initialization binds modules to the Registry. Registering peers, configuring feeds/routes,
+granting roles, and verifying parameters are separate setup steps.
+
+Deploy the timelock and keeper executors, register them, and finalize ADMIN/SECURITY,
+MINTER, and KEEPER grants. Remove temporary deployer authority as specified by the deployment
+scripts. Set the treasury and performance fee explicitly; current production scripts do not
+silently default these environment inputs.
+
+## Automation activation
+
+Keeper executors deploy without allowed `perform` callers.
+Create/configure Mimic tasks and allowlist their exact smart account through ADMIN.
+Deploying a contract or publishing a function alone does not activate automation.
+
+## Strategies and later upgrades
+
+Converters and token feeds must support the strategies' assets and routes.
+A strategy is deployed separately and contributes to the basket only after registration.
+
+Existing deployments use governance upgrade/registration operations rather than repeating
+the entire fresh-deployment sequence. See [Current deployments](/operations/current-deployments)
+for the current Controller/v2 migration boundary.

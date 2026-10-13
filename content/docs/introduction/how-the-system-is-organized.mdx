@@ -1,45 +1,45 @@
 ---
 title: How the system is organized
-description: The relationship between the landing site, docs app, web3 app, contracts, subgraph, and supporting diagrams.
+description: User entry, managed strategies, automation, governance, and indexed app data.
 ---
 
-## Workspace View
+## User and protocol surfaces
 
 <Cards>
-  <Card title="landing" href="/engineering/monorepo-structure">
-    Brand voice, high-level product positioning, and visual reference.
+  <Card title="Website and repositories" href="/engineering/monorepo-structure">
+    Product introduction and current source locations.
   </Card>
-  <Card title="web3-app" href="/app/overview">
-    User-facing protocol client for Ethereum mainnet.
+  <Card title="App" href="/app/overview">
+    Mint/burn, Portfolio, Metrics, wallet state, and history.
   </Card>
-  <Card title="smart-contracts" href="/contracts/overview">
-    Protocol implementation, tests, and deployment scripts.
+  <Card title="Contracts" href="/contracts/overview">
+    Entry, shares, NAV, queue, strategies, and authorization.
   </Card>
-  <Card title="subgraph" href="/data/subgraph-overview">
-    GoldSky indexing layer used by the app.
+  <Card title="Keepers" href="/contracts/keepers-and-automation">
+    Mimic W1/W2 functions and authenticated execution.
+  </Card>
+  <Card title="Governance" href="/governance/roles-permissions-and-admin-powers">
+    Timelocked changes and immediate emergency authority.
+  </Card>
+  <Card title="Indexed data" href="/data/subgraph-overview">
+    Goldsky events and lifecycle history; current actions use RPC state.
   </Card>
 </Cards>
 
-## Runtime Relationship
+## Runtime relationship
 
-<Tabs items={["User path", "Operator path"]}>
-  <Tab>
-    User opens the app, connects a wallet, mints or burns, and then inspects activity through the
-    account dialog.
-  </Tab>
-  <Tab>
-    Operators and keepers interact with Controller, StrategyManager, ExitQueue pricing, and deployment
-    or upgrade workflows outside the web app.
-  </Tab>
-</Tabs>
+Users mint or redeem through AMM. Controller and StrategyManager coordinate registered
+strategies. Mimic functions call authenticated executor contracts to perform routine work.
+ADMIN changes parameters and upgradeable components through governance; SECURITY has
+designated immediate emergency powers.
 
-## Documentation Boundary
+The app reads live state and indexed history. It does not itself price batches or operate
+strategies. Documentation records implementation and dated deployment evidence. It does not
+guarantee uninterrupted operation.
 
-This docs app does not own protocol logic or frontend logic, but it must remain aligned with them.
-That means the docs source of truth is spread across:
+## Source locations
 
-- `smart-contracts/README.md`
-- `frontend-app/web3-app/README.md`
-- `frontend-app/web3-app/src/config/index.ts`
-- `frontend-app/web3-app/subgraph/*`
-- `mermaid/*.md`
+Protocol implementation lives in `everstrat-xyz/contracts/src`; diagrams in `mermaid/`.
+Application features, address configuration, and the subgraph live in
+`everstrat-xyz/app/src` and `everstrat-xyz/app/subgraph`.
+Mimic tasks and governance records have their own repositories.

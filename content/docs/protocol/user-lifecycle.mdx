@@ -10,7 +10,8 @@ description: End-to-end lifecycle from connection to mint, burn, queued settleme
   <Step>Mint EVE by depositing ETH into the AMM.</Step>
   <Step>Hold or later burn EVE through the AMM redemption path.</Step>
   <Step>If liquidity is insufficient, wait for queue pricing and processing or cancel when permitted.</Step>
-  <Step>Review outcome in the account dialog and activity feed.</Step>
+  <Step>Claim credited ETH after successful queued processing.</Step>
+  <Step>Review current state and actions in Portfolio, and confirmed events in Activity.</Step>
 </Steps>
 
 ## Indexed Outcomes
@@ -24,8 +25,10 @@ The subgraph maps user-visible lifecycle events into:
 - `BURN_QUEUED`
 - `BURN_PROCESSED`
 - `CANCEL_REDEMPTION`
+- `CLAIM`
 
 ## Important Constraint
 
-The frontend only checks pending queue state in the **current batch** through direct RPC reads. The
-full historical picture comes from the subgraph, not from those live contract reads alone.
+The frontend checks current-batch state and all discovered indexed pending batch IDs through RPC.
+Pending discovery is independent of Activity pagination. The subgraph supplies history;
+current balances and action eligibility come from RPC.

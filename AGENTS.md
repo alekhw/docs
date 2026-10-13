@@ -1,11 +1,10 @@
 # AGENTS.md
 
 This file defines how agents should work at the root of the `everstrat-xyz/docs` repository.
-The app was extracted from `frontend-app/everstrat-docs` in
-`Guide-DAO-Organization/hackerhouse` with its Git history.
-
-Paths to the application and landing page below refer to the source monorepo, not local
-directories in this repository. Protocol sources and diagrams live in `everstrat-xyz/contracts`.
+This is a standalone repository, extracted from the historical hackerhouse monorepo.
+Protocol, app, website, keepers, and governance sources now live in separate
+`everstrat-xyz` repositories. Resolve their actual checkout locations before reading them;
+historical monorepo paths are not directories in this repository.
 
 It is specific to the Everstrat Docs application.
 
@@ -76,16 +75,23 @@ Agents should:
 
 - write in technical English
 - document current behavior, not speculative future behavior
-- keep terminology consistent with `smart-contracts` (a git submodule tracking `everstrat-xyz/contracts`), `frontend-app/web3-app`, and `smart-contracts/mermaid`
+- use `everstrat-xyz/contracts` for protocol implementation, `everstrat-xyz/app` for UI behavior,
+  `everstrat-xyz/keepers` for automation, and `everstrat-xyz/governance` for proposal payloads
 - prefer explicit constraints, edge cases, and operational details over marketing phrasing
 
-When protocol behavior changes, check whether docs content must be updated.
+For deployment claims, pin a chain block and distinguish proposed, scheduled, Ready, and Done.
+Keep address, setting, and migration state in `content/docs/operations/current-deployments.mdx`;
+link explanatory pages to that dated snapshot. Check deployed versions as well as source main.
+Document code capabilities separately from the funded/configured user path.
+
+Keep local audit reports, scratch evidence, endpoint inventories, and machine-specific paths
+outside publishable content and commits. Publish the corrected docs, not the local audit note.
 
 ## Design Rules
 
 This workspace should visually align with the Everstrat application, especially
 the Portfolio (Dashboard) and Metrics (Stats) screens. The landing page remains a
-secondary brand reference. In the local sibling `../app`, consult
+secondary brand reference. In the `everstrat-xyz/app` checkout, consult
 `src/components/ui/analytics-layout.ts`, `src/features/Header/components/AppHeader.tsx`,
 and the Dashboard and Stats components before changing the docs theme.
 
@@ -139,9 +145,12 @@ Run validation from this repository's root:
 
 ```bash
 bun run docs:gen
+bun run diagrams:gen
+bun run test:content
 bun run lint
 bun run types:check
 bun run build
+bun run test:markdown
 ```
 
 Important:
@@ -149,6 +158,7 @@ Important:
 - `bun run lint` checks Biome without changing files; `bun run lint:fix` applies safe fixes
 - `bun run docs:gen` refreshes generated `.source` files when docs collections change
 - `bun run types:check` regenerates Next route types before TypeScript checking
+- `bun run test:markdown` checks real HTTP responses on a temporary production server; build first
 
 At minimum, agents touching this workspace should run `bun run lint` unless blocked.
 
@@ -165,11 +175,11 @@ At minimum, agents touching this workspace should run `bun run lint` unless bloc
 
 Changes in these locations often require docs updates:
 
-- `smart-contracts/src` (submodule → `everstrat-xyz/contracts`)
-- `smart-contracts/script` (submodule)
-- `frontend-app/web3-app/src/config`
-- `frontend-app/web3-app/src/features`
-- `smart-contracts/mermaid/*.md` (submodule)
+- `everstrat-xyz/contracts`: `src/contracts`, `src/interfaces`, `src/libraries`, `script`, `mermaid`
+- `everstrat-xyz/app`: `src/config`, `src/features`, `src/proxy.ts`, `subgraph`
+- `everstrat-xyz/keepers`: `mimic-functions` and operational runbooks
+- `everstrat-xyz/governance`: proposal payloads and operation IDs, checked against chain receipts
+- `everstrat-xyz/website`: public copy and official community links
 
 If a task touches protocol behavior or frontend behavior outside this workspace, agents should check whether docs now drift from reality.
 

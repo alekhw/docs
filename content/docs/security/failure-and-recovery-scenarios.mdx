@@ -7,21 +7,23 @@ description: What can fail in practice and which recovery path exists today in t
 
 <Accordions type="single">
   <Accordion title="Queue processing is delayed">
-    If a priced batch is not processed within `MAX_BATCH_PROCESSING_TIME`, users can close via the
-    escape hatch. The app surfaces cancellation when that path becomes available.
+    An unprocessed request can no longer be settled strictly more than three days after
+    pricing. Cancelling it returns EVE and pays no ETH; waiting longer does not help.
+    Unpriced requests can be cancelled without that wait.
+    Processed requests instead require a claim. The app checks eligibility from RPC state.
   </Accordion>
   <Accordion title="Queued redemption moves outside tolerance">
     The request can close due to slippage instead of redeeming ETH. In that case the user receives
     token refund semantics rather than settlement.
   </Accordion>
   <Accordion title="Subgraph is behind the chain">
-    The account dialog may lag. Live write gating still depends on direct RPC reads for the current
-    batch, but historical UI can remain eventually consistent until indexing catches up.
+    Historical activity may lag. Balances, claimable ETH, current-batch state, and indexed pending
+    requests are checked through RPC independently of activity pagination.
   </Accordion>
 </Accordions>
 
 ## Operational Recovery
 
-- pause upgradeable contracts when necessary
+- pause designated modules when necessary, including static contracts with pause controls
 - process or close queued requests according to protocol rules
 - re-run or redeploy subgraph versions when indexing assumptions change

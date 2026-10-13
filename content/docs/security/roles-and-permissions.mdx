@@ -1,25 +1,44 @@
 ---
 title: Roles and permissions
-description: The active role model across EVE, AMM, Controller, ExitQueue, StrategyManager, and Oracle.
+description: Registry role authority, contract-address checks, and current mainnet assignments.
 ---
 
-## Role Matrix
+## Registry role model
 
-| Role | Where it appears | Main power |
+All protocol roles are checked through Registry. These assignments were verified at the
+[dated deployment snapshot](/operations/current-deployments).
+
+| Role | Main power | Snapshot holder |
 | --- | --- | --- |
-| `DEFAULT_ADMIN_ROLE` | setup paths | bootstrap role assignment during initialization |
-| `ADMIN_ROLE` | AMM and upgradeable contracts | upgrades, pausing, strategy management, keeper grants |
-| `KEEPER_ROLE` | Controller | strategy operations and queue operations |
-| `CONTROLLER_ROLE` | AMM, ExitQueue, StrategyManager | processing or management privileges granted to Controller |
-| `AMM_ROLE` | ExitQueue | push, pull, and close queue requests |
-| `ORACLE_MANAGER_ROLE` | Oracle | manage price feeds |
-| `MINTER_ROLE` | EVE | mint and burn EVE |
+| `ADMIN_ROLE` | Configuration, role grants, strategy registration, Controller single-strategy withdrawal, unpause, UUPS upgrades | 48-hour timelock |
+| `SECURITY_ROLE` | Pause, designated emergency recovery, supported ERC-20 accounting removal, Whitelist signer revocation | Security Safe |
+| `KEEPER_ROLE` | Controller strategy work, batch pricing and processing | QueueKeeperExecutor and StrategyKeeperExecutor |
+| `MINTER_ROLE` | EVE mint and burn | AMM and StrategyManager |
+| `CONVERTER_CALLER_ROLE` | Converter wrap, unwrap, and swap calls | Authorized registered strategies |
+| `CONVERTER_CALLER_MANAGER_ROLE` | Manage Converter caller grants | Converter |
 
-## Practical Assignments
+Registry's `DEFAULT_ADMIN_ROLE` has **zero holders** at the snapshot. `ADMIN_ROLE` is
+self-administered, so zero default-admin holders does not remove governance authority.
 
-- AMM gets `MINTER_ROLE` on EVE.
-- Controller gets `CONTROLLER_ROLE` where queue and strategy operations require it.
-- Keeper accounts receive `KEEPER_ROLE` on Controller.
-- Oracle manager manages feed configuration on Oracle.
+Controller 1.1.0 accepts ADMIN or KEEPER for `withdrawFromStrategy(address,uint256)`.
+Strategy `emergencyExit()` accepts ADMIN or SECURITY and requires a paused strategy.
+Registry pause affects only the Registry's own guarded functions.
 
-Read also [Governance / roles, permissions, and admin powers](/governance/roles-permissions-and-admin-powers).
+## Contract identity is separate from roles
+
+AMM's redemption processor, ExitQueue's Controller operations, and StrategyManager's routine
+operations authenticate the **registered Controller address**. ExitQueue request insertion,
+pulling, and closure authenticate the **registered AMM address**.
+
+These are `onlyAuthContract(Auth.CONTROLLER)` or `onlyAuthContract(Auth.AMM)` checks.
+The protocol does not define separate `CONTROLLER_ROLE` or `AMM_ROLE` grants for them.
+Oracle feed management uses `ADMIN_ROLE`, with no separate oracle-manager role.
+
+## Automation permission
+
+Mimic calls the executors' `perform()` methods through an allowlisted smart account. That account
+does not itself hold `KEEPER_ROLE`; the executors hold it and recheck each action on-chain.
+See [Keepers and automation](/contracts/keepers-and-automation).
+
+Sources: [Auth](https://github.com/everstrat-xyz/contracts/blob/157129b7c7f3db06275ecc6697ff0acfab3d9dbe/src/libraries/Auth.sol)
+and [Registry](https://github.com/everstrat-xyz/contracts/blob/157129b7c7f3db06275ecc6697ff0acfab3d9dbe/src/contracts/registry/Registry.sol).

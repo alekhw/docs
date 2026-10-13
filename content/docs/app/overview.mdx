@@ -1,34 +1,44 @@
 ---
 title: Overview
-description: The current shipped behavior of the mainnet web3 app.
+description: Mainnet mint/burn, Portfolio, Metrics, and account-state surfaces in the current app source.
 ---
 
-## Current Scope
+## Current routes
 
-The app currently includes:
-
-- wallet connect and wrong-network handling
-- mint and burn form
-- slippage control
-- shared transaction modal
-- account details dialog
-- GoldSky-backed activity feed
-- embedded GeckoTerminal chart
-
-## Current Network Snapshot
-
-| Item | Value |
+| Route | Purpose |
 | --- | --- |
-| Network | Ethereum mainnet |
-| Chain ID | `1` |
-| App name | `Everstrat` |
-| Default subgraph | `prod` GoldSky endpoint (`everything-strategy-mainnet`) |
+| `/mint` | Mint and burn form, approvals, slippage, and transaction status |
+| `/portfolio` | Wallet position, returns, claimable ETH, requests, and history |
+| `/metrics` | Protocol metrics, strategy allocation, and historical/market charts |
 
-## Read Next
+Legacy `/dashboard` and `/stats` routes redirect to Portfolio and Metrics.
+App access remains invite-gated.
+
+## Data and wallet behavior
+
+The app supports Ethereum mainnet (chain ID **1**), wallet connection, and strict
+unsupported-network handling. Direct RPC reads determine wallet balances, claimable ETH,
+and actionable queued requests. Goldsky provides indexed activity and transfer history.
+
+Portfolio uses historical redemption prices to value position movements.
+Metrics combines on-chain reads, indexed history, sampled historical snapshots, and
+GeckoTerminal market data rendered in a native chart. It is no longer documented as
+an embedded GeckoTerminal iframe or a prototype dashboard.
+
+A secondary-market quote is not AMM's protocol redemption price.
+See [Tracking your position](/using-everstrat/tracking-your-position) for calculation
+boundaries and missing-data behavior.
+
+## Source boundary
+
+This page follows
+[app source at 860fec9](https://github.com/everstrat-xyz/app/tree/860fec9affaf1ea5c4d0cf2ca96639ec2889068d).
+A source review does not establish which commit every public deployment currently serves.
 
 <Cards>
   <Card title="Wallet connection and supported chain" href="/app/wallet-connection-and-supported-chain" />
   <Card title="Mint UI" href="/app/mint-ui" />
   <Card title="Burn UI" href="/app/burn-ui" />
-  <Card title="Activity feed" href="/app/account-details-and-activity-feed" />
+  <Card title="Account state and activity" href="/app/account-details-and-activity-feed" />
+  <Card title="Portfolio and Metrics" href="/using-everstrat/tracking-your-position" />
 </Cards>
