@@ -1,98 +1,59 @@
 ---
 title: Depositing & minting
-description: How to deposit ETH and mint EVE, including the bonding curve premium, slippage protection, and the one-time bootstrap rule.
+description: Entry-price expectations, slippage, transaction states, and common deposit problems.
 ---
 
-<Callout type="warn" title="Testing phase — treat as a test protocol">
-  Everstrat is deployed on **Ethereum mainnet** (chain id 1), but it is in a **testing phase** and
-  should be treated as a **test protocol**. Entry is invite-gated, the software is experimental and
-  unaudited, and deposits are real ETH at real risk. Do not deposit more than you can afford to
-  lose entirely.
+<Callout type="warn" title="Real ETH at risk">
+  Everstrat is an experimental, unaudited protocol in a testing phase on Ethereum mainnet.
+  Entry is invite-gated. Deposits are real ETH and can be lost entirely.
 </Callout>
 
-When you deposit ETH you receive **EVE** tokens minted at the current **premium price**. This page
-explains what that price is, how it is calculated, and what to watch out for.
+For the short first-use walkthrough, see [Your first deposit](/get-started/first-mint).
+This page explains what to review and how to interpret a deposit result.
 
 <DocsDiagram name="mint" />
 
-## The premium price
+## Understand the quote
 
-Everstrat uses a bonding curve. There are two prices:
+Deposits mint EVE at the **entry (premium) price**. When the connector weight is below one,
+the entry price is higher than the base price used for redemption. An immediate round trip
+can therefore return less ETH, even before gas. The gap is not an entry fee paid to a fee recipient.
 
-- **Base price** — the redemption value of one EVE, calculated as `NAV / live supply`. This is the price
-  you receive when you *exit*. Live supply is total supply minus in-window priced
-  queued EVE, with the corresponding liability already deducted from NAV.
-- **Premium price** — the price you pay when you *enter*, calculated as
-  `NAV / (live supply × connectorWeight)`. At the snapshot's weight of 0.9, the premium
-  price is higher than the base price. Governance can set the weight to 1, making the prices equal.
+Review [Fees & costs](/using-everstrat/fees-and-costs). Exact formulas, the connector weight,
+and a worked example live in [Pricing & the bonding curve](/how-everstrat-works/pricing-and-bonding-curve).
+[EVE & NAV](/how-everstrat-works/eve-and-nav) explains the accounting behind the quote.
 
-The gap between the two prices is not a protocol fee. It accrues to existing EVE holders, slightly
-increasing the value of every EVE already in circulation. This is by design — the bonding curve rewards
-early participants and provides a buffer that protects the pool against rapid in-and-out cycling.
+## Slippage protection
 
-### Worked example
+The estimated EVE output can change before confirmation. **Max slippage** sets a minimum
+acceptable EVE output (`minTokensToMint`). Leave it on **Auto** or enter a manual percentage.
+If the confirmed transaction cannot meet that minimum, it reverts rather than minting fewer
+tokens. A reverted transaction can still consume gas.
 
-The following numbers are **illustrative** and assume no priced queued offsets.
-They show the math; they are not live values.
+## Deposit transaction states
 
-| Parameter | Value |
-| --- | --- |
-| Total NAV | 1,000 ETH |
-| EVE supply | 1,000 EVE |
-| Connector weight | 0.9 (default) |
+- **Before submission:** check invite access, Ethereum mainnet, your ETH amount, and gas reserve.
+  The first mint for a wallet/network requires the app's risk acknowledgment. Read the
+  [Risk Disclosure](/legal/risk-disclosure) and continue only if both statements are true.
+- **Wallet confirmation:** verify the AMM destination, ETH amount, and gas estimate. Native ETH
+  minting does not require an ERC-20 EVE approval.
+- **Submitted:** a transaction hash means the transaction was sent. Wait for its receipt to confirm success.
+- **Confirmed:** EVE is minted and your wallet balance updates. Review the deposit on **Portfolio**.
+  Indexed activity may take longer to update than current RPC balances.
+- **Cancelled or failed:** declining a wallet prompt does not mint EVE. A reverted transaction does
+  not complete the deposit; check the failure reason before resubmitting.
 
-**Base price** = 1,000 / 1,000 = **1.0 ETH per EVE**
+## Common blockers
 
-**Premium price** = 1,000 / (1,000 × 0.9) = 1,000 / 900 ≈ **1.111 ETH per EVE**
+- **Invite access unavailable:** finish the app's access flow; if required signing access is
+  unavailable, wait rather than sending ETH directly to a contract.
+- **Insufficient ETH:** reduce the deposit and retain enough ETH for gas.
+- **AMM paused or valuation unavailable:** minting cannot proceed until the relevant condition
+  is resolved. A quote shown earlier is not evidence that a new transaction can succeed.
+- **Quote moved beyond slippage:** refresh and review the new output before deciding whether to retry.
+- **First deposit into a new deployment:** the one-time bootstrap has additional conditions.
+  See [Bootstrap rules](/how-everstrat-works/pricing-and-bonding-curve#bootstrap-rules).
+  These rules apply once, when a deployment initializes supply.
 
-You deposit **2 ETH** → you receive roughly 2 / 1.111 ≈ **1.8 EVE**.
-
-After your deposit: NAV = 1,002 ETH, supply = 1,001.8 EVE, so base price ≈ 1,002 / 1,001.8 ≈
-**1.0002 ETH per EVE**. Existing holders' per-EVE value ticked up slightly because you paid a premium
-above base.
-
-<Callout type="info">
-  These are illustrative numbers used to explain the formula. Real-time NAV, supply, and prices are
-  shown in the app.
-</Callout>
-
-## Slippage protection (`minTokensToMint`)
-
-Price can move between the moment you request a deposit and the moment your transaction settles. When
-you submit a deposit you specify `minTokensToMint` — the fewest EVE you are willing to accept. If the
-price moves against you and you would receive fewer EVE than that floor, the transaction reverts
-automatically. You lose only the gas cost.
-
-## The one-time bootstrap rule
-
-The very first deposit into a fresh Everstrat deployment has special rules:
-
-- Your deposit must be worth at least **$1,000** (`MIN_INITIAL_DEPOSIT_USD`).
-- **1 EVE** is permanently minted to a dead address (`0x000…dEaD`) to anchor the supply.
-- You, as the first depositor, receive the remainder of the minted EVE.
-
-This bootstrap step happens only once per deployment. As a regular user joining an already-running
-protocol, you will never encounter it.
-
-## Step-by-step deposit
-
-<Steps>
-  <Step>
-    **Open the app and connect your wallet** on Ethereum mainnet (chain id 1). See
-    [Connect your wallet](/get-started/connect-wallet-and-supported-network) if you need help.
-  </Step>
-  <Step>
-    **Enter the ETH amount** you want to deposit. The app will show you the estimated EVE you will
-    receive at the current premium price.
-  </Step>
-  <Step>
-    **Review the price and slippage floor.** Confirm that the estimated EVE meets your expectations.
-    Adjust the slippage tolerance if needed.
-  </Step>
-  <Step>
-    **Confirm the transaction** in your wallet. Your EVE tokens appear in your balance once the
-    transaction is included in a block.
-  </Step>
-</Steps>
-
-For a guided walkthrough of your first deposit, see [Your first deposit](/get-started/first-mint).
+Next: [Exiting & redeeming](/using-everstrat/exiting-and-redeeming) and
+[Tracking your position](/using-everstrat/tracking-your-position).

@@ -1,40 +1,62 @@
 ---
 title: What is Everstrat?
-description: Product framing for Everstrat and where the older Everything Strategy name still appears.
+description: A plain-language introduction to Everstrat, EVE, and the deposit and redemption loop.
 ---
 
-## Product Positioning
+<Callout type="warn" title="Testing phase — treat as a test protocol">
+  Everstrat is deployed on **Ethereum mainnet** (chain id 1), but it is in a **testing phase**.
+  Entry is invite-gated, the software is experimental and unaudited, and deposits are real ETH
+  at real risk. Do not deposit more than you can afford to lose entirely.
+</Callout>
 
-The landing page positions the product as **Everstrat** with the promise:
-“one click to everything DeFi.”
+Everstrat lets you deposit ETH and receive **EVE**, a token representing your share of a managed,
+on-chain strategy portfolio. Keepers coordinate routine strategy operations. Governance controls
+which strategies are registered and how they are configured.
 
-Across the current repositories, that design resolves into several concrete surfaces:
+EVE's value tracks the portfolio's **net asset value (NAV)**. Strategies can earn or lose value;
+there is no promised return. To exit, you redeem EVE for ETH through the protocol's native market.
+Redemption depends on pause state, available valuation, liquidity, and queue conditions.
 
-- **smart contracts** that accept ETH, mint EVE, and manage redemptions
-- **a web3 app** that exposes mint, burn, and account history on Ethereum mainnet
-- **a subgraph** that turns raw protocol events into account and queue history
-- **docs** that explain how those surfaces relate
+## The core loop
+
+<Steps>
+  <Step>
+    **Deposit ETH and mint EVE.** The app estimates how much EVE your deposit will receive at
+    the entry price. You review the amount, slippage, and risks before confirming in your wallet.
+  </Step>
+  <Step>
+    **Hold EVE.** Its underlying value changes with the strategy portfolio. You can review your
+    position and pending redemptions on **Portfolio**, activity in the wallet account dialog,
+    and protocol information on **Metrics**.
+  </Step>
+  <Step>
+    **Redeem EVE for ETH.** At the [dated snapshot](/operations/current-deployments#exit-liquidity-at-this-block),
+    new exits queue. The AMM holds your EVE in escrow while the request is pending. After
+    processing, you submit a separate **Claim** transaction to withdraw credited ETH.
+    [The redemption queue](/how-everstrat-works/redemption-queue) has the full rules.
+  </Step>
+</Steps>
 
 ## Naming
 
-The product is **Everstrat** everywhere a user sees it: the landing page, the app, and these docs.
-The older name **Everything Strategy** survives in infrastructure identifiers such as the GoldSky
-subgraph slug `everything-strategy-mainnet`. The active mainnet EVE token was redeployed under the
-new name — `name()` on `0x8FE6…61EC` returns `Everstrat`.
+The product is **Everstrat**, and its share token's symbol is **EVE**. The deployed mainnet token
+reports the name **Everstrat**. The older name **Everything Strategy** remains in infrastructure
+identifiers such as the Goldsky subgraph slug `everything-strategy-mainnet`.
+See [EVE contract reference](/contracts/eve) for implementation and deployment details.
 
-## What Users Actually Interact With
+## Risks and limits
 
-Users do not interact with the full protocol stack directly. They mostly see:
+EVE is not a stablecoin, a fixed-APY product, or a guarantee of principal protection. Funds are
+held in protocol contracts and managed strategies, with privileged roles and upgradeable
+components. There is no insurance protecting deposits. Keepers, liquidity, and valuation
+availability affect redemptions.
 
-1. the wallet connection flow
-2. the mint or burn form
-3. transaction status UX
-4. account details and activity history
+Read [Key risks](/risk-and-trust/key-risks), [Trust & governance](/risk-and-trust/trust-and-governance),
+and the [Risk Disclosure](/legal/risk-disclosure) before using the app.
 
-The rest of the system exists to price, custody, distribute, redeem, and index those actions.
+## Where to go next
 
-<Callout type="idea" title="Use the docs in layers">
-  Start with [Get Started](/get-started/overview) if you need the product path. Jump to
-  [Protocol](/protocol/high-level-architecture) or [Contracts](/contracts/overview) if you need
-  implementation detail.
-</Callout>
+- Learn the vocabulary in [Core concepts](/introduction/core-concepts-glossary).
+- Check prerequisites in [Before you start](/get-started/overview).
+- Explore the mechanics in [How Everstrat Works](/how-everstrat-works/architecture).
+- Find source repositories in [Contributing](/contributing/repository-map).

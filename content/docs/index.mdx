@@ -12,23 +12,22 @@ icon: House
 </Callout>
 
 Everstrat lets you deposit ETH to receive EVE tokens, which represent your share of managed on-chain
-strategies. Authenticated keepers coordinate a permissioned Controller. At the
+strategies. Keepers run routine queue and strategy operations through permissioned executor
+contracts. At the
 [dated deployment snapshot](/operations/current-deployments#exit-liquidity-at-this-block),
-new successful exits queue because AMM has no free ETH. After successful processing, you
-claim credited ETH separately. Code supports immediate redemption only if enough free AMM ETH
-becomes available. Pause state, valuation, liquidity, and request rules still apply.
-This site documents the product, protocol, and
-operational details for users, integrators, and contributors.
+new exits queue, and you claim ETH in a separate transaction once your request is processed.
+This site documents the product, protocol, and operational details for users, integrators,
+and contributors.
 
 <Cards>
-  <Card title="Current deployment snapshot" href="/operations/current-deployments">
-    Dated mainnet settings, registered strategies, and migration status.
+  <Card title="Introduction" href="/introduction/what-is-everstrat">
+    What Everstrat is, what EVE represents, and the essential concepts.
   </Card>
   <Card title="Get Started" href="/get-started/overview">
-    Wallet setup, network requirements, first mint, and how to exit your position.
+    Before you start, wallet setup, your first deposit, and your first exit.
   </Card>
-  <Card title="Using Everstrat" href="/using-everstrat/what-is-everstrat">
-    What Everstrat is, how EVE tracks value, and how to read your position in the app.
+  <Card title="Using Everstrat" href="/using-everstrat/depositing-and-minting">
+    Detailed deposit and exit guides, costs, and your position in the app.
   </Card>
   <Card title="How Everstrat Works" href="/how-everstrat-works/architecture">
     System architecture, the mint and redemption paths, and the queued exit model.
@@ -36,4 +35,11 @@ operational details for users, integrators, and contributors.
   <Card title="Risk & Trust" href="/risk-and-trust/key-risks">
     Key risks, trust assumptions, governance controls, and security posture.
   </Card>
+  <Card title="Reference" href="/reference/faq">
+    Frequently asked questions, terminology, and official contract addresses.
+  </Card>
 </Cards>
+
+For dated mainnet settings and migration status, see the
+[current deployment snapshot](/operations/current-deployments). Contributors can start with
+the [repository map](/contributing/repository-map).

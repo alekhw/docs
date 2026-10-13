@@ -1,41 +1,47 @@
 ---
-title: Overview
-description: What Everstrat is, what EVE is, and the three steps to get started on Ethereum mainnet.
+title: Before you start
+description: Network, invite access, ETH for gas, official addresses, and risks to check before using Everstrat.
 ---
 
-<Callout type="warn" title="Testing phase — treat as a test protocol">
-  Everstrat is deployed on **Ethereum mainnet** (chain id 1), but it is in a **testing phase** and
-  should be treated as a **test protocol**. Entry is invite-gated, the software is experimental and
-  unaudited, and deposits are real ETH at real risk. Do not deposit more than you can afford to
-  lose entirely.
+<Callout type="warn" title="Real ETH at risk">
+  Everstrat is an experimental, unaudited protocol in a **testing phase on Ethereum mainnet**.
+  Treat it as a test protocol. Deposits are real ETH and can be lost entirely.
+  An invite grants access only. It does not mean the protocol is safe.
 </Callout>
 
-You deposit ETH and receive **EVE** — a token representing your share of a managed on-chain strategy
-portfolio. A keeper deploys the pooled ETH into yield strategies, and EVE's value tracks the
-portfolio's net asset value (NAV). Exits redeem EVE for ETH, subject to pause state, valuation
-availability, liquidity, and queue rules.
+If you are new to the product, read [What is Everstrat?](/introduction/what-is-everstrat)
+and [Core concepts](/introduction/core-concepts-glossary) first.
+
+## Check before connecting
+
+- **Network:** use Ethereum mainnet, chain id **1**. Testnet ETH cannot fund mainnet transactions.
+- **Access:** entry requires an invite while the invite period is active. Follow the app's access
+  flow before attempting your first deposit.
+- **Wallet and gas:** have ETH for the deposit **and** transaction gas. Approval, exit, and Claim
+  are separate transactions when required. Leave ETH in your wallet instead of depositing its
+  entire balance; the needed gas amount varies with network conditions.
+- **Official deployment:** verify the full addresses against
+  [Contract addresses](/reference/contract-addresses) and the dated
+  [current deployment snapshot](/operations/current-deployments). Ignore unofficial token listings
+  and unsolicited deposit instructions.
+- **Risks and costs:** read [Key risks](/risk-and-trust/key-risks),
+  [Fees & costs](/using-everstrat/fees-and-costs), and the [Risk Disclosure](/legal/risk-disclosure).
+  Do not continue if the app's risk or restricted-person acknowledgment is not true for you.
+
+## First-use sequence
 
 <Cards>
-  <Card title="Connect your wallet" href="/get-started/connect-wallet-and-supported-network" />
-  <Card title="Your first deposit" href="/get-started/first-mint" />
-  <Card title="Your first exit" href="/get-started/burn-and-redeem" />
+  <Card title="Connect your wallet" href="/get-started/connect-wallet-and-supported-network">
+    Connect a supported wallet and use the correct network.
+  </Card>
+  <Card title="Your first deposit" href="/get-started/first-mint">
+    Review the quote, acknowledge risks, and mint EVE.
+  </Card>
+  <Card title="Your first exit" href="/get-started/burn-and-redeem">
+    Approve EVE if needed, submit an exit, and Claim if queued.
+  </Card>
 </Cards>
 
-## What you'll do
-
-<Steps>
-  <Step>
-    **Connect a wallet on Ethereum mainnet.** The app only works on mainnet — it will
-    prompt you to switch if you're on another network. Entry requires a whitelist invite while
-    the invite period is active.
-  </Step>
-  <Step>
-    **Deposit ETH to mint EVE.** Enter an amount, review your estimated EVE, and confirm. EVE's value
-    is tied to the portfolio NAV.
-  </Step>
-  <Step>
-    **Burn EVE to redeem ETH.** When you're ready to exit, burn your EVE. Depending on available
-    liquidity, the exit settles immediately or enters a queue. Queued settlement is not guaranteed
-    to be quick and requires a separate claim.
-  </Step>
-</Steps>
+Exits depend on pause state, valuation, liquidity, and queue rules. Queued settlement has no
+guaranteed deadline. The detailed [exit guide](/using-everstrat/exiting-and-redeeming) explains
+pending requests, credited ETH, and cancellation conditions.

@@ -4,7 +4,7 @@ This repository contains the public documentation site for Everstrat.
 
 The application lives at the root of [`everstrat-xyz/docs`](https://github.com/everstrat-xyz/docs).
 It was extracted from `frontend-app/everstrat-docs` in
-[`Guide-DAO-Organization/hackerhouse`](https://github.com/Guide-DAO-Organization/hackerhouse)
+`Guide-DAO-Organization/hackerhouse` (private; repository access required)
 with its Git history. The application and landing page now live in standalone
 `everstrat-xyz/app` and `everstrat-xyz/website` repositories.
 
@@ -73,6 +73,14 @@ The docs site is root-routed.
 - `/` renders the docs home page
 - `/<slug>` renders additional docs pages
 - `/docs/*` is kept only as a legacy redirect path
+
+Introduction precedes Get Started in the shared desktop/mobile page tree. Product basics live
+in Introduction, short first-use guides in Get Started, detailed app guidance in Using Everstrat,
+and formulas and queue mechanics in How Everstrat Works. Contributor material lives in Contributing.
+
+Consolidated product and contributor pages are removed from `content/docs`, not merely hidden
+from navigation. `next.config.mjs` preserves their old page, `/docs/*`, Markdown export, and
+social image URLs with permanent redirects. Link new content to the canonical destination.
 
 This is intentional because the app is expected to run behind a dedicated docs subdomain.
 
@@ -171,6 +179,7 @@ Default local URL:
 
 ```bash
 bun run docs:gen
+bun run test:docs
 bun run test:content
 bun run lint
 bun run types:check

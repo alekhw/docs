@@ -4,6 +4,7 @@
   "root": true,
   "pages": [
     "index",
+    "introduction",
     "get-started",
     "using-everstrat",
     "how-everstrat-works",
@@ -18,8 +19,7 @@
     "governance",
     "developers",
     "operations",
-    "engineering",
-    "introduction",
+    "contributing",
     "legal"
   ]
 }

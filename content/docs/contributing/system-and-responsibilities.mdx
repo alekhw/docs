@@ -1,0 +1,60 @@
+---
+title: System and responsibilities
+description: Runtime relationships and ownership boundaries across Everstrat's standalone repositories.
+---
+
+## Ownership boundaries
+
+| Repository / directory | Owns |
+| --- | --- |
+| `everstrat-xyz/contracts` | Protocol implementation, role model, deployment scripts, tests |
+| `everstrat-xyz/keepers` | Off-chain Mimic decisions, relay logic, gas policy, task runbooks |
+| `everstrat-xyz/governance` | Proposed and executed privileged operations |
+| `everstrat-xyz/app` | Wallet UX, mint/burn, Portfolio, Metrics, and transaction lifecycle |
+| `everstrat-xyz/app/subgraph` | Indexed event model and deployment configuration |
+| `everstrat-xyz/website` | Landing page and product introduction |
+| `everstrat-xyz/docs` | Public explanations, references, search, and LLM exports |
+
+Documentation describes these boundaries; the logic lives in the owning repository.
+For live protocol assertions, verify chain state as well as source.
+
+## Runtime relationship
+
+Users mint or redeem through AMM. Controller and StrategyManager coordinate registered
+strategies. Mimic functions call authenticated executor contracts to perform routine work.
+ADMIN changes parameters and upgradeable components through governance; SECURITY has
+designated immediate emergency powers.
+
+The app reads live state and indexed history. It does not itself price batches or operate
+strategies. Documentation records implementation and dated deployment evidence. It does not
+guarantee uninterrupted operation.
+
+## User and protocol surfaces
+
+<Cards>
+  <Card title="Repositories" href="/contributing/repository-map">
+    Current source locations and evidence-reading order.
+  </Card>
+  <Card title="App" href="/app/overview">
+    Mint/burn, Portfolio, Metrics, wallet state, and history.
+  </Card>
+  <Card title="Contracts" href="/contracts/overview">
+    Entry, shares, NAV, queue, strategies, and authorization.
+  </Card>
+  <Card title="Keepers" href="/contracts/keepers-and-automation">
+    Mimic W1/W2 functions and authenticated execution.
+  </Card>
+  <Card title="Governance" href="/governance/roles-permissions-and-admin-powers">
+    Timelocked changes and immediate emergency authority.
+  </Card>
+  <Card title="Indexed data" href="/data/subgraph-overview">
+    Goldsky events and lifecycle history; current actions use RPC state.
+  </Card>
+</Cards>
+
+## Source locations
+
+Protocol implementation lives in `everstrat-xyz/contracts/src`; diagrams in `mermaid/`.
+Application features, address configuration, and the subgraph live in
+`everstrat-xyz/app/src` and `everstrat-xyz/app/subgraph`.
+Mimic tasks and governance records have their own repositories.

@@ -147,6 +147,7 @@ Run validation from this repository's root:
 bun run docs:gen
 bun run diagrams:gen
 bun run test:content
+bun run test:docs
 bun run lint
 bun run types:check
 bun run build
