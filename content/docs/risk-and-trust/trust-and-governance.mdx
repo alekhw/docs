@@ -8,6 +8,9 @@ description: Contract and operational trust, immutable code, and the limits of t
   be inferred from deployed contracts. Do not deposit more than you can afford to lose entirely.
 </Callout>
 
+{/* Preserve published section links from the consolidated trust/security pages. */}
+<span id="main-assumptions" className="block scroll-m-28" />
+
 ## What you are trusting
 
 You rely on contract correctness, governance decisions, accurate NAV reporting, and
@@ -43,6 +46,11 @@ backing or access. See [Emergency authority](/risk-and-trust/roles-and-permissio
 for authorization, pause requirements, and limits. AMM claims and eligible cancellations remain
 available during pauses.
 
+<span id="contract-trust-split" className="block scroll-m-28" />
+<span id="immutable-core" className="block scroll-m-28" />
+<span id="upgradeable-management-layer" className="block scroll-m-28" />
+<span id="what-is-more-rigid" className="block scroll-m-28" />
+
 ## Immutable versus upgradeable
 
 | Component | Code model |
@@ -51,9 +59,14 @@ available during pauses.
 | Each UniCL strategy | Immutable instance; replacement uses new deployment and registration |
 | Controller, StrategyManager, ExitQueue, Oracle, Converter | ADMIN-authorized UUPS upgrades |
 
+<span id="design-tradeoff" className="block scroll-m-28" />
+
 Immutable AMM code still depends on configurable peers and upgradeable NAV/queue contracts.
 Immutable strategy code still depends on feeds, routes, and external pools.
 Fixed bytecode does not make economic behavior independent of governance.
+
+<span id="operational-trust-split" className="block scroll-m-28" />
+<span id="what-is-not-trustless" className="block scroll-m-28" />
 
 ## Operational trust
 

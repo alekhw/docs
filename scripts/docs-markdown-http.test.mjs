@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { createServer } from "node:net";
 import { dirname, join, relative } from "node:path";
@@ -201,6 +201,49 @@ test("all historical aliases return a direct 308 with working targets and preser
         : /^text\/html\b/;
     assert.match(target.headers.get("content-type"), expected, rule.source);
     await target.arrayBuffer();
+  });
+});
+
+test("Phase 2 redirects preserve every published heading and diagram fragment", async () => {
+  // Snapshot of heading IDs and diagram anchors before Phase 2 (336e7312).
+  // Fragments are handled by the browser, so checking a redirect's status alone
+  // cannot detect a destination that no longer contains the bookmarked section.
+  const historical = JSON.parse(
+    readFileSync(
+      join(root, "scripts/fixtures/docs-phase2-anchors.json"),
+      "utf8",
+    ),
+  );
+  assert.equal(historical.length, 40);
+  assert.equal(
+    historical.reduce((total, page) => total + page.fragments.length, 0),
+    107,
+  );
+  await each(historical, async ({ source, destination, fragments }) => {
+    for (const prefix of ["", "/docs"]) {
+      const response = await fetch(`${baseUrl}${prefix}${source}`, {
+        redirect: "manual",
+        headers: { Accept: "text/html" },
+      });
+      assert.equal(response.status, 308, `${prefix}${source}`);
+      const location = new URL(response.headers.get("location"), baseUrl);
+      assert.equal(location.pathname, destination, source);
+      // A fragment-free Location lets browsers inherit the original fragment.
+      assert.equal(location.hash, "", source);
+      const target = await fetch(location, { redirect: "manual" });
+      assert.equal(target.status, 200, destination);
+      assert.match(target.headers.get("content-type"), /^text\/html\b/);
+      const ids = [
+        ...(await target.text()).matchAll(/<[^>]+\sid="([^"]+)"/g),
+      ].map((match) => match[1]);
+      for (const fragment of fragments) {
+        assert.equal(
+          ids.filter((id) => id === fragment).length,
+          1,
+          `${prefix}${source}#${fragment} must have exactly one target on ${destination}`,
+        );
+      }
+    }
   });
 });
 
